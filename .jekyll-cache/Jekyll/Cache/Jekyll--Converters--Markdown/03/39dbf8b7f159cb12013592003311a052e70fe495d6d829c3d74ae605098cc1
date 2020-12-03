@@ -1,0 +1,91 @@
+I",&<p>Out of all the new capabilities C# 9 brings, <a href="https://daveabrock.com/2020/07/06/c-sharp-9-deep-dive-records">records are my favorite</a>. With positional syntax, they are <a href="https://daveabrock.com/2020/11/02/csharp-9-records-immutable-default">immutable by default</a>, which makes working with data classes a snap. I love the possibility of maintaining mutable state in C# where appropriate, like for business logic, and maintaining immutability (and data equality!) with records.</p>
+
+<p>And did you know that <a href="https://docs.microsoft.com/aspnet/core/release-notes/aspnetcore-5.0?view=aspnetcore-5.0#model-binding-and-validation-with-c-9-record-types">with ASP.NET Core 5, model binding and validation supports record types</a>?</p>
+
+<p>In the last post about <a href="https://daveabrock.com/2020/11/16/httprepl-openapi-swagger-netcoreapis">OpenAPI support in ASP.NET Core 5</a>, I used a sample project that worked with three <em>very simple</em> endpoints (or controllers): <code class="language-plaintext highlighter-rouge">Bands</code>, <code class="language-plaintext highlighter-rouge">Movies</code>, and <code class="language-plaintext highlighter-rouge">People</code>. Each model was in its own class, like this:</p>
+
+<p><code class="language-plaintext highlighter-rouge">Band.cs</code>:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System.ComponentModel.DataAnnotations</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">HttpReplApi.Models</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">Band</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="kt">int</span> <span class="n">Id</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+
+        <span class="p">[</span><span class="n">Required</span><span class="p">]</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">Name</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">Movie.cs</code>:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System.ComponentModel.DataAnnotations</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">HttpReplApi.Models</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">Movie</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="kt">int</span> <span class="n">Id</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+
+        <span class="p">[</span><span class="n">Required</span><span class="p">]</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">Name</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">public</span> <span class="kt">int</span> <span class="n">ReleaseYear</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">Person.cs</code>:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System.ComponentModel.DataAnnotations</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">HttpReplApi.Models</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">Person</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="kt">int</span> <span class="n">Id</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+
+        <span class="p">[</span><span class="n">Required</span><span class="p">]</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>I can simplify these with using records instead. In the root, I’ll just create an <code class="language-plaintext highlighter-rouge">ApiModels.cs</code> file (I could have them in the controllers themselves, but that feels … messy):</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System.ComponentModel.DataAnnotations</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">HttpReplApi</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="n">record</span> <span class="nf">Band</span><span class="p">(</span><span class="kt">int</span> <span class="n">Id</span><span class="p">,</span> <span class="p">[</span><span class="n">Required</span><span class="p">]</span> <span class="kt">string</span> <span class="n">Name</span><span class="p">);</span>
+    <span class="k">public</span> <span class="n">record</span> <span class="nf">Movie</span><span class="p">(</span><span class="kt">int</span> <span class="n">Id</span><span class="p">,</span> <span class="p">[</span><span class="n">Required</span><span class="p">]</span> <span class="kt">string</span> <span class="n">Name</span><span class="p">,</span> <span class="kt">int</span> <span class="n">ReleaseYear</span><span class="p">);</span>
+    <span class="k">public</span> <span class="n">record</span> <span class="nf">Person</span><span class="p">(</span><span class="kt">int</span> <span class="n">Id</span><span class="p">,</span> <span class="p">[</span><span class="n">Required</span><span class="p">]</span> <span class="kt">string</span> <span class="n">FirstName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">LastName</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>After I <a href="https://github.com/daveabrock/HttpReplApi/blob/master/HttpReplApi/Data/SeedData.cs">change my <code class="language-plaintext highlighter-rouge">SeedData</code> class to use positional parameters</a>, I am good to go—this took me about 90 seconds.</p>
+
+<p>For some fun, if I grab a movie by ID, I can use the deconstruction support to get out my properties. (I’m using a discard since I’m not doing anything with the first argument, the <code class="language-plaintext highlighter-rouge">Id</code>.)</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="nf">HttpGet</span><span class="p">(</span><span class="s">"{id}"</span><span class="p">)]</span>
+<span class="k">public</span> <span class="k">async</span> <span class="n">Task</span><span class="p">&lt;</span><span class="n">ActionResult</span><span class="p">&lt;</span><span class="n">Movie</span><span class="p">&gt;&gt;</span> <span class="nf">GetById</span><span class="p">(</span><span class="kt">int</span> <span class="n">id</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">var</span> <span class="n">movie</span> <span class="p">=</span> <span class="k">await</span> <span class="n">_context</span><span class="p">.</span><span class="n">Movies</span><span class="p">.</span><span class="nf">FindAsync</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">movie</span> <span class="k">is</span> <span class="k">null</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nf">NotFound</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="kt">var</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">year</span><span class="p">)</span> <span class="p">=</span> <span class="n">movie</span><span class="p">;</span>
+    <span class="n">_logger</span><span class="p">.</span><span class="nf">LogInformation</span><span class="p">(</span><span class="s">$"We have </span><span class="p">{</span><span class="n">name</span><span class="p">}</span><span class="s"> from </span><span class="p">{</span><span class="n">year</span><span class="p">}</span><span class="s">"</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="n">movie</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+:ET

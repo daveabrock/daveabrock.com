@@ -1,0 +1,219 @@
+I"K<p>This is part 4 in a four-part series on .NET native feature flags:</p>
+
+<ul>
+  <li>Part 1: <a href="https://daveabrock.com/2020/05/24/introducing-feature-management-copy">Introducing the <code class="language-plaintext highlighter-rouge">Microsoft.FeatureManagement</code> library</a></li>
+  <li>Part 2: <a href="https://daveabrock.com/2020/05/30/introducing-feature-management-aspnetcore">Use Microsoft.FeatureManagement.AspNetCore to filter actions and HTML</a></li>
+  <li>Part 3: <a href="https://daveabrock.com/2020/06/07/custom-filters-in-core-flags">Implement custom filters in your ASP.NET Core feature flags</a></li>
+  <li>Part 4, this post: Manage feature flags with Azure App Configuration</li>
+</ul>
+
+<p>Throughout this blog series, we’ve done a test drive on all that native .NET feature flags have to offer. We’ve created a basic toggle, filtered view components and controller actions in ASP.NET Core, and written our own filters. However, you may have noticed something: these settings are all driven by our configuration in the <code class="language-plaintext highlighter-rouge">appsettings.json</code> file. So, turning these flags off and on requires an update to the configuration file and a re-deploy. You can simplify this with release variables in your pipeline with your favorite tool (like Jenkins, GitHub Actions, or Azure DevOps, for example), but this is such a drag.</p>
+
+<p>In this post, we’ll be able to make your life easier by storing features in Azure App Configuration. Once you connect your App Configuration instance with your app, you’ll be able to enable/disable your feature flags, literally, with a click of a button in Azure - no configuration change or redeploy required.</p>
+
+<p>In <a href="https://daveabrock.com/2020/06/07/custom-filters-in-core-flags">the last post</a>, we implemented functionality to display an emergency banner on our site in case unforeseen circumstances happen (go figure). It involved a verbose application setting in <code class="language-plaintext highlighter-rouge">appsettings.json</code>:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"FeatureManagement"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"EmergencyBanner"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"EnabledFor"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"Name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Microsoft.TimeWindow"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"Parameters"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"Start"</span><span class="p">:</span><span class="w"> </span><span class="s2">"01 Jan 2020 12:00:00 +00:00"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"End"</span><span class="p">:</span><span class="w"> </span><span class="s2">"01 Jul 2020 12:00:00 +00:00"</span><span class="w">
+          </span><span class="p">}</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>With our feature in Azure App Configuration, we can remove this from our application and manage the feature, including specific time window and whether it is on or off, right in Azure. This post will refactor what we built in the last post to a cleaner solution using Azure App Configuration.</p>
+
+<p>This post covers the following content.</p>
+
+<ul>
+  <li><a href="#project-setup">Project setup</a></li>
+  <li><a href="#set-up-azure-app-configuration">Set up Azure App Configuration</a>
+    <ul>
+      <li><a href="#create-new-azure-app-configuration-instance">Create new Azure App Configuration instance</a></li>
+      <li><a href="#add-feature-to-azure-app-configuration">Add feature to Azure App Configuration</a></li>
+    </ul>
+  </li>
+  <li><a href="#refactor-and-simplify-your-application">Refactor (and simplify!) your application</a>
+    <ul>
+      <li><a href="#add-connection-string-to-your-local-secrets">Add connection string to your local secrets</a></li>
+      <li><a href="#update-host-builder-configuration">Update host builder configuration</a></li>
+      <li><a href="#change-view">Change view</a></li>
+      <li><a href="#clean-up-controller-and-configuration">Clean up controller and configuration</a></li>
+    </ul>
+  </li>
+  <li><a href="#next-steps">Next steps</a></li>
+</ul>
+
+<p>Ready to party in the cloud? Of course you are. Let’s get started.</p>
+
+<h1 id="project-setup">Project setup</h1>
+
+<p>Before getting started, please refer to the <a href="https://daveabrock.com/2020/06/07/custom-filters-in-core-flags">the last post</a> by implementing the emergency banner functionality.</p>
+
+<p>Once you’ve done you’ll need to install the <code class="language-plaintext highlighter-rouge">Microsoft.Extensions.ConfigurationAzureAppConfiguration</code> NuGet package, either from the NuGet Package Manager UI in Visual Studio or the CLI.</p>
+
+<p>Once that is installed, confirm your <code class="language-plaintext highlighter-rouge">Startup.cs</code> file looks like the following:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">void</span> <span class="nf">ConfigureServices</span><span class="p">(</span><span class="n">IServiceCollection</span> <span class="n">services</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">services</span><span class="p">.</span><span class="nf">AddControllersWithViews</span><span class="p">();</span>
+    <span class="n">services</span><span class="p">.</span><span class="nf">AddFeatureManagement</span><span class="p">().</span><span class="n">AddFeatureFilter</span><span class="p">&lt;</span><span class="n">TimeWindowFilter</span><span class="p">&gt;();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now that we have our application set up, let’s go set up Azure App Configuration.</p>
+
+<h1 id="set-up-azure-app-configuration">Set up Azure App Configuration</h1>
+
+<p>Before you get started with this section, confirm that you have an <a href="https://azure.microsoft.com/free">Azure account ready to go</a>. Once it is, head on over to the Azure Portal at <a href="https://portal.azure.com">portal.azure.com</a>. Now you’re ready to create a new Azure App Configuration instance.</p>
+
+<p class="notice--warning"><strong>Heads up!</strong> Azure is famous for continuously tweaking their UI, so screenshots may not always be up to date, but shouldn’t change too much.</p>
+
+<h2 id="create-new-azure-app-configuration-instance">Create new Azure App Configuration instance</h2>
+
+<p>Once you’re in the portal, do the following to create a new Azure App Configuration instance:</p>
+
+<ol>
+  <li>Click the <strong>+Create a Resource</strong> button, in the top-left corner of the portal</li>
+  <li>Search for <strong>App Configuration</strong> and click on the suggested result</li>
+  <li>Click <strong>Create</strong> to begin the creation process</li>
+  <li>Select an appropriate Azure subscription</li>
+  <li>Select (or create a new) resource group</li>
+  <li>Select your desired location</li>
+  <li>Select your pricing tier. The <strong>Free</strong> tier should suffice for this demo  (reference <a href="https://azure.microsoft.com/pricing/details/app-configuration/">this article</a> for a full comparison)</li>
+  <li>Click <strong>Review + Create</strong>, then <strong>Create</strong>, to create an Azure App Configuration instance.</li>
+</ol>
+
+<p>After a few minutes, your instance is live. Click the <strong>Go to resource</strong> button to navigate to it.</p>
+
+<h2 id="add-feature-to-azure-app-configuration">Add feature to Azure App Configuration</h2>
+
+<p>With an instance of Azure App Configuration, we’re now ready to add our <strong>EmergencyBanner</strong> feature flag to it.</p>
+
+<p>To add our feature flag in Azure App Configuration, perform the following steps:</p>
+
+<ol>
+  <li>Click the <strong>Feature manager</strong> menu option</li>
+  <li>Click <strong>+Add</strong> to add a feature</li>
+  <li>Change the state to <strong>On</strong></li>
+  <li>For <strong>Key</strong>, enter <strong>EmergencyBanner</strong>.</li>
+  <li>Enter some text in the <strong>Description</strong> field, such as <strong>Used to display an emergency message for delayed packages</strong>. (We left the Labels field blank, but it definitely comes in handy for grouping similar features by type or deployment environment.)</li>
+  <li>Now, click <strong>+Add Filter</strong> to enter a date range for when this message will be active.</li>
+  <li>For <strong>Key</strong>, enter <strong>Microsoft.TimeWindow</strong>, the namespace used in our project. Then, click the ellipses to the right, and click <strong>Edit parameters</strong>.</li>
+  <li>Here, you will set two name/value pairs, and click <strong>Apply</strong>. It is crucially important that these are valid UTC dates. Also, if you are seeing this post past July 2020 (hello, future!) feel free to adjust the dates to your liking.
+    <ul>
+      <li><strong>Start</strong>: “01 Jan 2020 12:00:00 +00:00”</li>
+      <li><strong>End</strong>: “01 Jul 2020 12:00:00 +00:00”</li>
+    </ul>
+  </li>
+  <li>Click <strong>Apply</strong> once more to create your conditional feature flag in Azure App Configuration. Here’s a snapshot of what your configuration should look like:</li>
+</ol>
+
+<p><img src="http://localhost:4001/images/TimeWindow-AppConfig.PNG" alt="Time window configuration" /></p>
+
+<p>Great! We are now ready for refactor our application to see this in action. Before you do this, however, navigate to <strong>Access keys</strong> from your Azure App Configuration instance, and copy a connection string (primary or secondary is fine).</p>
+
+<h1 id="refactor-and-simplify-your-application">Refactor (and simplify!) your application</h1>
+
+<p>Now, we’re ready to refactor our application to reflect the new value in Azure App Configuration.</p>
+
+<h2 id="add-connection-string-to-your-local-secrets">Add connection string to your local secrets</h2>
+
+<p>How do we bring in the feature flag we created? Well, we could paste the connection string right into our <code class="language-plaintext highlighter-rouge">appsettings.json</code> file, but that’s neither safe nor secure. Instead, let’s use <a href="https://docs.microsoft.com/aspnet/core/security/app-secrets?view=aspnetcore-3.1&amp;tabs=windows">our Secret Manager</a>. To get started with this, right-click your solution and click <strong>Manage User Secrets</strong>. That will open a blank JSON file, where you can safely store your application secrets outside of your application configuration.</p>
+
+<p>Update the file to the following:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"FeatureFlagsConnectionString"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;your connection string&gt;"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="update-host-builder-configuration">Update host builder configuration</h2>
+
+<p>Next, you will update your host builder configuration to connect to your Azure Application instance. Modify your <code class="language-plaintext highlighter-rouge">CreateHostBuilder</code> method in <code class="language-plaintext highlighter-rouge">Program.cs</code> to the following:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="n">IHostBuilder</span> <span class="nf">CreateHostBuilder</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span> <span class="p">=&gt;</span>
+    <span class="n">Host</span><span class="p">.</span><span class="nf">CreateDefaultBuilder</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="p">.</span><span class="nf">ConfigureWebHostDefaults</span><span class="p">(</span><span class="n">webBuilder</span> <span class="p">=&gt;</span>
+            <span class="n">webBuilder</span><span class="p">.</span><span class="nf">ConfigureAppConfiguration</span><span class="p">((</span><span class="n">hostingContext</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span> <span class="p">=&gt;</span>
+            <span class="p">{</span>
+                <span class="kt">var</span> <span class="n">settings</span> <span class="p">=</span> <span class="n">config</span><span class="p">.</span><span class="nf">Build</span><span class="p">();</span>
+                <span class="n">config</span><span class="p">.</span><span class="nf">AddAzureAppConfiguration</span><span class="p">(</span><span class="n">options</span> <span class="p">=&gt;</span>
+                <span class="p">{</span>
+                    <span class="n">options</span><span class="p">.</span><span class="nf">Connect</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s">"FeatureFlagsConnectionString"</span><span class="p">]);</span>
+                    <span class="n">options</span><span class="p">.</span><span class="nf">UseFeatureFlags</span><span class="p">();</span>
+                <span class="p">});</span>
+            <span class="p">})</span>
+        <span class="p">.</span><span class="n">UseStartup</span><span class="p">&lt;</span><span class="n">Startup</span><span class="p">&gt;());</span>
+</code></pre></div></div>
+
+<p>What did you do here? At startup, you are connecting to your Azure App Configuration instance, with your feature flag that you specified in the Secret Manager. (For performance, if you are loading a bunch of feature flag configurations, you should consider <a href="https://docs.microsoft.com/azure/azure-app-configuration/enable-dynamic-configuration-aspnet-core?tabs=core3x">using a sentinel key here</a>.)</p>
+
+<h2 id="change-view">Change view</h2>
+
+<p>In the previous post, we had a model property that checked if a flag was active. Now, we can just do a simple check in <code class="language-plaintext highlighter-rouge">Views/Home/Index.cshtml</code>:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@inject Microsoft.FeatureManagement.IFeatureManager featureManager
+
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"text-center"</span><span class="nt">&gt;</span>
+        @if (await featureManager.IsEnabledAsync(FeatureFlags.EmergencyBanner))
+        {
+            <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"alert alert-warning"</span> <span class="na">role=</span><span class="s">"alert"</span><span class="nt">&gt;</span>
+                Because of unexpected delays, your deliveries might take longer. Thank you for your patience.
+            <span class="nt">&lt;/div&gt;</span>
+        }
+    <span class="nt">&lt;/div&gt;</span>
+</code></pre></div></div>
+
+<p>Excellent! Before we run this, let’s clean up what we don’t need.</p>
+
+<h2 id="clean-up-controller-and-configuration">Clean up controller and configuration</h2>
+
+<p>Remember this mess in <code class="language-plaintext highlighter-rouge">appsettings.json</code>? Delete it, you don’t need it!</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"FeatureManagement"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"EmergencyBanner"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"EnabledFor"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"Name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Microsoft.TimeWindow"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"Parameters"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"Start"</span><span class="p">:</span><span class="w"> </span><span class="s2">"01 Jan 2020 12:00:00 +00:00"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"End"</span><span class="p">:</span><span class="w"> </span><span class="s2">"01 Jul 2020 12:00:00 +00:00"</span><span class="w">
+          </span><span class="p">}</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Also, in your <code class="language-plaintext highlighter-rouge">HomeController.cs</code>, you can change back the default action to its default state:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="n">IActionResult</span> <span class="nf">Index</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nf">View</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>You can also delete <code class="language-plaintext highlighter-rouge">IndexViewModel.cs</code>, if you prefer.</p>
+
+<p>Now, run the app!</p>
+
+<p><img src="http://localhost:4001/images/timewindow.png" alt="After turning on flag" /></p>
+
+<h1 id="next-steps">Next steps</h1>
+
+<p>I hope you enjoyed walking through setting feature flags in Azure App Configuration. Working with the Azure UI was great, but to take it to the next level consider scripting this using the Azure CLI. Microsoft <a href="https://docs.microsoft.com/azure/azure-app-configuration/scripts/cli-create-service">has some sample scripts</a> to help you get started.</p>
+
+<p>This completes my series on exploring .NET feature management. I hope you enjoyed it. I only scratched the surface, admittedly - go explore for yourself and let me know how you’re using it!</p>
+:ET

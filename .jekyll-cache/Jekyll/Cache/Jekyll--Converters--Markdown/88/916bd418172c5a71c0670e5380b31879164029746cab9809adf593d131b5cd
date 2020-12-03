@@ -1,0 +1,41 @@
+I"P<p>Here’s a weekly Friday shout-out of articles, videos, and other content I found interesting.</p>
+
+<h2 id="development-and-testing">Development and testing</h2>
+
+<ul>
+  <li><a href="https://developer.okta.com/blog/2020/04/10/build-fast-website-csharp-dapper">Build an Incredibly Fast Website with Dapper + C#</a> (Chase Aucoin)</li>
+  <li><a href="https://www.carlrippon.com/why-react-with-aspnetcore/">Why React with ASP.NET Core?</a> (Carl Rippon)</li>
+  <li><a href="https://andrewlock.net/how-to-automatically-choose-a-free-port-in-asp-net-core/">How to automatically choose a free port in ASP.NET Core 3.0</a> (Andrew Lock)</li>
+  <li><a href="https://www.tpeczek.com/2020/04/reporting-api-in-aspnet-core-network.html">Reporting API in ASP.NET Core - Network Error Logging</a> (Tomasz Pęczek)</li>
+  <li><a href="https://martinfowler.com/articles/class-too-large.html">Refactoring: This class is too large</a> (Clare Sudbery)</li>
+  <li><a href="https://channel9.msdn.com/Shows/On-NET/Introducing-the-Diagnostics-Client-Library-for-NET-Core?WT.mc_id=DX_MVP4025064">Introducing the Diagnostics Client Library for .NET Core</a> (Channel 9)</li>
+  <li><a href="https://dontcodetired.com/blog/post/Pretty-Method-Display-in-xUnitnet">Pretty Method Display in xUnit.net</a> (Jason Roberts)</li>
+  <li><a href="https://ardalis.com/are-boolean-flags-on-methods-a-code-smell">Are Boolean Flags on Methods a Code Smell?</a> (Steve Smith)</li>
+  <li><a href="https://enterprisecraftsmanship.com/posts/when-to-mock/">When To Mock</a> (Vladimir Khorikov)</li>
+  <li><a href="https://www.softwaremeadows.com/posts/using_fluentassertions_with_xunit_theory_to_test_for_an_exception_and_/">Using FluentAssertions with xUnit Theory to Test for an Exception AND a Successful Return</a> (Charles Flatt)</li>
+</ul>
+
+<h2 id="youtube">YouTube</h2>
+
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=C-2e2E1o50A">Visual Studio Remote Office Hours - April 10</a> (Microsoft Visual Studio)</li>
+  <li><a href="https://www.youtube.com/watch?v=4XlA2WDXyTo">Consuming GraphQL in C#</a> (dotNET)</li>
+  <li><a href="https://www.youtube.com/watch?v=OUCN1i-ziLo">ASP.NET Community Standup - April 14th 2020 - SignalR with Brady Gaster and David Pine</a> (.NET Foundation)</li>
+</ul>
+
+<h2 id="developer-productivity">Developer productivity</h2>
+
+<ul>
+  <li><a href="https://johnpapa.net/try-githubs-new-cli-gh/">Try gh, GitHub’s new CLI</a> (John Papa)</li>
+  <li><a href="https://github.blog/2020-04-14-github-is-now-free-for-teams/">GitHub is now free for teams</a> (Nat Friedman)</li>
+  <li><a href="https://www.telerik.com/blogs/how-to-use-fiddler">How Do You Fiddle?</a> (Sam Basu)</li>
+</ul>
+
+<h2 id="general-technology-topics">General technology topics</h2>
+
+<ul>
+  <li><a href="https://techcrunch.com/2020/04/13/apple-google-coronavirus-tracing/">Q&amp;A: Apple and Google discuss their coronavirus tracing efforts</a> (TechCrunch)</li>
+  <li><a href="https://www.theverge.com/2020/4/14/21219907/medium-coronavirus-covid-19-news-misinformation-conspiracy-theories-best-worst">How Medium became the best and worst place for coronavirus news</a> (The Verge)</li>
+  <li><a href="https://www.hanselman.com/blog/The2020GuideToCreatingQualityTechnicalScreencastsPresentationsAndRemoteMeetings.aspx">The 2020 Guide to Creating Quality Technical Screencasts, Presentations, and Remote Meetings</a> (Scott Hanselman)</li>
+</ul>
+:ET

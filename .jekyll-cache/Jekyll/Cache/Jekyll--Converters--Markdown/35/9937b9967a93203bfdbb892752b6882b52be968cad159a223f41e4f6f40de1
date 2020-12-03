@@ -1,0 +1,214 @@
+I"�R<p class="notice--success">This is an archive of my weekly (free!) newsletter, -The .NET Stacks-. Consider <a href="https://dotnetstacks.com">subscribing today</a> to get this content right away! Subscribers don’t have to wait a week to receive the content.</p>
+
+<p>On tap this week:</p>
+
+<ul>
+  <li>C# 9: a functionally better release</li>
+  <li>The .NET Foundation nominees are out!</li>
+  <li>Dev Discussions: Michael Crump</li>
+  <li>Community roundup</li>
+</ul>
+
+<h2 id="c-9-a-functionally-better-release">C# 9: a functionally better release</h2>
+
+<p>I’ve been writing a lot about C# 9 lately. <em>No, seriously: a lot.</em> This week I went a little nuts with three posts: I talked about <a href="https://daveabrock.com/2020/07/06/c-sharp-9-deep-dive-records">records</a>, <a href="https://daveabrock.com/2020/07/06/c-sharp-9-pattern-matching">pattern matching</a>, and <a href="https://daveabrock.com/2020/07/09/c-sharp-9-top-level-programs">top-level programs</a>. I’ve been learning a ton, which is always the main goal, but what’s really interesting is how C# is starting to blur the lines between object-oriented and functional programming. Throughout the years, we’ve seen some FP concepts visit C#, but I feel this release is really kicking it up a notch.</p>
+
+<p>In the not-so-distant past, discussing FP and OO meant putting up with silly dogmatic arguments that they have to be mutually exclusive. It isn’t hard to understand why: traditional concepts of OO constructs are grouping data and behavior (state) in single mutable objects, and FP draws a hard line between data and behavior in the name of purity and minimizing side effects (immutability by default).</p>
+
+<p>So, typically as a .NET developer, this left you with two choices: C#, .NET’s flagship language, or F#, a wonderful functional language that is concise (no curlies or semi-colons and great type inference), convenient (functions as first-class objects), and has default immutability.</p>
+
+<p>However, this is no longer a binary choice. For example, let’s look at a blog post from a few years ago that <a href="https://devblogs.microsoft.com/dotnet/get-started-with-f-as-a-c-developer/">maps C# concepts to F# concepts</a>.</p>
+
+<ul>
+  <li><strong>C#/OO has variables, F#/FP has immutable values</strong>. C# 9 init-only properties and records bring that ability to C#.</li>
+  <li><strong>C# has statements, F# has expressions</strong>. C# 8 introduced switch expressions and enhanced pattern matching, and has more expressions littered throughout the language now.</li>
+  <li><strong>C# has objects with methods, F# has types and functions</strong>. C# 9 records are also blurring the line in this regard.</li>
+</ul>
+
+<p>So here we are, just years after wondering if F# will ever take over C#, we see people wondering the exact opposite as Isaac Abraham asks: <a href="https://www.compositional-it.com/news-blog/will-csharp-replace-fsharp/">will C# replace F#</a>? (Spoiler alert: no.)</p>
+
+<p>There is definitely pushback in the community from C# 8 purists, to which I say: <em>why not both?</em> You now have the freedom to “bring in” the value of functional programming, while doing it in a familiar language. You can bring in these features, along with C#’s compatibility. These changes will not break the language. And if they don’t appeal to you, you don’t have to use them. (Of course, mixing FP and OO in C# is not always graceful and is definitely worth mentioning.)</p>
+
+<p>This isn’t a C# vs F# rant, but it comes down to this: is C# with functional bits “good enough” because of your team’s skillset, comfort level, and OO needs? Or do you need a clean break, and immutability by default? As for me, I enjoy seeing these features gradually introduced. For example, C# 9 records allow you to build immutable structures but the language isn’t imposing this on you for all your objects. You need to opt in.</p>
+
+<p>A more nuanced question to ask is: will C#’s functional concepts ever overpower the language and tilt the scales in FP’s direction? Soon, I’ll be interviewing Phillip Carter (the PM for F# at Microsoft) and am curious to hear what he has to say about it. Any questions? Let me know soon and I’ll be sure to include them.</p>
+
+<h2 id="the-net-foundation-nominees-are-out">The .NET Foundation nominees are out</h2>
+
+<p>This week, the .NET Foundation <a href="https://dotnetfoundation.org/about/election/candidates">announced the Board of Director nominees for the 2020 campaign</a>. I am familiar with most of these folks (a few are subscribers, hi!)—it’s a very strong list and you probably can’t go wrong with anyone. I’d encourage you to look at the list and all their profiles to see who you’d like to vote for (if you are a member). If not, you can <a href="https://dotnetfoundation.org/member/become-a-member">apply for membership</a>. Or, if you’re just following the progress of the foundation, that’s great too.</p>
+
+<p>I know I’ve talked a lot about the Foundation lately, but this is an important moment for the .NET Foundation. The luster has worn off and it’s time to address the big questions: what exactly is the Foundation responsible for? Where is the line between “independence” and Microsoft interests? When OSS projects collide with Microsoft interests, what is the process to work through it? And will the Foundation commit itself to open communication and greater transparency?</p>
+
+<p>As for me, these are the big questions <em>I hope</em> the nominees are thinking about, among other things.</p>
+
+<h2 id="dev-discussions-michael-crump">Dev Discussions: Michael Crump</h2>
+
+<p>If you’ve worked on Azure, you’ve likely come across Michael Crump’s work. He started <a href="http://azuredev.tips">Azure Tips and Tricks</a>, a collection of tips, videos, and talks—if it’s Azure, it’s probably there. He also runs a popular Twitch stream where he talks about various topics.</p>
+
+<p>I caught up with Michael to talk about how he got to working on Azure at Microsoft, his work for the developer community, and his programming advice.</p>
+
+<p><img src="http://localhost:4001/images/michael-crump.png" alt="Michael Crump" /></p>
+
+<p><strong>My <a href="https://google.com">crack team of researchers</a> tell me that you were a former Microsoft Silverlight MVP. Ah, memories. Do you miss it?</strong></p>
+
+<p>Ah, yes. I was a Microsoft MVP for 4 years, I believe. I spent a lot of time working with Silverlight because, at that time, I was working in the medical field and a lot of our doctors used Macs. Since I was a C# WinForms/WPF developer, I jumped at the chance to start using those skillsets for code that would run on PCs and Macs.</p>
+
+<p><strong>Can you walk me through your path to Microsoft, and what you do at Microsoft now?</strong></p>
+
+<p>I started in Mac tech support because after graduating college, Mac tech support agents were getting paid more than PC agents (supply and demand, I guess!). Then, I was a full-time software developer for about 8 years. I worked in the medical field and created a calculator that determined what amount of vitamins our pre-mature babies should take.</p>
+
+<p>Well, after a while, the stress got to me and I discovered my love for teaching and started a job at Telerik as a developer advocate. Then, the opportunity came at Microsoft for a role to educate and inspire application developers. So my role today consists of developer content in many forms, and helping to set our Tier 1 event strategy for app developers.</p>
+
+<p><strong>Tell us a little about Azure Tips and Tricks. What motivated you to get started, and how can people get involved?</strong></p>
+
+<p>Azure Tips and Tricks was created because I’d find a thing or two about Azure, and forget how to do it again. It was originally designed as something <em>just for me</em> but many blog aggregators starting picking up on the posts and we decided to go big with it—from e-books, blog posts, videos, conference talks and stickers.</p>
+
+<p>The easiest way to contribute is by clicking on the <strong>Edit Page</strong> button at the bottom of each page. You can also go to <em><a href="http://source.azuredev.tips">http://source.azuredev.tips</a></em> to learn more.</p>
+
+<p><strong>What made you get into Twitch? What goes on in your channel?</strong></p>
+
+<p>I loved the ability to actually code and have someone watch you and help you code. The interactivity aspect and seeing the same folks come back gets you hooked.</p>
+
+<p>The <a href="https://twitch.tv/mbcrump">stream</a> is broken down into three streams a week:</p>
+
+<ul>
+  <li>Azure Tips and Tricks, every Wednesday at 1 PM PST (Pacific Standard Time, America)</li>
+  <li>Live Interviews with Developers, every Friday at 9 AM PST (Pacific Standard Time, America)</li>
+  <li>Live coding/Security Sunday streams, Sundays at 10:30 AM PST (Pacific Standard Time, America)</li>
+</ul>
+
+<p><strong>What is your one piece of programming advice?</strong></p>
+
+<p>I actually published <a href="https://dev.to/mbcrump/12-things-every-software-developer-should-be-doing-in-2020-5hbp">a list of my top 12 things every developer should know</a>.</p>
+
+<p>My top one would probably be to learn a different programming language (other than your primary language). Simply put, it broadens your perspective and permits a deeper understanding of how a computer and programming languages work.</p>
+
+<p><em>This is only an excerpt of my talk with Michael. Read the <a href="https://daveabrock.com/2020/07/10/dev-discussions-michael-crump">full interview over at my website</a>.</em></p>
+
+<h2 id="community-roundup">Community roundup</h2>
+
+<p>An <em>extremely</em> busy week, full of great content!</p>
+
+<h3 id="microsoft">Microsoft</h3>
+
+<h4 id="announcements">Announcements</h4>
+
+<ul>
+  <li>AKS now supports <a href="https://azure.microsoft.com/updates/azure-kubernetes-service-aks-now-supports-confidential-workloads-through-dcsv2-skus-preview/">confidential workloads</a>.</li>
+  <li>The Edge team <a href="https://blogs.windows.com/msedgedev/2020/07/08/introducing-storage-access-api">announces the storage access API</a>.</li>
+  <li>Microsoft <a href="https://techcommunity.microsoft.com/t5/azure-ai/introducing-text-analytics-for-health/ba-p/1505152">introduces the Text Analytics for Health APIs</a>.</li>
+  <li>Pratik Nadagouda <a href="https://devblogs.microsoft.com/visualstudio/exciting-new-updates-to-the-git-experience-in-visual-studio/">talks about updates to the Git experience in Visual Studio</a>.</li>
+  <li>Eric Boyd <a href="https://azure.microsoft.com/blog/azure-ai-build-missioncritical-ai-apps-with-new-cognitive-services-capabilities/">shows off new Azure Cognitive Services capabilities</a>.</li>
+  <li>The .NET Foundation <a href="https://dotnetfoundation.org/blog/2020/07/07/kicking-off-campaign-2020">has the nominees set for the 2020 campaign</a>.</li>
+</ul>
+
+<h4 id="videos">Videos</h4>
+
+<ul>
+  <li>The Visual Studio Toolbox <a href="https://channel9.msdn.com/Shows/Visual-Studio-Toolbox/Performance-Profiling-Part-1-An-Introduction">begins a series on performance profiling</a> and <a href="https://channel9.msdn.com/Shows/Visual-Studio-Toolbox/Finding-Code-Part-2">continues their series on finding code in Visual Studio</a>.</li>
+  <li>The Xamarin Show <a href="https://channel9.msdn.com/Shows/XamarinShow/App-Center-plus-App-Insights?WT.mc_id=DX_MVP4025064">discusses App Center and App Insights</a>.</li>
+  <li>Data Exposed <a href="https://channel9.msdn.com/Shows/Data-Exposed/Why-Azure-SQL-is-Best-for-Developers-Part-2">continues their “why Azure SQL is best for devs” series</a>.</li>
+  <li>So many community standups: we have the <a href="https://www.youtube.com/watch?v=IVJgrLTG1WM">Languages &amp; Runtime one</a>, <a href="https://www.youtube.com/watch?v=5Oow3LlFjTQ">Entity Framework</a>, and <a href="https://www.youtube.com/watch?v=sYTH_xYH3iA">ASP.NET Core</a>.</li>
+</ul>
+
+<h4 id="blog-posts">Blog posts</h4>
+
+<ul>
+  <li>Jason Freeberg <a href="https://techcommunity.microsoft.com/t5/apps-on-azure/zero-to-hero-with-app-service-part-3-releasing-to-production/ba-p/1506722">continues his Zero to Hero with App Service series</a>.</li>
+  <li>Miguel Ramos <a href="https://blogs.windows.com/windowsdeveloper/2020/07/07/a-deep-dive-into-winui-3-in-desktop-apps">dives into WinUI 3 in desktop apps</a>.</li>
+  <li>Jayme Singleton <a href="https://devblogs.microsoft.com/xamarin/virtual-events-july/">runs through the .NET virtual events in July</a>.</li>
+  <li>Leonard Lobel <a href="https://devblogs.microsoft.com/cosmosdb/change-feed-unsung-hero-of-azure-cosmos-db/">highlights the Azure CosmosDB change feed</a>.</li>
+</ul>
+
+<h3 id="community-blogs">Community Blogs</h3>
+
+<h3 id="aspnet-core">ASP.NET Core</h3>
+
+<ul>
+  <li>Christian Nagel <a href="https://csharp.christiannagel.com/2020/07/07/aspnetcoreroles/">walks through local users with ASP.NET Core</a>.</li>
+  <li>Andrew Lock <a href="https://andrewlock.net/adding-an-endpoint-graph-to-your-aspnetcore-application/">continues talking about adding an endpoint graph to ASP.NET Core.</a>.</li>
+  <li>Thomas Ardal <a href="https://blog.elmah.io/add-razor-runtime-compilation-when-developing-asp-net-core/">adds Razor runtime compilation for ASP.NET Core</a>.</li>
+  <li>Anthony Giretti <a href="https://anthonygiretti.com/2020/07/06/exposing-proto-files-in-a-grpc-service-over-a-frameworkless-and-lightweight-api/">exposes proto files in a lightweight gRPC service</a>.</li>
+  <li>Neel Bhatt <a href="https://neelbhatt.com/2020/07/05/event-sourcing-in-net-core-part-1-a-gentle-introduction/">introduces event sourcing in .NET Core</a>.</li>
+  <li>Dominick Baier <a href="https://leastprivilege.com/2020/07/06/flexible-access-token-validation-in-asp-net-core/">talks about flexible access token validation in ASP.NET Core</a>.</li>
+  <li>The .NET Rocks podcast <a href="https://www.dotnetrocks.com/default.aspx?ShowNum=1695">talks about ASP.NET Core Endpoints with Steve Smith</a>.</li>
+  <li>The ON.NET show <a href="https://channel9.msdn.com/Shows/On-NET/ASPNET-Core-Series-SignalR">discusses SignalR</a>.</li>
+</ul>
+
+<h3 id="blazor">Blazor</h3>
+
+<ul>
+  <li>Wael Kdouh <a href="https://medium.com/@waelkdouh/securing-a-blazor-webassembly-application-with-azure-active-directory-7822148f332b">secures a Blazor WebAssembly Application With Azure Active Directory</a>.</li>
+  <li>Jon Hilton <a href="https://jonhilton.net/blazor-client-server-validation-with-fluentvalidation/">discusses Blazor validation logic on the client and the server</a>.</li>
+  <li>Marinko Spasojevic <a href="https://code-maze.com/blazor-webassembly-httpclient/">consumes a web API with Blazor WebAssembly</a>.</li>
+  <li>Matthew Jones <a href="https://exceptionnotfound.net/minesweeper-in-blazor-webassembly-part-2-the-blazor-component/">continues writing Minesweeper for Blazor Web Assembly</a>.</li>
+</ul>
+
+<h3 id="entity-framework">Entity Framework</h3>
+
+<ul>
+  <li>Khalid Abuhakmeh <a href="https://khalidabuhakmeh.com/add-custom-database-functions-for-entity-framework-core">talks about adding custom database functions for EF Core</a>.</li>
+  <li>Jon P. Smith <a href="https://www.thereformedprogrammer.net/ef-core-in-depth-soft-deleting-data-with-global-query-filters/">discusses soft deleting data with Global Query Filters in EF Core</a>.</li>
+</ul>
+
+<h3 id="languages">Languages</h3>
+
+<ul>
+  <li>Dave Brock goes deep on C# 9, with <a href="https://daveabrock.com/2020/07/06/c-sharp-9-deep-dive-records">records</a>, <a href="https://daveabrock.com/2020/07/06/c-sharp-9-pattern-matching">pattern matching</a>, and <a href="https://daveabrock.com/2020/07/09/c-sharp-9-top-level-programs">top-level programs</a>.</li>
+  <li>Ian Griffiths <a href="https://endjin.com/blog/2020/07/dotnet-csharp-8-nullable-references-conditional-post-conditions.html">continues his series on C# 8 nullable references with conditional post-conditions.</a>.</li>
+  <li>Khalid Abuhakmeh <a href="https://khalidabuhakmeh.com/understand-reading-from-a-file-using-csharp">walks through reading from a file in C#</a>.</li>
+</ul>
+
+<h4 id="azure">Azure</h4>
+
+<ul>
+  <li>Joseph Guadagno <a href="https://www.josephguadagno.net/2020/07/10/securing-azure-function-settings-with-azure-key-vault">uses Azure Key Vault to secure Azure Functions</a> (hi, Joe!).</li>
+  <li>Visual Studio Magazine <a href="https://visualstudiomagazine.com/articles/2020/07/09/azure-ml-studio-web.aspx">walks through Azure Machine Learning Studio Web</a>.</li>
+  <li>Damien Bowden <a href="https://damienbod.com/2020/07/06/using-external-inputs-in-azure-durable-functions/">walks through using external inputs in Azure Durable Functions</a>.</li>
+  <li>Azure Tips and Tricks <a href="https://microsoft.github.io/AzureTipsAndTricks/blog/tip269.html">has new content about Azure certifications for developers</a>.</li>
+  <li>Jason Gaylord <a href="https://www.jasongaylord.com/blog/2020/07/09/adding-azure-feature-flags-to-client-side-applications">discusses adding Azure feature flags to client applications</a>.</li>
+</ul>
+
+<h3 id="xamarin">Xamarin</h3>
+
+<ul>
+  <li>Simon Bisson <a href="https://www.infoworld.com/article/3565550/understanding-net-maui-and-the-future-of-xamarin.html">pontificates on .NET MAUI and the future of Xamarin</a>.</li>
+  <li>Leomaris Reyes <a href="https://askxammy.com/using-biometric-identification-in-xamarin-forms/">uses biometric identification in Xamarin.Forms</a>.</li>
+  <li>Kym Phillpotts <a href="https://kymphillpotts.com/pizza-shop.html">creates a pizza shop in Xamarin.Forms</a>.</li>
+  <li>The Xamarin Podcast <a href="https://www.xamarinpodcast.com/75">discusses Xamarin.Forms 4.7 and other topics</a>.</li>
+</ul>
+
+<h3 id="tools">Tools</h3>
+
+<ul>
+  <li>JetBrains introduces <a href="https://blog.jetbrains.com/dotnet/2020/07/09/introducing-the-net-guide-tutorials-and-tips-tricks-for-net-rider-and-resharper/">the .NET Guide</a>.</li>
+  <li>Jason Gaylord <a href="https://www.jasongaylord.com/blog/2020/07/08/create-delete-branches-using-visual-studio-code">shows us how to create and delete branches in Visual Studio Code</a>.</li>
+  <li>Mike Larah <a href="https://endjin.com/blog/2020/07/debugging-web-apps-in-visual-studio-with-custom-browser-configurations.html">uses custom browser configurations with Visual Studio</a>.</li>
+  <li>Muhammad Rehan Saeed <a href="https://rehansaeed.com/the-fastest-nuget-package-ever-published-probably/">shows us how to publish NuGet packages quickly</a>.</li>
+  <li>Patrick Smacchia <a href="https://blog.ndepend.com/top-10-visual-studio-refactoring-tips/">talks about his top 10 Visual Studio refactoring tips</a>.</li>
+  <li>Bruce Cottman asks <a href="https://medium.com/swlh/will-github-actions-kill-off-jenkins-f85e614bb8d3">if GitHub Actions will kill off Jenkins</a>.</li>
+</ul>
+
+<h3 id="projects">Projects</h3>
+
+<ul>
+  <li>Oren Eini <a href="https://ayende.com/blog/191363-C/ann-cosmos-db-profiler-1-0-release?Key=6bba589c-83a2-4b83-b864-9e46505cb1e3">releases CosmosDB Profiler 1.0</a>.</li>
+  <li>Manuel Grundner <a href="https://blog.delegate.at/2020/07/06/tasty-delicious-dotnet-testing.html">introduces his new Tasty project, an effort to bring the style of his favorite test frameworks to .NET</a>.</li>
+</ul>
+
+<h3 id="community-podcasts-and-videos">Community podcasts and videos</h3>
+
+<ul>
+  <li>Scott Hanselman <a href="https://www.youtube.com/watch?v=fFxYq0hAAHw">shows off his Raspberry Pi and shows off how you can run .NET Notebooks and .NET Interactive on it</a>, <a href="https://www.youtube.com/watch?v=Mfz8NQncwiQ">talks about Git pull requests</a>, <a href="https://www.youtube.com/watch?v=WBg9mlpzEYU">shows off Git 101 basics</a>, and <a href="https://www.youtube.com/watch?v=lu__oGZVT98&amp;feature=youtu.be">walks through setting up a prompt with Git, Windows Terminal, PowerShell, and Cascadia Code</a>.</li>
+  <li>The ASP.NET Monsters <a href="https://www.youtube.com/watch?v=NnUoOdnsIko">talk about NodaTime and API controllers</a>.</li>
+  <li>The 6-Figure Developer podcast <a href="https://6figuredev.com/podcast/episode-151-artificial-intelligence-with-matthew-renze/">talks about AI with Matthew Renze</a>.</li>
+  <li>The No Dogma podcast <a href="https://no-dogma-podcast-301aeb97.simplecast.com/episodes/144-bill-wagner-net-5-and-unifying-net-dOZsxRN4">talks with Bill Wagner about .NET 5 and unifying .NET</a>.</li>
+  <li>The Coding Blocks podcast <a href="https://www.codingblocks.net/podcast/the-devops-handbook-the-technical-practices-of-flow/">studies The DevOps Handbook</a>.</li>
+</ul>
+
+<h2 id="new-subscribers-and-feedback">New subscribers and feedback</h2>
+
+<p>Has this email been forwarded to you? Welcome! I’d love for you <a href="https://www.dotnetstacks.com">to subscribe</a> and join the community. I promise to guard your email address with my life.</p>
+
+<p>I would love to hear any feedback you have for The .NET Stacks! My goal is to make this the one-stop shop for weekly updates on developing in the .NET ecosystem, so I look forward to any feedback you can provide. You can directly reply to this email, or <a href="https://www.dotnetstacks.com">talk to me on Twitter as well</a>. See you next week!</p>
+:ET

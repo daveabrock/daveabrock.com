@@ -1,0 +1,23 @@
+<p>As a developer for more than a decade, sometimes I wonder how it’s taken me this long to do a thing. This morning, it was renaming a Git branch. Whatever the case, I finally found the need to do it this morning and am happy to share how easy it is.</p>
+
+<h1 id="rename-locally">Rename locally</h1>
+
+<p>If you aren’t already at the branch in question, check it out:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git checkout &lt;my-branch-i-want-to-rename&gt;
+</code></pre></div></div>
+
+<p>Now that your branch is checked out, rename it by using the <code class="language-plaintext highlighter-rouge">git branch</code> command:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git branch <span class="nt">-m</span> &lt;new-name-of-my-branch&gt;
+</code></pre></div></div>
+
+<h1 id="push-to-remote-if-needed">Push to remote, if needed</h1>
+
+<p>If you have pushed the old branch, you’ll need to clean it up in the remote branch as well. To do this, delete the old branch and then push your newly-named branch to your repository:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git push origin <span class="nt">--delete</span> &lt;my-branch-i-want-to-rename&gt;
+git push origin <span class="nt">-u</span> &lt;new-name-of-my-branch
+</code></pre></div></div>
+
+<p>Mission accomplished! Take the rest of the day off—you deserve it.</p>

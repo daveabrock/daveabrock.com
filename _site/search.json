@@ -1,0 +1,1077 @@
+[
+  
+    {
+      "title"    : "The .NET Stacks #27: Giving some 💜 to under-the-radar ASP.NET Core 5 features",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-27'> <img src='images/library.jpg' alt='The .NET Stacks #27: Giving some 💜 to under-the-radar ASP.NET Core 5 features'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-27'>The .NET Stacks #27: Giving some 💜 to under-the-radar ASP.NET Core 5 features</a> </h2> <p class='article__excerpt'> 
+
+Note: This is the published version of my free, weekly newsletter, The .NET Stacks. It was originally sent to subscriber... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-11-28T00:00:00-06:00'>28 Nov 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-27",
+      "date"     : "2020-11-28 00:00:00 -0600"
+    } ,
+  
+    {
+      "title"    : "Use Azure Functions, Azure Storage blobs, and Cosmos DB to copy images from public URLs",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/images-azure-blobs-cosmos'>Use Azure Functions, Azure Storage blobs, and Cosmos DB to copy images from public URLs</a> </h2> <p class='article__excerpt'> There are several reasons why you’ll want to host publicly accessible images yourself. For example, you may want to compre... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-11-25T00:00:00-06:00'>25 Nov 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/aspnet-core' class='article__tag'>aspnet-core</a>  <a href='/tag/azure' class='article__tag'>azure</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "aspnet-core and azure",
+      "url"      : "/images-azure-blobs-cosmos",
+      "date"     : "2020-11-25 00:00:00 -0600"
+    } ,
+  
+    {
+      "title"    : "Blast Off with Blazor: Isolate and test your service dependencies",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/blast-off-blazor-service-dependencies'>Blast Off with Blazor: Isolate and test your service dependencies</a> </h2> <p class='article__excerpt'> So far in our series, we’ve walked through the intro, wrote our first component, and dynamically updated the HTML head fro... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-11-22T00:00:00-06:00'>22 Nov 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/aspnet-core' class='article__tag'>aspnet-core</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "aspnet-core",
+      "url"      : "/blast-off-blazor-service-dependencies",
+      "date"     : "2020-11-22 00:00:00 -0600"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #26: .NET 5 has arrived, let&#39;s party",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-26'> <img src='images/library.jpg' alt='The .NET Stacks #26: .NET 5 has arrived, let's party'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-26'>The .NET Stacks #26: .NET 5 has arrived, let's party</a> </h2> <p class='article__excerpt'> 
+
+Note: This is the published version of my free, weekly newsletter: The .NET Stacks—originally sent to subscribers on Nov... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-11-21T00:00:00-06:00'>21 Nov 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-26",
+      "date"     : "2020-11-21 00:00:00 -0600"
+    } ,
+  
+    {
+      "title"    : "Simplify your ASP.NET Core API models with C# 9 records",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/simplify-api-models-with-records'>Simplify your ASP.NET Core API models with C# 9 records</a> </h2> <p class='article__excerpt'> Out of all the new capabilities C# 9 brings, records are my favorite. With positional syntax, they are immutable by defaul... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-11-18T00:00:00-06:00'>18 Nov 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/aspnet-core' class='article__tag'>aspnet-core</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "aspnet-core",
+      "url"      : "/simplify-api-models-with-records",
+      "date"     : "2020-11-18 00:00:00 -0600"
+    } ,
+  
+    {
+      "title"    : "Use OpenAPI, Swagger UI, and HttpRepl in ASP.NET Core 5 to supercharge your API development",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/httprepl-openapi-swagger-netcoreapis'>Use OpenAPI, Swagger UI, and HttpRepl in ASP.NET Core 5 to supercharge your API development</a> </h2> <p class='article__excerpt'> When developing APIs in ASP.NET Core, you’ve got many tools at your disposal. Long gone are the days when you run your app... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-11-16T00:00:00-06:00'>16 Nov 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/aspnet-core' class='article__tag'>aspnet-core</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "aspnet-core",
+      "url"      : "/httprepl-openapi-swagger-netcoreapis",
+      "date"     : "2020-11-16 00:00:00 -0600"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #25: .NET 5 officially launches tomorrow",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-25'> <img src='images/library.jpg' alt='The .NET Stacks #25: .NET 5 officially launches tomorrow'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-25'>The .NET Stacks #25: .NET 5 officially launches tomorrow</a> </h2> <p class='article__excerpt'> 
+
+With .NET 5 shipping this week, it’s going to be such a release.
+
+On tap this week:
+
+
+  .NET 5 officially launches tomor... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-11-13T00:00:00-06:00'>13 Nov 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-25",
+      "date"     : "2020-11-13 00:00:00 -0600"
+    } ,
+  
+    {
+      "title"    : "Blast Off with Blazor: Use .NET 5 to update the HTML head from a Blazor component",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/blast-off-blazor-update-head'>Blast Off with Blazor: Use .NET 5 to update the HTML head from a Blazor component</a> </h2> <p class='article__excerpt'> So far in this series, we’ve walked through a project intro and also got our feet wet with our first component.
+
+Today, we... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-11-08T00:00:00-06:00'>08 Nov 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/blazor' class='article__tag'>blazor</a>  <a href='/tag/aspnet-core' class='article__tag'>aspnet-core</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "blazor and aspnet-core",
+      "url"      : "/blast-off-blazor-update-head",
+      "date"     : "2020-11-08 00:00:00 -0600"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #24: Blazor readiness and James Hickey on Coravel",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-24'> <img src='images/library.jpg' alt='The .NET Stacks #24: Blazor readiness and James Hickey on Coravel'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-24'>The .NET Stacks #24: Blazor readiness and James Hickey on Coravel</a> </h2> <p class='article__excerpt'> 
+
+RIP, James Bond. While watching Goldfinger last night, I forgot about the best feature of Connery Bond films: if you’re ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-11-06T00:00:00-06:00'>06 Nov 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-24",
+      "date"     : "2020-11-06 00:00:00 -0600"
+    } ,
+  
+    {
+      "title"    : "Are C# 9 records immutable by default?",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/csharp-9-records-immutable-default'>Are C# 9 records immutable by default?</a> </h2> <p class='article__excerpt'> I’m seeing a lot of people excited about records in C# 9, myself included. I wrote about records in excruciating detail th... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-11-02T00:00:00-06:00'>02 Nov 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/csharp' class='article__tag'>csharp</a>  <a href='/tag/csharp-9' class='article__tag'>csharp-9</a>  <a href='/tag/dotnet' class='article__tag'>dotnet</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "csharp, csharp-9, and dotnet",
+      "url"      : "/csharp-9-records-immutable-default",
+      "date"     : "2020-11-02 00:00:00 -0600"
+    } ,
+  
+    {
+      "title"    : "Dev Discussions - James Hickey",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/dev-discussions-james-hickey'>Dev Discussions - James Hickey</a> </h2> <p class='article__excerpt'> This is the full interview from my discussion with James Hickey in my weekly (free!) newsletter, The .NET Stacks. Consider... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-11-01T00:00:00-05:00'>01 Nov 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  <a href='/tag/dev-discussions' class='article__tag'>dev-discussions</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks and dev-discussions",
+      "url"      : "/dev-discussions-james-hickey",
+      "date"     : "2020-11-01 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #23: .NET 5 support, migration tools, and links",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-23'> <img src='images/library.jpg' alt='The .NET Stacks #23: .NET 5 support, migration tools, and links'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-23'>The .NET Stacks #23: .NET 5 support, migration tools, and links</a> </h2> <p class='article__excerpt'> 
+
+Get yourself a teammate that looks at your code like Prince William looks at KFC.
+
+Here’s what we have this week:
+
+
+  Un... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-10-31T00:00:00-05:00'>31 Oct 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-23",
+      "date"     : "2020-10-31 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Blast Off with Blazor: Learn components and testing with a custom 404 page",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/blast-off-blazor-404-page'>Blast Off with Blazor: Learn components and testing with a custom 404 page</a> </h2> <p class='article__excerpt'> I hope you enjoyed the introduction to our Blast Off with Blazor project. It’s time to get to work!
+
+We’re going to write ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-10-28T00:00:00-05:00'>28 Oct 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/blazor' class='article__tag'>blazor</a>  <a href='/tag/aspnet-core' class='article__tag'>aspnet-core</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "blazor and aspnet-core",
+      "url"      : "/blast-off-blazor-404-page",
+      "date"     : "2020-10-28 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Blast Off with Blazor: Get to know Blazor and our project",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/blast-off-blazor-intro'>Blast Off with Blazor: Get to know Blazor and our project</a> </h2> <p class='article__excerpt'> A couple of weeks ago, I wrote about deploying an Azure Static Web App with Blazor and Azure Functions. In that post, I ta... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-10-26T00:00:00-05:00'>26 Oct 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/blazor' class='article__tag'>blazor</a>  <a href='/tag/aspnet-core' class='article__tag'>aspnet-core</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "blazor and aspnet-core",
+      "url"      : "/blast-off-blazor-intro",
+      "date"     : "2020-10-26 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #22: .NET 5 RC 2 ships, .NET Foundation all hands, and links",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-22'> <img src='images/library.jpg' alt='The .NET Stacks #22: .NET 5 RC 2 ships, .NET Foundation all hands, and links'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-22'>The .NET Stacks #22: .NET 5 RC 2 ships, .NET Foundation all hands, and links</a> </h2> <p class='article__excerpt'> 
+
+I messaged a developer friend to see if he liked my puns, and he said “false.” I told him I didn’t appreciate the cyber ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-10-24T00:00:00-05:00'>24 Oct 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-22",
+      "date"     : "2020-10-24 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "C# 10 First Look: Constant string interpolation",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/const-string-interpolation'>C# 10 First Look: Constant string interpolation</a> </h2> <p class='article__excerpt'> C# 9 is finally here, everybody.
+
+This summer, we took a look at most of its core features. We looked at init-only feature... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-10-20T00:00:00-05:00'>20 Oct 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/csharp' class='article__tag'>csharp</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "csharp",
+      "url"      : "/const-string-interpolation",
+      "date"     : "2020-10-20 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Improve rendering performance with Blazor component virtualization",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/blazor-component-virtualization'>Improve rendering performance with Blazor component virtualization</a> </h2> <p class='article__excerpt'> When measuring web performance—especially on page load—it’s not always about a consistent metric, such as how quickly the ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-10-20T00:00:00-05:00'>20 Oct 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/blazor' class='article__tag'>blazor</a>  <a href='/tag/aspnet-core' class='article__tag'>aspnet-core</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "blazor and aspnet-core",
+      "url"      : "/blazor-component-virtualization",
+      "date"     : "2020-10-20 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #21: Azure Static Web Apps, .NET 6 feedback, and more!",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-21'> <img src='images/library.jpg' alt='The .NET Stacks #21: Azure Static Web Apps, .NET 6 feedback, and more!'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-21'>The .NET Stacks #21: Azure Static Web Apps, .NET 6 feedback, and more!</a> </h2> <p class='article__excerpt'> 
+
+Happy Monday! It looks like my pun from last week received some attention (and some new subscribers). I’m glad you all j... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-10-16T00:00:00-05:00'>16 Oct 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-21",
+      "date"     : "2020-10-16 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Blast Off with Blazor, Azure Functions, and Azure Static Web Apps",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/azure-functions-static-apps-blazor'>Blast Off with Blazor, Azure Functions, and Azure Static Web Apps</a> </h2> <p class='article__excerpt'> Static sites are so great. After all, you’re reading these words on a static site. Why bother with the overhead of dynamic... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-10-13T00:00:00-05:00'>13 Oct 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/blazor' class='article__tag'>blazor</a>  <a href='/tag/azure' class='article__tag'>azure</a>  <a href='/tag/aspnet-core' class='article__tag'>aspnet-core</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "blazor, azure, and aspnet-core",
+      "url"      : "/azure-functions-static-apps-blazor",
+      "date"     : "2020-10-13 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "How to Docker with .NET: Getting Started",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/docker-aspnet-core-intro'>How to Docker with .NET: Getting Started</a> </h2> <p class='article__excerpt'> As a developer, do you ever think about all the time you spend … not developing? Among the work we do to get things workin... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-10-10T00:00:00-05:00'>10 Oct 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/docker' class='article__tag'>docker</a>  <a href='/tag/tools' class='article__tag'>tools</a>  <a href='/tag/aspnet-core' class='article__tag'>aspnet-core</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "docker, tools, and aspnet-core",
+      "url"      : "/docker-aspnet-core-intro",
+      "date"     : "2020-10-10 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #20: Route to Code, IdentityServer, community links",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-20'> <img src='images/library.jpg' alt='The .NET Stacks #20: Route to Code, IdentityServer, community links'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-20'>The .NET Stacks #20: Route to Code, IdentityServer, community links</a> </h2> <p class='article__excerpt'> 
+
+Based on my eating habits this week, I should probably rename this newsletter to The .NET Snacks.
+
+This week:
+
+
+  Use “r... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-10-09T00:00:00-05:00'>09 Oct 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-20",
+      "date"     : "2020-10-09 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #19: An Ignite recap and F# with Phillip Carter",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-19'> <img src='images/library.jpg' alt='The .NET Stacks #19: An Ignite recap and F# with Phillip Carter'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-19'>The .NET Stacks #19: An Ignite recap and F# with Phillip Carter</a> </h2> <p class='article__excerpt'> 
+
+This week, we’ll review Ignite 2020, talk with Phillip Carter about F# from the Microsoft perspective, and check out wha... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-10-03T00:00:00-05:00'>03 Oct 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-19",
+      "date"     : "2020-10-03 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #18: RC1 is here, the fate of .NET Standard, and F# with Isaac Abraham",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-18'> <img src='images/library.jpg' alt='The .NET Stacks #18: RC1 is here, the fate of .NET Standard, and F# with Isaac Abraham'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-18'>The .NET Stacks #18: RC1 is here, the fate of .NET Standard, and F# with Isaac Abraham</a> </h2> <p class='article__excerpt'> 
+
+.NET 5 RC1 is here
+
+This week, Microsoft pushed out the RC1 release for .NET 5, which is scheduled to officially “go liv... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-09-26T00:00:00-05:00'>26 Sep 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-18",
+      "date"     : "2020-09-26 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Dev Discussions - Phillip Carter",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/dev-discussions-phillip-carter'>Dev Discussions - Phillip Carter</a> </h2> <p class='article__excerpt'> This is the full interview from my discussion with Phillip Carter in my weekly (free!) newsletter, The .NET Stacks. Consid... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-09-26T00:00:00-05:00'>26 Sep 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  <a href='/tag/dev-discussions' class='article__tag'>dev-discussions</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks and dev-discussions",
+      "url"      : "/dev-discussions-phillip-carter",
+      "date"     : "2020-09-26 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Get to know your .NET streamers",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/dot-net-streamers'>Get to know your .NET streamers</a> </h2> <p class='article__excerpt'> I’ve been geeking out on a lot of Twitch streams lately. I think it’s a fantastic way to learn and engage with other folks... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-09-24T00:00:00-05:00'>24 Sep 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/community' class='article__tag'>community</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "community",
+      "url"      : "/dot-net-streamers",
+      "date"     : "2020-09-24 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #17: EF Core 5, Blazor + CSS, and community!",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-17'> <img src='images/library.jpg' alt='The .NET Stacks #17: EF Core 5, Blazor + CSS, and community!'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-17'>The .NET Stacks #17: EF Core 5, Blazor + CSS, and community!</a> </h2> <p class='article__excerpt'> 
+
+Just a reminder that in your methods, try to write less than 914 “using var” statements.
+
+We’re talking about a lot of l... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-09-19T00:00:00-05:00'>19 Sep 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-17",
+      "date"     : "2020-09-19 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Dev Discussions - Isaac Abraham",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/dev-discussions-isaac-abraham'>Dev Discussions - Isaac Abraham</a> </h2> <p class='article__excerpt'> This is the full interview from my discussion with Isaac Abraham in my weekly (free!) newsletter, The .NET Stacks. Conside... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-09-19T00:00:00-05:00'>19 Sep 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  <a href='/tag/dev-discussions' class='article__tag'>dev-discussions</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks and dev-discussions",
+      "url"      : "/dev-discussions-isaac-abraham",
+      "date"     : "2020-09-19 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #16: App trimming and more on ML.NET",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-16'> <img src='images/library.jpg' alt='The .NET Stacks #16: App trimming and more on ML.NET'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-16'>The .NET Stacks #16: App trimming and more on ML.NET</a> </h2> <p class='article__excerpt'> 
+
+Welcome to 2020, where Thomas Running is finally getting the credit he deserves.
+
+With the .NET 5 last preview hitting l... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-09-12T00:00:00-05:00'>12 Sep 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-16",
+      "date"     : "2020-09-12 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Use CSS isolation in your Blazor projects",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/blazor-css-isolation'>Use CSS isolation in your Blazor projects</a> </h2> <p class='article__excerpt'> I’m excited to see Blazor now supporting CSS isolation—also known as scoped CSS.
+
+This post discusses how to use CSS isola... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-09-10T00:00:00-05:00'>10 Sep 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/aspnet-core' class='article__tag'>aspnet-core</a>  <a href='/tag/blazor' class='article__tag'>blazor</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "aspnet-core and blazor",
+      "url"      : "/blazor-css-isolation",
+      "date"     : "2020-09-10 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #15: The final preview and ML.NET with Luis Quintanilla",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-15'> <img src='images/library.jpg' alt='The .NET Stacks #15: The final preview and ML.NET with Luis Quintanilla'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-15'>The .NET Stacks #15: The final preview and ML.NET with Luis Quintanilla</a> </h2> <p class='article__excerpt'> 
+
+Welcome to the start of another week—I hope you are well and safe. We had an insanely busy week in the .NET world, so le... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-09-05T00:00:00-05:00'>05 Sep 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-15",
+      "date"     : "2020-09-05 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Dev Discussions - Luis Quintanilla (2 of 2)",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/dev-discussions-luis-quintanilla-2'>Dev Discussions - Luis Quintanilla (2 of 2)</a> </h2> <p class='article__excerpt'> This is the full interview from my discussion with Luis Quintanilla in my weekly (free!) newsletter, The .NET Stacks. Cons... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-09-05T00:00:00-05:00'>05 Sep 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  <a href='/tag/dev-discussions' class='article__tag'>dev-discussions</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks and dev-discussions",
+      "url"      : "/dev-discussions-luis-quintanilla-2",
+      "date"     : "2020-09-05 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "NDepend: Boost Your Team&#39;s Code Quality",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/boost-code-quality-ndepend'>NDepend: Boost Your Team's Code Quality</a> </h2> <p class='article__excerpt'> Have you used NDepend before? If you’ve been working on .NET for some time, you may have either used it or heard of it—I b... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-09-04T00:00:00-05:00'>04 Sep 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/tools' class='article__tag'>tools</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "tools",
+      "url"      : "/boost-code-quality-ndepend",
+      "date"     : "2020-09-04 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "How To Not Hate JavaScript",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/how-to-not-hate-javascript'>How To Not Hate JavaScript</a> </h2> <p class='article__excerpt'> “I hate JavaScript.”
+
+Let’s get real: we’ve all said it. When we say these words in anger, what do we really hate about Ja... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-09-02T00:00:00-05:00'>02 Sep 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/javascript' class='article__tag'>javascript</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "javascript",
+      "url"      : "/how-to-not-hate-javascript",
+      "date"     : "2020-09-02 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #14: Checking in on NuGet changes, many-to-many in EF Core, community roundup, and more!",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-14'> <img src='images/library.jpg' alt='The .NET Stacks #14: Checking in on NuGet changes, many-to-many in EF Core, community roundup, and more!'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-14'>The .NET Stacks #14: Checking in on NuGet changes, many-to-many in EF Core, community roundup, and more!</a> </h2> <p class='article__excerpt'> 
+
+Happy Monday. Do you ever watch a satire and think it’s a documentary?
+
+This week, we’ll:
+
+
+  Get excited about many-to-... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-08-29T00:00:00-05:00'>29 Aug 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-14",
+      "date"     : "2020-08-29 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Dev Discussions - Luis Quintanilla (1 of 2)",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/dev-discussions-luis-quintanilla-1'>Dev Discussions - Luis Quintanilla (1 of 2)</a> </h2> <p class='article__excerpt'> This is the full interview from my discussion with Luis Quintanilla in my weekly (free!) newsletter, The .NET Stacks. Cons... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-08-29T00:00:00-05:00'>29 Aug 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  <a href='/tag/dev-discussions' class='article__tag'>dev-discussions</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks and dev-discussions",
+      "url"      : "/dev-discussions-luis-quintanilla-1",
+      "date"     : "2020-08-29 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Use Project Tye to simplify your .NET microservice development experience (part 2)",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/microservices-with-tye-2'>Use Project Tye to simplify your .NET microservice development experience (part 2)</a> </h2> <p class='article__excerpt'> In the last post, I introduced Project Tye: what it is, the Blazor-powered dashboard, monitoring services, adding dependen... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-08-27T00:00:00-05:00'>27 Aug 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/tools' class='article__tag'>tools</a>  <a href='/tag/aspnet-core' class='article__tag'>aspnet-core</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "tools and aspnet-core",
+      "url"      : "/microservices-with-tye-2",
+      "date"     : "2020-08-27 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #13: .NET 5 Preview 8 and Blazor, interview with Scott Addie, community links!",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-13'> <img src='images/library.jpg' alt='The .NET Stacks #13: .NET 5 Preview 8 and Blazor, interview with Scott Addie, community links!'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-13'>The .NET Stacks #13: .NET 5 Preview 8 and Blazor, interview with Scott Addie, community links!</a> </h2> <p class='article__excerpt'> 
+
+Happy Monday to you! Here’s what we have for this week:
+
+
+  How Blazor is drastically improving in preview 8 of .NET 5
+ ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-08-22T00:00:00-05:00'>22 Aug 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-13",
+      "date"     : "2020-08-22 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Use Project Tye to simplify your .NET microservice development experience (part 1)",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/microservices-with-tye-1'>Use Project Tye to simplify your .NET microservice development experience (part 1)</a> </h2> <p class='article__excerpt'> You don’t have to be operating at Uber scale to understand the complexities of microservices and distributed systems. In m... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-08-19T00:00:00-05:00'>19 Aug 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/tools' class='article__tag'>tools</a>  <a href='/tag/aspnet-core' class='article__tag'>aspnet-core</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "tools and aspnet-core",
+      "url"      : "/microservices-with-tye-1",
+      "date"     : "2020-08-19 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #12: Azure DevOps or GitHub Actions, .NET Foundation results, community links!",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-12'> <img src='images/library.jpg' alt='The .NET Stacks #12: Azure DevOps or GitHub Actions, .NET Foundation results, community links!'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-12'>The .NET Stacks #12: Azure DevOps or GitHub Actions, .NET Foundation results, community links!</a> </h2> <p class='article__excerpt'> 
+
+Happy Monday, everyone! Current status: still wondering if I’m just a JSON pusher (warning: link has a naughty word).
+
+T... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-08-15T00:00:00-05:00'>15 Aug 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-12",
+      "date"     : "2020-08-15 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Dev Discussions - Scott Addie",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dev-discussions-scott-addie'> <img src='/images/keynote-scott.jpg' alt='Dev Discussions - Scott Addie'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dev-discussions-scott-addie'>Dev Discussions - Scott Addie</a> </h2> <p class='article__excerpt'> This is the full interview from my discussion with Scott Addie in my weekly (free!) newsletter, The .NET Stacks. Consider ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-08-15T00:00:00-05:00'>15 Aug 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  <a href='/tag/dev-discussions' class='article__tag'>dev-discussions</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks and dev-discussions",
+      "url"      : "/dev-discussions-scott-addie",
+      "date"     : "2020-08-15 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "C# 9: Records Revisited",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/records-spec'>C# 9: Records Revisited</a> </h2> <p class='article__excerpt'> We had a lot of fun playing with the new C# 9 features over the last few months. As with learning anything brand new, we h... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-08-14T00:00:00-05:00'>14 Aug 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/csharp' class='article__tag'>csharp</a>  <a href='/tag/csharp-9' class='article__tag'>csharp-9</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "csharp and csharp-9",
+      "url"      : "/records-spec",
+      "date"     : "2020-08-14 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #11: Newtonsoft, async void, more with Jeremy Likness, more!",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-11'> <img src='images/library.jpg' alt='The .NET Stacks #11: Newtonsoft, async void, more with Jeremy Likness, more!'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-11'>The .NET Stacks #11: Newtonsoft, async void, more with Jeremy Likness, more!</a> </h2> <p class='article__excerpt'> 
+
+This week, we:
+
+
+  Talk a little about Newtonsoft.Json
+  Discuss why async void is bad
+  Give you a quick reminder to vo... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-08-08T00:00:00-05:00'>08 Aug 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-11",
+      "date"     : "2020-08-08 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #10: .NET 5 taking shape, how approachable is .NET, a talk with Jeremy Likness, more!",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-10'> <img src='images/library.jpg' alt='The .NET Stacks #10: .NET 5 taking shape, how approachable is .NET, a talk with Jeremy Likness, more!'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-10'>The .NET Stacks #10: .NET 5 taking shape, how approachable is .NET, a talk with Jeremy Likness, more!</a> </h2> <p class='article__excerpt'> 
+
+We had a tremendously busy week in .NET and it shows in this week’s edition.
+
+This week, we:
+
+
+  Discuss the latest in .... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-08-01T00:00:00-05:00'>01 Aug 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-10",
+      "date"     : "2020-08-01 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Dev Discussions - Jeremy Likness (2 of 2)",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/dev-discussions-jeremy-likness-2'>Dev Discussions - Jeremy Likness (2 of 2)</a> </h2> <p class='article__excerpt'> This is the full interview from my discussion with Jeremy Likness in my weekly (free!) newsletter, The .NET Stacks. Consid... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-08-01T00:00:00-05:00'>01 Aug 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  <a href='/tag/dev-discussions' class='article__tag'>dev-discussions</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks and dev-discussions",
+      "url"      : "/dev-discussions-jeremy-likness-2",
+      "date"     : "2020-08-01 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Talk with Groot using the Microsoft Bot Framework and Azure sentiment analysis",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/azure-bot-service-cognitive-services'>Talk with Groot using the Microsoft Bot Framework and Azure sentiment analysis</a> </h2> <p class='article__excerpt'> Like any good adventure, this one started on Twitter.
+
+My friend (and friend of the newsletter) Shahed Chowdhuri took his ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-07-28T00:00:00-05:00'>28 Jul 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/csharp' class='article__tag'>csharp</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "csharp",
+      "url"      : "/azure-bot-service-cognitive-services",
+      "date"     : "2020-07-28 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #9: Project Coyote, new Razor editor, and more!",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-9'> <img src='images/library.jpg' alt='The .NET Stacks #9: Project Coyote, new Razor editor, and more!'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-9'>The .NET Stacks #9: Project Coyote, new Razor editor, and more!</a> </h2> <p class='article__excerpt'> 
+
+So, what do you think? I changed newsletter providers and got a new look (thanks to @comfycoder for the logo help). I ho... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-07-25T00:00:00-05:00'>25 Jul 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-9",
+      "date"     : "2020-07-25 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Dev Discussions - Jeremy Likness (1 of 2)",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/dev-discussions-jeremy-likness-1'>Dev Discussions - Jeremy Likness (1 of 2)</a> </h2> <p class='article__excerpt'> This is the full interview from my discussion with Jeremy Likness in my weekly (free!) newsletter, The .NET Stacks. Consid... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-07-25T00:00:00-05:00'>25 Jul 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  <a href='/tag/dev-discussions' class='article__tag'>dev-discussions</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks and dev-discussions",
+      "url"      : "/dev-discussions-jeremy-likness-1",
+      "date"     : "2020-07-25 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "C# 9: Putting it all together with a scavenger hunt",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/c-sharp-9-scavenger-hunt'>C# 9: Putting it all together with a scavenger hunt</a> </h2> <p class='article__excerpt'> Here we are, friends: our last post in our C# 9 deep dive series. We’ve discussed a lot of topics, so I thought it’d be fu... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-07-21T00:00:00-05:00'>21 Jul 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/csharp' class='article__tag'>csharp</a>  <a href='/tag/csharp-9' class='article__tag'>csharp-9</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "csharp and csharp-9",
+      "url"      : "/c-sharp-9-scavenger-hunt",
+      "date"     : "2020-07-21 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #8: functional C# 9, .NET Foundation nominees, Azure community, more!",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-8'> <img src='images/library.jpg' alt='The .NET Stacks #8: functional C# 9, .NET Foundation nominees, Azure community, more!'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-8'>The .NET Stacks #8: functional C# 9, .NET Foundation nominees, Azure community, more!</a> </h2> <p class='article__excerpt'> This is an archive of my weekly (free!) newsletter, -The .NET Stacks-. Consider subscribing today to get this content righ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-07-18T00:00:00-05:00'>18 Jul 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-8",
+      "date"     : "2020-07-18 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "C# 9: Answering your questions",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/c-sharp-9-q-and-a'>C# 9: Answering your questions</a> </h2> <p class='article__excerpt'> Note: Originally published five months before the official release of C# 9, I’ve updated this post after the release to ca... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-07-17T00:00:00-05:00'>17 Jul 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/csharp' class='article__tag'>csharp</a>  <a href='/tag/csharp-9' class='article__tag'>csharp-9</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "csharp and csharp-9",
+      "url"      : "/c-sharp-9-q-and-a",
+      "date"     : "2020-07-17 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "C# 9 Deep Dive: Target Typing and Covariant Returns",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/c-sharp-9-target-typing-covariants'>C# 9 Deep Dive: Target Typing and Covariant Returns</a> </h2> <p class='article__excerpt'> We’ve been quite busy, my friends. In this C# 9 deep dive series, we’ve looked at init-only features, records, pattern mat... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-07-14T00:00:00-05:00'>14 Jul 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/csharp' class='article__tag'>csharp</a>  <a href='/tag/csharp-9' class='article__tag'>csharp-9</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "csharp and csharp-9",
+      "url"      : "/c-sharp-9-target-typing-covariants",
+      "date"     : "2020-07-14 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #7: Azure SDKs, testing, community roundup, more!",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-7'> <img src='images/library.jpg' alt='The .NET Stacks #7: Azure SDKs, testing, community roundup, more!'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-7'>The .NET Stacks #7: Azure SDKs, testing, community roundup, more!</a> </h2> <p class='article__excerpt'> This is an archive of my weekly (free!) newsletter, The .NET Stacks. Consider subscribing today to get this content right ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-07-12T00:00:00-05:00'>12 Jul 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-7",
+      "date"     : "2020-07-12 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Dev Discussions - Michael Crump on contributing to the Azure community",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/dev-discussions-michael-crump'>Dev Discussions - Michael Crump on contributing to the Azure community</a> </h2> <p class='article__excerpt'> This is the full interview from my discussion with Michael Crump in my weekly (free!) newsletter, The .NET Stacks. Conside... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-07-10T00:00:00-05:00'>10 Jul 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  <a href='/tag/dev-discussions' class='article__tag'>dev-discussions</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks and dev-discussions",
+      "url"      : "/dev-discussions-michael-crump",
+      "date"     : "2020-07-10 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "C# 9 Deep Dive: Top-Level Programs",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/c-sharp-9-top-level-programs'>C# 9 Deep Dive: Top-Level Programs</a> </h2> <p class='article__excerpt'> This is the fourth post in a six-post series on C# 9 features in-depth:
+
+
+  Post 1 - Init-only features
+  Post 2 - Records... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-07-09T00:00:00-05:00'>09 Jul 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/csharp' class='article__tag'>csharp</a>  <a href='/tag/csharp-9' class='article__tag'>csharp-9</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "csharp and csharp-9",
+      "url"      : "/c-sharp-9-top-level-programs",
+      "date"     : "2020-07-09 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "C# 9 Deep Dive: Pattern Matching",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/c-sharp-9-pattern-matching'>C# 9 Deep Dive: Pattern Matching</a> </h2> <p class='article__excerpt'> In the previous post of this series, we discussed the power of records. That was a heavy topic.
+
+For something completely ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-07-06T00:00:00-05:00'>06 Jul 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/csharp' class='article__tag'>csharp</a>  <a href='/tag/csharp-9' class='article__tag'>csharp-9</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "csharp and csharp-9",
+      "url"      : "/c-sharp-9-pattern-matching",
+      "date"     : "2020-07-06 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "C# 9 Deep Dive: Records",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/c-sharp-9-deep-dive-records'>C# 9 Deep Dive: Records</a> </h2> <p class='article__excerpt'> Note: Originally published five months before the official release of C# 9, I’ve updated this post after the release to ca... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-07-06T00:00:00-05:00'>06 Jul 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/csharp' class='article__tag'>csharp</a>  <a href='/tag/csharp-9' class='article__tag'>csharp-9</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "csharp and csharp-9",
+      "url"      : "/c-sharp-9-deep-dive-records",
+      "date"     : "2020-07-06 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #6: Blazor mobile bindings, EF update, ASP.NET Core A-Z, more!",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-6'> <img src='images/library.jpg' alt='The .NET Stacks #6: Blazor mobile bindings, EF update, ASP.NET Core A-Z, more!'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-6'>The .NET Stacks #6: Blazor mobile bindings, EF update, ASP.NET Core A-Z, more!</a> </h2> <p class='article__excerpt'> This is an archive of my weekly (free!) newsletter, The .NET Stacks. Consider subscribing today to get this content right ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-07-05T00:00:00-05:00'>05 Jul 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-6",
+      "date"     : "2020-07-05 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "C# 9 Deep Dive: Init-only features",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/c-sharp-9-deep-dive-inits'>C# 9 Deep Dive: Init-only features</a> </h2> <p class='article__excerpt'> Note: Originally published five months before the official release of C# 9, I’ve updated this post after the release to ca... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-06-29T00:00:00-05:00'>29 Jun 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/csharp' class='article__tag'>csharp</a>  <a href='/tag/csharp-9' class='article__tag'>csharp-9</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "csharp and csharp-9",
+      "url"      : "/c-sharp-9-deep-dive-inits",
+      "date"     : "2020-06-29 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Dev Discussions - Shahed Chowdhuri talks about his ASP.NET Core A-Z blog series",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/dev-discussions-shahed-chowdhuri'>Dev Discussions - Shahed Chowdhuri talks about his ASP.NET Core A-Z blog series</a> </h2> <p class='article__excerpt'> This is the full interview from my discussion with Shahed Chowdhuri in my weekly (free!) newsletter, The .NET Stacks. Cons... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-06-28T00:00:00-05:00'>28 Jun 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  <a href='/tag/dev-discussions' class='article__tag'>dev-discussions</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks and dev-discussions",
+      "url"      : "/dev-discussions-shahed-chowdhuri",
+      "date"     : "2020-06-28 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "On simplifying null validation with C# 9",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/simplified-null-validation'>On simplifying null validation with C# 9</a> </h2> <p class='article__excerpt'> UPDATE: Since the initial publishing of the post, the approach has changed. This post has been updated to reflect the late... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-06-24T00:00:00-05:00'>24 Jun 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/csharp' class='article__tag'>csharp</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "csharp",
+      "url"      : "/simplified-null-validation",
+      "date"     : "2020-06-24 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #5: gRPC-Web, play with C# 9, .NET Foundation, community roundup!",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-5'> <img src='images/library.jpg' alt='The .NET Stacks #5: gRPC-Web, play with C# 9, .NET Foundation, community roundup!'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-5'>The .NET Stacks #5: gRPC-Web, play with C# 9, .NET Foundation, community roundup!</a> </h2> <p class='article__excerpt'> This is an archive of my weekly (free!) newsletter, The .NET Stacks. Consider subscribing today to get this content right ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-06-20T00:00:00-05:00'>20 Jun 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-5",
+      "date"     : "2020-06-20 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Reduce mental energy with C# 9",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/reduce-mental-energy-with-c-sharp'>Reduce mental energy with C# 9</a> </h2> <p class='article__excerpt'> Note: Originally published five months before the official release of C# 9, I’ve updated this post after the release to ca... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-06-18T00:00:00-05:00'>18 Jun 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/csharp' class='article__tag'>csharp</a>  <a href='/tag/csharp-9' class='article__tag'>csharp-9</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "csharp and csharp-9",
+      "url"      : "/reduce-mental-energy-with-c-sharp",
+      "date"     : "2020-06-18 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Party in the cloud with feature flags and Azure App Configuration",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/use-feature-flags-azure-app-config'>Party in the cloud with feature flags and Azure App Configuration</a> </h2> <p class='article__excerpt'> This is part 4 in a four-part series on .NET native feature flags:
+
+
+  Part 1: Introducing the Microsoft.FeatureManagement... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-06-17T00:00:00-05:00'>17 Jun 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/csharp' class='article__tag'>csharp</a>  <a href='/tag/dotnet-core' class='article__tag'>dotnet-core</a>  <a href='/tag/feature-flags' class='article__tag'>feature-flags</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "csharp, dotnet-core, and feature-flags",
+      "url"      : "/use-feature-flags-azure-app-config",
+      "date"     : "2020-06-17 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #4: EF Core, PresenceLight, community roundup!",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-4'> <img src='images/library.jpg' alt='The .NET Stacks #4: EF Core, PresenceLight, community roundup!'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-4'>The .NET Stacks #4: EF Core, PresenceLight, community roundup!</a> </h2> <p class='article__excerpt'> This is an archive of my weekly (free!) newsletter, The .NET Stacks. Consider subscribing today to get this content right ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-06-14T00:00:00-05:00'>14 Jun 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-4",
+      "date"     : "2020-06-14 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Dev Discussions - Isaac Levin talks PresenceLight",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/dev-discussions-isaac-levin'>Dev Discussions - Isaac Levin talks PresenceLight</a> </h2> <p class='article__excerpt'> This is the full interview from my discussion with Isaac Levin in my weekly (free!) newsletter, The .NET Stacks. Consider ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-06-13T00:00:00-05:00'>13 Jun 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  <a href='/tag/dev-discussions' class='article__tag'>dev-discussions</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks and dev-discussions",
+      "url"      : "/dev-discussions-isaac-levin",
+      "date"     : "2020-06-13 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #3: Native feature flags, local Kubernetes, community roundup!",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-3'> <img src='images/library.jpg' alt='The .NET Stacks #3: Native feature flags, local Kubernetes, community roundup!'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-3'>The .NET Stacks #3: Native feature flags, local Kubernetes, community roundup!</a> </h2> <p class='article__excerpt'> This is an archive of my weekly (free!) newsletter, The .NET Stacks. Consider subscribing today to get this content right ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-06-08T00:00:00-05:00'>08 Jun 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-3",
+      "date"     : "2020-06-08 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Implement custom filters in your ASP.NET Core feature flags",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/custom-filters-in-core-flags'>Implement custom filters in your ASP.NET Core feature flags</a> </h2> <p class='article__excerpt'> So far in this series, we introduced Microsoft.FeatureManagement as a way to manage feature flag functionality in your .NE... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-06-07T00:00:00-05:00'>07 Jun 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/csharp' class='article__tag'>csharp</a>  <a href='/tag/dotnet-core' class='article__tag'>dotnet-core</a>  <a href='/tag/feature-flags' class='article__tag'>feature-flags</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "csharp, dotnet-core, and feature-flags",
+      "url"      : "/custom-filters-in-core-flags",
+      "date"     : "2020-06-07 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #2: Project Tye, YARP, news, and community!",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-2'> <img src='images/library.jpg' alt='The .NET Stacks #2: Project Tye, YARP, news, and community!'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-2'>The .NET Stacks #2: Project Tye, YARP, news, and community!</a> </h2> <p class='article__excerpt'> This is an archive of my weekly (free!) newsletter, The .NET Stacks. Consider subscribing today to get this content right ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-05-31T00:00:00-05:00'>31 May 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-2",
+      "date"     : "2020-05-31 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Using Microsoft.FeatureManagement.AspNetCore to filter actions and HTML",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/introducing-feature-management-aspnetcore'>Using Microsoft.FeatureManagement.AspNetCore to filter actions and HTML</a> </h2> <p class='article__excerpt'> In our previous post, we introduced Microsoft.FeatureManagement as a way to manage feature flag functionality in your .NET... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-05-30T00:00:00-05:00'>30 May 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/csharp' class='article__tag'>csharp</a>  <a href='/tag/dotnet-core' class='article__tag'>dotnet-core</a>  <a href='/tag/feature-flags' class='article__tag'>feature-flags</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "csharp, dotnet-core, and feature-flags",
+      "url"      : "/introducing-feature-management-aspnetcore",
+      "date"     : "2020-05-30 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Introducing the Microsoft.FeatureManagement library",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/introducing-feature-management-copy'>Introducing the Microsoft.FeatureManagement library</a> </h2> <p class='article__excerpt'> A couple of weeks ago, I needed to find a way to better manage new functionality for a feature that was not ready yet (it ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-05-24T00:00:00-05:00'>24 May 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/csharp' class='article__tag'>csharp</a>  <a href='/tag/dotnet-core' class='article__tag'>dotnet-core</a>  <a href='/tag/feature-flags' class='article__tag'>feature-flags</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "csharp, dotnet-core, and feature-flags",
+      "url"      : "/introducing-feature-management-copy",
+      "date"     : "2020-05-24 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "The .NET Stacks #1: Microsoft Build, announcements galore!",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/dotnet-stacks-1'> <img src='images/library.jpg' alt='The .NET Stacks #1: Microsoft Build, announcements galore!'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/dotnet-stacks-1'>The .NET Stacks #1: Microsoft Build, announcements galore!</a> </h2> <p class='article__excerpt'> This is an archive of my weekly (free!) newsletter, The .NET Stacks. Consider subscribing today to get this content right ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-05-24T00:00:00-05:00'>24 May 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/dotnet-stacks-1",
+      "date"     : "2020-05-24 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Introducing The .NET Stacks weekly newsletter",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/introducing-dotnetstacks'>Introducing The .NET Stacks weekly newsletter</a> </h2> <p class='article__excerpt'> Every Friday or so, I typically round up the week’s best links. I wanted to expand on this further, and have a weekly dige... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-05-21T00:00:00-05:00'>21 May 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/dotnet-stacks' class='article__tag'>dotnet-stacks</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "dotnet-stacks",
+      "url"      : "/introducing-dotnetstacks",
+      "date"     : "2020-05-21 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "What I&#39;m Reading (Week of 5/11/20)",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/what-i-am-reading'>What I'm Reading (Week of 5/11/20)</a> </h2> <p class='article__excerpt'> Here’s a weekly shout-out of articles, videos, and other content I found interesting.
+
+Development
+
+
+  Deploying a Static ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-05-17T00:00:00-05:00'>17 May 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/what-i-am-reading' class='article__tag'>what-i-am-reading</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "what-i-am-reading",
+      "url"      : "/what-i-am-reading",
+      "date"     : "2020-05-17 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "What I&#39;m Reading (Week of 5/4/20)",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/what-i-am-reading'>What I'm Reading (Week of 5/4/20)</a> </h2> <p class='article__excerpt'> Here’s a weekly Friday shout-out of articles, videos, and other content I found interesting.
+
+Development
+
+
+  C# Source Ge... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-05-08T00:00:00-05:00'>08 May 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/what-i-am-reading' class='article__tag'>what-i-am-reading</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "what-i-am-reading",
+      "url"      : "/what-i-am-reading",
+      "date"     : "2020-05-08 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "First Look: C# Source Generators",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/first-look-c-sharp-generators'>First Look: C# Source Generators</a> </h2> <p class='article__excerpt'> Last week, Microsoft introduced a preview of C# Source Generators, to be released with the C# 9 release. While the tooling... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-05-08T00:00:00-05:00'>08 May 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/csharp' class='article__tag'>csharp</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "csharp",
+      "url"      : "/first-look-c-sharp-generators",
+      "date"     : "2020-05-08 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "What I&#39;m Reading (Week of 4/27/20)",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/what-i-am-reading'>What I'm Reading (Week of 4/27/20)</a> </h2> <p class='article__excerpt'> Here’s a weekly Friday shout-out of articles, videos, and other content I found interesting.
+
+
+  Aggregation extensions in... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-05-01T00:00:00-05:00'>01 May 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/what-i-am-reading' class='article__tag'>what-i-am-reading</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "what-i-am-reading",
+      "url"      : "/what-i-am-reading",
+      "date"     : "2020-05-01 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "What I&#39;m Reading (Week of 4/20/20)",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/what-i-am-reading'>What I'm Reading (Week of 4/20/20)</a> </h2> <p class='article__excerpt'> Here’s a weekly Friday shout-out of articles, videos, and other content I found interesting.
+
+Development and testing
+
+
+  ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-04-24T00:00:00-05:00'>24 Apr 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/what-i-am-reading' class='article__tag'>what-i-am-reading</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "what-i-am-reading",
+      "url"      : "/what-i-am-reading",
+      "date"     : "2020-04-24 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Compress Images in GitHub Using Imgbot",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/compress-images-in-github-using-imgbot'>Compress Images in GitHub Using Imgbot</a> </h2> <p class='article__excerpt'> We’ve all been there: we’re reading an article online and it takes forever to load. To investigate—because we’re developer... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-04-23T00:00:00-05:00'>23 Apr 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/github' class='article__tag'>github</a>  <a href='/tag/tools' class='article__tag'>tools</a>  <a href='/tag/imgbot' class='article__tag'>imgbot</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "github, tools, and imgbot",
+      "url"      : "/compress-images-in-github-using-imgbot",
+      "date"     : "2020-04-23 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Tweeting New GitHub Pages Posts from GitHub Actions",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/posting-to-twitter-from-gh-actions'>Tweeting New GitHub Pages Posts from GitHub Actions</a> </h2> <p class='article__excerpt'> For the last few years, I hosted my blog on the Ghost platform. It was a fast, Node-powered CMS, which allowed for stupid-... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-04-19T00:00:00-05:00'>19 Apr 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/github' class='article__tag'>github</a>  <a href='/tag/github-actions' class='article__tag'>github-actions</a>  <a href='/tag/ci-cd' class='article__tag'>ci-cd</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "github, github-actions, and ci-cd",
+      "url"      : "/posting-to-twitter-from-gh-actions",
+      "date"     : "2020-04-19 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "What I&#39;m Reading (Week of 4/14/20)",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/what-i-am-reading'>What I'm Reading (Week of 4/14/20)</a> </h2> <p class='article__excerpt'> Here’s a weekly Friday shout-out of articles, videos, and other content I found interesting.
+
+Development and testing
+
+
+  ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-04-17T00:00:00-05:00'>17 Apr 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/what-i-am-reading' class='article__tag'>what-i-am-reading</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "what-i-am-reading",
+      "url"      : "/what-i-am-reading",
+      "date"     : "2020-04-17 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "C# 8, A Year Late",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/csharp-8-year-late'>C# 8, A Year Late</a> </h2> <p class='article__excerpt'> After working in C# for the better part of a decade, last year I went on a hiatus from the .NET ecosystem and dove in head... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2020-03-29T00:00:00-05:00'>29 Mar 2020</time></span>  <div class='article-tags__box'>  <a href='/tag/csharp' class='article__tag'>csharp</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "csharp",
+      "url"      : "/csharp-8-year-late",
+      "date"     : "2020-03-29 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "How to rename a Git branch",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/how-to-rename-a-git-branch'>How to rename a Git branch</a> </h2> <p class='article__excerpt'> As a developer for more than a decade, sometimes I wonder how it’s taken me this long to do a thing. This morning, it was ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2019-09-30T00:00:00-05:00'>30 Sep 2019</time></span>  <div class='article-tags__box'>  <a href='/tag/git' class='article__tag'>git</a>  <a href='/tag/quick-tips' class='article__tag'>quick-tips</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "git and quick-tips",
+      "url"      : "/how-to-rename-a-git-branch",
+      "date"     : "2019-09-30 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Keep Those Boolean Conditionals Simple",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/keep-those-boolean-conditionals-simple'>Keep Those Boolean Conditionals Simple</a> </h2> <p class='article__excerpt'> When working on legacy projects (or even new ones!) you are bound to come across code that is interesting—and trust me, yo... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2019-02-07T00:00:00-06:00'>07 Feb 2019</time></span>  <div class='article-tags__box'>  <a href='/tag/csharp' class='article__tag'>csharp</a>  <a href='/tag/quick-tips' class='article__tag'>quick-tips</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "csharp and quick-tips",
+      "url"      : "/keep-those-boolean-conditionals-simple",
+      "date"     : "2019-02-07 00:00:00 -0600"
+    } ,
+  
+    {
+      "title"    : "How 2018 Went",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/how-2018-went'>How 2018 Went</a> </h2> <p class='article__excerpt'> I’m not a fan of resolutions—how very waterfall-y. In this fail-fast agile culture we live in now, that’s a long time to w... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2018-12-28T00:00:00-06:00'>28 Dec 2018</time></span>  <div class='article-tags__box'>  <a href='/tag/personal' class='article__tag'>personal</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "personal",
+      "url"      : "/how-2018-went",
+      "date"     : "2018-12-28 00:00:00 -0600"
+    } ,
+  
+    {
+      "title"    : "Level Up Your GitHub Experience with Chrome Extensions",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/level-up-github-experience-with-chrome-extensions'>Level Up Your GitHub Experience with Chrome Extensions</a> </h2> <p class='article__excerpt'> If you do any work in open source, you probably live for GitHub. With all the time you spend using it, you can improve you... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2018-11-26T00:00:00-06:00'>26 Nov 2018</time></span>  <div class='article-tags__box'>  <a href='/tag/github' class='article__tag'>github</a>  <a href='/tag/tools' class='article__tag'>tools</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "github and tools",
+      "url"      : "/level-up-github-experience-with-chrome-extensions",
+      "date"     : "2018-11-26 00:00:00 -0600"
+    } ,
+  
+    {
+      "title"    : "Razor Support for ASP.NET Core Apps in Visual Studio Code",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/net-core-apps-in-visual-studio-code-now-have-razor-support'>Razor Support for ASP.NET Core Apps in Visual Studio Code</a> </h2> <p class='article__excerpt'> The beauty of a cross-platform framework like ASP.NET Core is your ability to choose tooling you prefer. With all its adva... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2018-11-19T00:00:00-06:00'>19 Nov 2018</time></span>  <div class='article-tags__box'>  <a href='/tag/vs-code' class='article__tag'>vs-code</a>  <a href='/tag/dotnet-core' class='article__tag'>dotnet-core</a>  <a href='/tag/razor' class='article__tag'>razor</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "vs-code, dotnet-core, and razor",
+      "url"      : "/net-core-apps-in-visual-studio-code-now-have-razor-support",
+      "date"     : "2018-11-19 00:00:00 -0600"
+    } ,
+  
+    {
+      "title"    : "That which does not kill us makes us stronger",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/that-which-does-not-kill-us-makes-us-stronger'> <img src='/images/02.jpg' alt='That which does not kill us makes us stronger'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/that-which-does-not-kill-us-makes-us-stronger'>That which does not kill us makes us stronger</a> </h2> <p class='article__excerpt'> Sin tantum modo ad indicia veteris memoriae cognoscenda, curiosorum. Haec et tu ita posuisti, et verba vestra sunt. Idemne... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2018-11-13T06:01:35-06:00'>13 Nov 2018</time></span>  <div class='article-tags__box'>  <a href='/tag/Graffiti' class='article__tag'>Graffiti</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "Graffiti",
+      "url"      : "/that-which-does-not-kill-us-makes-us-stronger",
+      "date"     : "2018-11-13 06:01:35 -0600"
+    } ,
+  
+    {
+      "title"    : "Do what you can, with what you have, where you are",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/do-what-you-can-with-what-you-have-where-you-are'> <img src='/images/03.jpg' alt='Do what you can, with what you have, where you are'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/do-what-you-can-with-what-you-have-where-you-are'>Do what you can, with what you have, where you are</a> </h2> <p class='article__excerpt'> Sin tantum modo ad indicia veteris memoriae cognoscenda, curiosorum. Haec et tu ita posuisti, et verba vestra sunt. Idemne... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2018-11-12T06:01:35-06:00'>12 Nov 2018</time></span>  <div class='article-tags__box'>  <a href='/tag/Art' class='article__tag'>Art</a>  <a href='/tag/Culture' class='article__tag'>Culture</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "Art and Culture",
+      "url"      : "/do-what-you-can-with-what-you-have-where-you-are",
+      "date"     : "2018-11-12 06:01:35 -0600"
+    } ,
+  
+    {
+      "title"    : "Share Blazor Components with Shared Class Libraries",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/using-blazor-shared-libraries'>Share Blazor Components with Shared Class Libraries</a> </h2> <p class='article__excerpt'> UPDATE! A lot has changed in the two years since this post was first written. I’ve updated this post to make it current an... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2018-11-12T00:00:00-06:00'>12 Nov 2018</time></span>  <div class='article-tags__box'>  <a href='/tag/blazor' class='article__tag'>blazor</a>  <a href='/tag/csharp' class='article__tag'>csharp</a>  <a href='/tag/dotnet-core' class='article__tag'>dotnet-core</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "blazor, csharp, and dotnet-core",
+      "url"      : "/using-blazor-shared-libraries",
+      "date"     : "2018-11-12 00:00:00 -0600"
+    } ,
+  
+    {
+      "title"    : "If you cannot do great things, do small things in a great way",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/If-you-cannot-do-great-things-do-small-things-in-a-great-way'> <img src='/images/04.jpg' alt='If you cannot do great things, do small things in a great way'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/If-you-cannot-do-great-things-do-small-things-in-a-great-way'>If you cannot do great things, do small things in a great way</a> </h2> <p class='article__excerpt'> Sin tantum modo ad indicia veteris memoriae cognoscenda, curiosorum. Haec et tu ita posuisti, et verba vestra sunt. Idemne... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2018-11-11T06:01:35-06:00'>11 Nov 2018</time></span>  <div class='article-tags__box'>  <a href='/tag/Graffiti' class='article__tag'>Graffiti</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "Graffiti",
+      "url"      : "/If-you-cannot-do-great-things-do-small-things-in-a-great-way",
+      "date"     : "2018-11-11 06:01:35 -0600"
+    } ,
+  
+    {
+      "title"    : "Strive not to be a success, but rather to be of value",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/Strive-not-to-be-a-success-but-rather-to-be-of-value'> <img src='/images/05.jpg' alt='Strive not to be a success, but rather to be of value'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/Strive-not-to-be-a-success-but-rather-to-be-of-value'>Strive not to be a success, but rather to be of value</a> </h2> <p class='article__excerpt'> Sin tantum modo ad indicia veteris memoriae cognoscenda, curiosorum. Haec et tu ita posuisti, et verba vestra sunt. Idemne... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2018-11-10T06:01:35-06:00'>10 Nov 2018</time></span>  <div class='article-tags__box'>  <a href='/tag/Culture' class='article__tag'>Culture</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "Culture",
+      "url"      : "/Strive-not-to-be-a-success-but-rather-to-be-of-value",
+      "date"     : "2018-11-10 06:01:35 -0600"
+    } ,
+  
+    {
+      "title"    : "What you do speaks so loudly that I cannot hear what you say",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/What-you-do-speaks-so-loudly-that-I-cannot-hear-what-you-say'> <img src='/images/08.jpg' alt='What you do speaks so loudly that I cannot hear what you say'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/What-you-do-speaks-so-loudly-that-I-cannot-hear-what-you-say'>What you do speaks so loudly that I cannot hear what you say</a> </h2> <p class='article__excerpt'> Sin tantum modo ad indicia veteris memoriae cognoscenda, curiosorum. Haec et tu ita posuisti, et verba vestra sunt. Idemne... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2018-11-07T06:01:35-06:00'>07 Nov 2018</time></span>  <div class='article-tags__box'>  <a href='/tag/Lettering' class='article__tag'>Lettering</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "Lettering",
+      "url"      : "/What-you-do-speaks-so-loudly-that-I-cannot-hear-what-you-say",
+      "date"     : "2018-11-07 06:01:35 -0600"
+    } ,
+  
+    {
+      "title"    : "You must be the change you wish to see in the world",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/You-must-be-the-change-you-wish-to-see-in-the-world'> <img src='/images/09.jpg' alt='You must be the change you wish to see in the world'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/You-must-be-the-change-you-wish-to-see-in-the-world'>You must be the change you wish to see in the world</a> </h2> <p class='article__excerpt'> Sin tantum modo ad indicia veteris memoriae cognoscenda, curiosorum. Haec et tu ita posuisti, et verba vestra sunt. Idemne... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2018-11-06T06:01:35-06:00'>06 Nov 2018</time></span>  <div class='article-tags__box'>  <a href='/tag/Culture' class='article__tag'>Culture</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "Culture",
+      "url"      : "/You-must-be-the-change-you-wish-to-see-in-the-world",
+      "date"     : "2018-11-06 06:01:35 -0600"
+    } ,
+  
+    {
+      "title"    : "Believe and act as if it were impossible to fail",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/Believe-and-act-as-if-it-were-impossible-to-fail'> <img src='/images/10.jpg' alt='Believe and act as if it were impossible to fail'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/Believe-and-act-as-if-it-were-impossible-to-fail'>Believe and act as if it were impossible to fail</a> </h2> <p class='article__excerpt'> Sin tantum modo ad indicia veteris memoriae cognoscenda, curiosorum. Haec et tu ita posuisti, et verba vestra sunt. Idemne... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2018-11-05T06:01:35-06:00'>05 Nov 2018</time></span>  <div class='article-tags__box'>  <a href='/tag/Culture' class='article__tag'>Culture</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "Culture",
+      "url"      : "/Believe-and-act-as-if-it-were-impossible-to-fail",
+      "date"     : "2018-11-05 06:01:35 -0600"
+    } ,
+  
+    {
+      "title"    : "The way I see it, every life is a pile of good things",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/the-way-i-see-it-every-life-is-a-pile-of-good-things'> <img src='/images/11.jpg' alt='The way I see it, every life is a pile of good things'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/the-way-i-see-it-every-life-is-a-pile-of-good-things'>The way I see it, every life is a pile of good things</a> </h2> <p class='article__excerpt'> Sin tantum modo ad indicia veteris memoriae cognoscenda, curiosorum. Haec et tu ita posuisti, et verba vestra sunt. Idemne... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2018-10-31T07:01:35-05:00'>31 Oct 2018</time></span>  <div class='article-tags__box'>  <a href='/tag/Art' class='article__tag'>Art</a>  <a href='/tag/Culture' class='article__tag'>Culture</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "Art and Culture",
+      "url"      : "/the-way-i-see-it-every-life-is-a-pile-of-good-things",
+      "date"     : "2018-10-31 07:01:35 -0500"
+    } ,
+  
+    {
+      "title"    : "GitHub tip: You don&#39;t need that .git extension to clone",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/dont-need-git-extension-to-clone'>GitHub tip: You don't need that .git extension to clone</a> </h2> <p class='article__excerpt'> If you want to clone a GitHub repository, the most common (and documented) way is to browse to it and click that green Clo... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2018-10-27T00:00:00-05:00'>27 Oct 2018</time></span>  <div class='article-tags__box'>  <a href='/tag/git' class='article__tag'>git</a>  <a href='/tag/quick-tips' class='article__tag'>quick-tips</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "git and quick-tips",
+      "url"      : "/dont-need-git-extension-to-clone",
+      "date"     : "2018-10-27 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Everything has beauty, but not everyone can see",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/Everything-has-beauty-but-not-everyone-can-see'> <img src='/images/12.jpg' alt='Everything has beauty, but not everyone can see'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/Everything-has-beauty-but-not-everyone-can-see'>Everything has beauty, but not everyone can see</a> </h2> <p class='article__excerpt'> Sin tantum modo ad indicia veteris memoriae cognoscenda, curiosorum. Haec et tu ita posuisti, et verba vestra sunt. Idemne... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2018-05-29T10:05:55-05:00'>29 May 2018</time></span>  <div class='article-tags__box'>  <a href='/tag/Art' class='article__tag'>Art</a>  <a href='/tag/Culture' class='article__tag'>Culture</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "Art and Culture",
+      "url"      : "/Everything-has-beauty-but-not-everyone-can-see",
+      "date"     : "2018-05-29 10:05:55 -0500"
+    } ,
+  
+    {
+      "title"    : "JavaScript Scope Can Be Tricky",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/javascript-scope-can-be-tricky'>JavaScript Scope Can Be Tricky</a> </h2> <p class='article__excerpt'> I was writing some vanilla JavaScript this weekend - it has been quite awhile since I did so. As I’ve been writing mostly ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2018-04-30T00:00:00-05:00'>30 Apr 2018</time></span>  <div class='article-tags__box'>  <a href='/tag/javascript' class='article__tag'>javascript</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "javascript",
+      "url"      : "/javascript-scope-can-be-tricky",
+      "date"     : "2018-04-30 00:00:00 -0500"
+    } ,
+  
+    {
+      "title"    : "Remember that happiness is a way of travel, not a destination",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='image-wrap'> <a class='article__image' href='/Remember-that-happiness-is-a-way-of-travel-not-a-destination'> <img src='/images/13.jpg' alt='Remember that happiness is a way of travel, not a destination'> </a> </div>  <div class='article__content'> <h2 class='article__title'> <a href='/Remember-that-happiness-is-a-way-of-travel-not-a-destination'>Remember that happiness is a way of travel, not a destination</a> </h2> <p class='article__excerpt'> Sin tantum modo ad indicia veteris memoriae cognoscenda, curiosorum. Haec et tu ita posuisti, et verba vestra sunt. Idemne... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2018-04-24T07:01:35-05:00'>24 Apr 2018</time></span>  <div class='article-tags__box'>  <a href='/tag/Lettering' class='article__tag'>Lettering</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "Lettering",
+      "url"      : "/Remember-that-happiness-is-a-way-of-travel-not-a-destination",
+      "date"     : "2018-04-24 07:01:35 -0500"
+    } ,
+  
+    {
+      "title"    : "Full-Stack Development in Visual Studio Code with ASP.NET Core",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/full-stack-development-in-vs-code-with-asp-net-core'>Full-Stack Development in Visual Studio Code with ASP.NET Core</a> </h2> <p class='article__excerpt'> The true power with ASP.NET Core is in its flexibility. With a powerful CLI, I can run an app on any platform with just a ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2018-03-05T00:00:00-06:00'>05 Mar 2018</time></span>  <div class='article-tags__box'>  <a href='/tag/csharp' class='article__tag'>csharp</a>  <a href='/tag/vs-code' class='article__tag'>vs-code</a>  <a href='/tag/sql' class='article__tag'>sql</a>  <a href='/tag/dotnet-core' class='article__tag'>dotnet-core</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "csharp, vs-code, sql, and dotnet-core",
+      "url"      : "/full-stack-development-in-vs-code-with-asp-net-core",
+      "date"     : "2018-03-05 00:00:00 -0600"
+    } ,
+  
+    {
+      "title"    : "Using Anchor Links in Markdown",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/using-anchor-links-in-markdown'>Using Anchor Links in Markdown</a> </h2> <p class='article__excerpt'> This is a short post that might help you.
+
+I wasn’t sure how to use anchor links in Markdown. These come in handy when you... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2018-03-04T00:00:00-06:00'>04 Mar 2018</time></span>  <div class='article-tags__box'>  <a href='/tag/blogging' class='article__tag'>blogging</a>  <a href='/tag/markdown' class='article__tag'>markdown</a>  <a href='/tag/quick-tips' class='article__tag'>quick-tips</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "blogging, markdown, and quick-tips",
+      "url"      : "/using-anchor-links-in-markdown",
+      "date"     : "2018-03-04 00:00:00 -0600"
+    } ,
+  
+    {
+      "title"    : "The AppCache API: Is It Worth It?",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/the-appcache-api-is-it-worth-it'>The AppCache API: Is It Worth It?</a> </h2> <p class='article__excerpt'> The Application Cache (AppCache) API allows offline access to your application by providing the following benefits:
+
+
+  Pe... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2017-02-04T00:00:00-06:00'>04 Feb 2017</time></span>  <div class='article-tags__box'>  <a href='/tag/javascript' class='article__tag'>javascript</a>  <a href='/tag/html5' class='article__tag'>html5</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "javascript and html5",
+      "url"      : "/the-appcache-api-is-it-worth-it",
+      "date"     : "2017-02-04 00:00:00 -0600"
+    } ,
+  
+    {
+      "title"    : "Publish your localhost with the World using Localtunnel",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/publish-your-localhost-with-the-world-using-localtunnel'>Publish your localhost with the World using Localtunnel</a> </h2> <p class='article__excerpt'> During your development process, you may need to show off your work from a browsable URL but you aren’t quite ready for a ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2017-02-04T00:00:00-06:00'>04 Feb 2017</time></span>  <div class='article-tags__box'>  <a href='/tag/tools' class='article__tag'>tools</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "tools",
+      "url"      : "/publish-your-localhost-with-the-world-using-localtunnel",
+      "date"     : "2017-02-04 00:00:00 -0600"
+    } ,
+  
+    {
+      "title"    : "Exploring the Web Storage APIs",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/exploring-the-web-storage-apis'>Exploring the Web Storage APIs</a> </h2> <p class='article__excerpt'> For years, if we wanted to store local data we would look to using HTTP cookies—a convenient way to persist small amounts ... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2017-02-04T00:00:00-06:00'>04 Feb 2017</time></span>  <div class='article-tags__box'>  <a href='/tag/javascript' class='article__tag'>javascript</a>  <a href='/tag/html5' class='article__tag'>html5</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "javascript and html5",
+      "url"      : "/exploring-the-web-storage-apis",
+      "date"     : "2017-02-04 00:00:00 -0600"
+    } ,
+  
+    {
+      "title"    : "Exploring the Geolocation API",
+      "article"  : "<div class='article col col-4 col-d-6 col-t-12'> <div class='article__inner'>  <div class='article__content'> <h2 class='article__title'> <a href='/exploring-the-geolocation-api'>Exploring the Geolocation API</a> </h2> <p class='article__excerpt'> Building location-aware applications is a snap with the HTML5 Geolocation APIs. These APIs allows you to retrieve a user’s... </p> <div class='article__meta'> <a href='/about/' class='article__author-link'>Dave Brock</a> <span class='article__date'><time datetime='2017-02-04T00:00:00-06:00'>04 Feb 2017</time></span>  <div class='article-tags__box'>  <a href='/tag/javascript' class='article__tag'>javascript</a>  <a href='/tag/html5' class='article__tag'>html5</a>  </div>  </div> </div> </div> </div>",
+      "category" : "",
+      "tags"     : "javascript and html5",
+      "url"      : "/exploring-the-geolocation-api",
+      "date"     : "2017-02-04 00:00:00 -0600"
+    } 
+  
+]

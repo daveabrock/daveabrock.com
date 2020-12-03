@@ -1,0 +1,167 @@
+I"�C<p>The true power with ASP.NET Core is in its flexibility. With a powerful CLI, I can run an app on any platform with just a basic text editor, if I so desire. And speaking of desire: when I write code, I prefer <a href="https://code.visualstudio.com/">Visual Studio Code</a>. It’s fast, responsive, and gives me exactly what I need and nothing more. Of course, I rely on Visual Studio 2017 from time-to-time for advanced debugging and profiling. But when I’m in a code-debug-code workflow, nothing is better.</p>
+
+<p>Visual Studio Code is perfect for ASP.NET Core - allowing me to write front-end <em>and</em> back-end code in one great lightweight environment. Unfortunately, when I talk to ASP.NET Core developers many times Visual Studio Code isn’t a consideration. Often, I hear that while Code is a great tool, it only is for those slinging front-end code. And after decades of the full-fledged Visual Studio being the only option to write .NET code, who can blame them?</p>
+
+<p>Let’s get started and walk through how you can debug C# code, query databases, and more with .NET Core using Visual Studio Code.</p>
+
+<p><strong>Note</strong>: All screenshots and keyboard shortcuts are using Windows 10, but they should be very similar on other operating systems like a Mac.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<p>Before we get started, you’ll need to make sure you have the following installed on your platform of choice.</p>
+
+<ul>
+  <li><a href="https://www.microsoft.com/net/learn/get-started/windows">ASP.NET Core SDK</a> (confirm installation by executing <code class="language-plaintext highlighter-rouge">dotnet --version</code> from a terminal window)</li>
+  <li><a href="https://code.visualstudio.com/">Visual Studio Code</a></li>
+  <li>After installing Code, the <a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.csharp">OmniSharp C# extension</a></li>
+</ul>
+
+<p>Now that we have everything set up, let’s start by creating a new ASP.NET Core web application from the <a href="https://docs.microsoft.com/dotnet/core/tools/?tabs=netcore2x">ASP.NET Core command-line interface (CLI)</a>.</p>
+
+<h2 id="create-a-new-core-project">Create a new Core project</h2>
+
+<p>We’re going to create a new Core project first, using the ASP.NET Core CLI.</p>
+
+<p>First, from a terminal window let’s get a list of all available templates by adding the <code class="language-plaintext highlighter-rouge">-l</code> flag to our <code class="language-plaintext highlighter-rouge">dotnet new</code> command:</p>
+
+<p><code class="language-plaintext highlighter-rouge">dotnet new -l</code></p>
+
+<p><img src="https://raw.githubusercontent.com/daveabrock/blog-assets/master/blog/fullstackwithcode/dotnet-new-l.PNG" alt="Create a new Core project" /></p>
+
+<p>You can see that we can create a new project based on many different project template types. For our purposes, any application will do - let’s go ahead and create a new ASP.NET Core MVC App by including the <code class="language-plaintext highlighter-rouge">Short Name</code> in the command in your terminal window.</p>
+
+<p><code class="language-plaintext highlighter-rouge">dotnet new mvc</code></p>
+
+<p><img src="https://raw.githubusercontent.com/daveabrock/blog-assets/master/blog/fullstackwithcode/dotnet-new-mvc.PNG" alt="MVC project options" /></p>
+
+<p>Now that we successfully created our project, we can open our new solution in Visual Studio Code. From the terminal, navigate one folder down to the project directory and enter <code class="language-plaintext highlighter-rouge">code .</code> from your terminal window.</p>
+
+<h2 id="working-with-your-core-solution-in-code">Working with your Core solution in Code</h2>
+
+<p>When you first open the C# project, you’ll get a warning that Code needs to build required assets to the project.</p>
+
+<p><img src="https://raw.githubusercontent.com/daveabrock/blog-assets/master/blog/fullstackwithcode/required-assets.PNG" alt="Build required assets dialog" /></p>
+
+<p>After you click <code class="language-plaintext highlighter-rouge">Yes</code>, you’ll see a <code class="language-plaintext highlighter-rouge">.vscode</code> folder added to your project, which includes the following:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">launch.json</code> - where Code keeps debugging configuration information</li>
+  <li><code class="language-plaintext highlighter-rouge">tasks.json</code> - where you can define any tasks that you need run - for example, <code class="language-plaintext highlighter-rouge">dotnet build</code> or <code class="language-plaintext highlighter-rouge">dotnet run</code>.</li>
+</ul>
+
+<p>For example, here’s what my <code class="language-plaintext highlighter-rouge">tasks.json</code> looks like out of the box.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2.0.0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"tasks"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"build"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"dotnet build"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"shell"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"group"</span><span class="p">:</span><span class="w"> </span><span class="s2">"build"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"presentation"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="nl">"reveal"</span><span class="p">:</span><span class="w"> </span><span class="s2">"silent"</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="nl">"problemMatcher"</span><span class="p">:</span><span class="w"> </span><span class="s2">"$msCompile"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>This allows me to build my solution without needing to keep entering <code class="language-plaintext highlighter-rouge">dotnet build</code> from the command line. In Windows, I can hit <code class="language-plaintext highlighter-rouge">Ctrl</code> + <code class="language-plaintext highlighter-rouge">Shift</code> + <code class="language-plaintext highlighter-rouge">B</code> much like I can in regular Visual Studio. Try it out!</p>
+
+<h2 id="debugging-c-code">Debugging C# Code</h2>
+
+<p>Now, let’s take a look at how C# debugging works in Visual Studio Code. First, set a breakpoint anywhere in the application much like you would do in any other IDE (in a gutter next to the line number). In my case, I’m creating a breakpoint inside the <code class="language-plaintext highlighter-rouge">About</code> controller action in <code class="language-plaintext highlighter-rouge">Controllers/HomeController.cs</code>.</p>
+
+<p><img src="https://raw.githubusercontent.com/daveabrock/blog-assets/master/blog/fullstackwithcode/breakpoint.PNG" alt="Create a breakpoint" /></p>
+
+<p>Now, navigate to the <strong>Debug</strong> tab in Code and click the <em>Debug</em> button.</p>
+
+<p><img src="https://raw.githubusercontent.com/daveabrock/blog-assets/master/blog/fullstackwithcode/debug-button.PNG" alt="Debug button" /></p>
+
+<p>Code will launch your application using <code class="language-plaintext highlighter-rouge">http://localhost:5000</code>.</p>
+
+<p><img src="https://raw.githubusercontent.com/daveabrock/blog-assets/master/blog/fullstackwithcode/localhost.PNG" alt="Launch site" /></p>
+
+<p>Next, trigger your breakpoint - for me, that means clicking the <code class="language-plaintext highlighter-rouge">About</code> link in the top menu so that I can enter the <code class="language-plaintext highlighter-rouge">About</code> action in the <code class="language-plaintext highlighter-rouge">Home</code> controller.</p>
+
+<p>If you go back to the Debug section in Code, you’ll see all the debugging options at your disposal: accessing your variables, call stack, all your breakpoints, and even the ability to watch variables or objects.</p>
+
+<p><img src="https://raw.githubusercontent.com/daveabrock/blog-assets/master/blog/fullstackwithcode/debug.PNG" alt="Debugging options" /></p>
+
+<p>Now, let’s add a watch statement for the <code class="language-plaintext highlighter-rouge">ViewData</code> message.</p>
+
+<p><img src="https://raw.githubusercontent.com/daveabrock/blog-assets/master/blog/fullstackwithcode/watch-before.png" alt="Watch statement - before" /></p>
+
+<p>It’s <code class="language-plaintext highlighter-rouge">null</code> now because I haven’t executed that line of code yet. Once I step into the method, you’ll see the value of <code class="language-plaintext highlighter-rouge">ViewData["Message"]</code>.
+<img src="https://raw.githubusercontent.com/daveabrock/blog-assets/master/blog/fullstackwithcode/watch-after.PNG" alt="Watch statement - after" /></p>
+
+<p>Now that we’ve been able to debug C#, let’s query a database!</p>
+
+<h2 id="working-with-databases-in-code">Working with Databases in Code</h2>
+
+<p>So, I’ve created a new C# project and can debug it in Visual Studio Code. Pretty cool, right? But with any server-side application, you’ll want to work with a database. You can easily do this in Code - for our purposes, we’ll be working with SQL Server.</p>
+
+<p>(<strong>Note</strong>: If you are working with SQL Server on a Mac, a setup guide is beyond the scope of this post. This piece <a href="https://docs.microsoft.com/en-us/sql/linux/quickstart-install-connect-docker">should be able to assist you</a>.)</p>
+
+<p>Before we get started, we’ll need to install <a href="https://marketplace.visualstudio.com/items?itemName=ms-mssql.mssql">Microsoft’s own SQL Server extension</a> from Visual Studio Code. Just search for <code class="language-plaintext highlighter-rouge">mssql</code> in the Extensions panel and you should have no problem finding it.</p>
+
+<p><img src="https://raw.githubusercontent.com/daveabrock/blog-assets/master/blog/fullstackwithcode/mssql.PNG" alt="mssql extension result" /></p>
+
+<p>Now that you have the extension installed, you’ll need to create a connection to your database server (this can be locally or even something hosted in Azure). To start connecting to the database, access the Command menu (<code class="language-plaintext highlighter-rouge">Ctrl</code> + <code class="language-plaintext highlighter-rouge">Shift</code> + <code class="language-plaintext highlighter-rouge">P</code>) and search for <code class="language-plaintext highlighter-rouge">sql</code>. You’ll see all the commands the extension has provided for you.</p>
+
+<p><img src="https://raw.githubusercontent.com/daveabrock/blog-assets/master/blog/fullstackwithcode/command-menu.png" alt="mssql command menu" /></p>
+
+<p>Select <code class="language-plaintext highlighter-rouge">MS SQL : Connect</code> from the command menu and follow the prompts.</p>
+
+<ul>
+  <li><strong>Server name</strong> - since I am connecting locally, I just entered <code class="language-plaintext highlighter-rouge">(localhost)\MSSQLLocalDB.</code> You can do this, or if hosted in Azure the <em>mydb</em>.database.windows.net address, or even a remote IP address.</li>
+  <li><strong>Database name</strong> - enter the database you want to use (this is optional).</li>
+  <li><strong>Integrated/SQL Server authentication</strong> - pick your authentication method. If you’re using a local DB, <strong>Integrated</strong> will do. For something like Azure, you’ll need SQL authentication.</li>
+  <li><strong>Profile name</strong> - you can optionally enter a name for the profile.</li>
+</ul>
+
+<p>Now that we’re set up and connected, let’s set up a database with horror movies. To do this, first create a <em>.sql</em> file in your project.</p>
+
+<h3 id="create-sample-database">Create sample database</h3>
+
+<p>In your SQL file, create a database. Feel free to copy and paste this syntax, then execute (<code class="language-plaintext highlighter-rouge">Ctrl</code> + <code class="language-plaintext highlighter-rouge">Shift</code> + <code class="language-plaintext highlighter-rouge">E</code>).</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CREATE</span> <span class="k">DATABASE</span> <span class="n">MyHorrorDB</span>
+</code></pre></div></div>
+
+<p>Now, if you execute the following you should be able to see the name of your new database.</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="n">Name</span> <span class="k">FROM</span> <span class="n">sys</span><span class="p">.</span><span class="n">Databases</span>
+</code></pre></div></div>
+
+<p>Now that we have proof of our created databases, execute the following SQL to inject your database with sample data. You should notice IntelliSense-like completion!</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">USE</span> <span class="n">MyHorrorDB</span>
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">Movies</span> <span class="p">(</span><span class="n">MovieId</span> <span class="nb">INT</span><span class="p">,</span> <span class="n">Name</span> <span class="n">NVARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span> <span class="nb">Year</span> <span class="nb">INT</span><span class="p">)</span>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">Movies</span> <span class="k">VALUES</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'Halloween'</span><span class="p">,</span> <span class="mi">1978</span><span class="p">);</span>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">Movies</span> <span class="k">VALUES</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">'Psycho'</span><span class="p">,</span> <span class="mi">1960</span><span class="p">);</span>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">Movies</span> <span class="k">VALUES</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">'The Texas Chainsaw Massacre'</span><span class="p">,</span> <span class="mi">1974</span><span class="p">);</span>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">Movies</span> <span class="k">VALUES</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s1">'The Exorcist'</span><span class="p">,</span> <span class="mi">1973</span><span class="p">);</span>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">Movies</span> <span class="k">VALUES</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s1">'Night of the Living Dead'</span><span class="p">,</span> <span class="mi">1968</span><span class="p">);</span>
+<span class="k">GO</span>
+</code></pre></div></div>
+
+<p>Now, do a blanket <code class="language-plaintext highlighter-rouge">SELECT</code> to get all your movies (obviously, a blanket <code class="language-plaintext highlighter-rouge">SELECT</code> is not recommended for performance reasons but this is pretty harmless since we’re querying five movies).</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">Movies</span>
+</code></pre></div></div>
+
+<p>Now you should your sample data in action!</p>
+
+<p><img src="https://raw.githubusercontent.com/daveabrock/blog-assets/master/blog/fullstackwithcode/horror-movies.PNG" alt="Query results" /></p>
+
+<p>You can do much more than query databases, though! Take a look at <a href="https://docs.microsoft.com/sql/linux/sql-server-linux-develop-use-vscode">this document</a> for more details.</p>
+
+<h2 id="wrapping-up">Wrapping up</h2>
+
+<p>While this is just scratching the surface, I hope this convinces you to give Visual Studio Code a try for developing in ASP.NET Core when you don’t need a full-fledged IDE. And, of course, leave me a comment if you want to keep this conversation going!</p>
+
+<p><em>Thanks to <a href="https://twitter.com/Scott_Addie">Scott Addie</a> of Microsoft and <a href="https://twitter.com/saltnburnem">Chris DeMars</a> for performing a technical review of this post.</em></p>
+:ET

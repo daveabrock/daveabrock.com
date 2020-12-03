@@ -1,0 +1,36 @@
+<p>During your development process, you may need to show off your work from a browsable URL but you aren’t quite ready for a deploy or even a check in. For example, you might want to do some easy mobile testing on your device of choice, or you may have an eager customer that wants to see your latest and greatest. Alternatively, your application might have webhooks to other services that require a public URL.</p>
+
+<p>There are several options you could consider. You could use a cloud service like <a href="https://azure.microsoft.com/en-us/">Microsoft Azure</a> or <a href="https://aws.amazon.com">Amazon Web Services</a>, but you’ll need to register, configure, and eventually pay. <a href="https://www.npmjs.com/package/localhost-now">Now</a> is great, but it only serves up static files. <a href="https://ngrok.com/">Ngrok</a> is full-featured and robust, but if you’re looking for a quick solution with minimal configuration you should look elsewhere.</p>
+
+<p>I prefer <a href="https://localtunnel.github.io/www/">Localtunnel</a> and its amazing simplicity. Its simplicity should not be taken as a deficiency, <a href="https://news.ycombinator.com/item?id=7585056">as others have noted</a>. Once I download the package, all I need to do is tell Localtunnel the port I am working on—then I get back a public URL I can share with anyone in the world.</p>
+
+<p>You can get Localtunnel from a Node.js package. (If you need Node, download it from <a href="https://nodejs.org/en/download/">this site</a>, and of course confirm the installation by typing <code class="language-plaintext highlighter-rouge">node -v</code> in your shell.)</p>
+
+<p>To get started, install Localtunnel from NPM:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm <span class="nb">install</span> <span class="nt">-g</span> localtunnel
+</code></pre></div></div>
+
+<p>Then, once your localhost server is running, enter the following in the shell (change your port appropriately):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>lt <span class="nt">--port</span> 8000
+</code></pre></div></div>
+
+<p>That’s it! You’ll get back a randomized subdomain URL to share:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>your url is: https://cqjfkqyjve.localtunnel.me
+</code></pre></div></div>
+
+<p>Optionally, if you’d like a friendlier subdomain, you can use the subdomain parameter to specify one:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>lt <span class="nt">--port</span> 8000 <span class="nt">--subdomain</span> dave
+</code></pre></div></div>
+
+<p>Localtunnel then gives you a custom subdomain. You can use your desired subdomain as long as <strong>no one is using it when you are requesting yours</strong>.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>your url is: https://dave.localtunnel.me
+</code></pre></div></div>
+
+<p>You can share this link with anyone in the world, as long as the <code class="language-plaintext highlighter-rouge">lt</code> session remains active.</p>
+
+<p>To find out more about Localtunnel, head over to <a href="https://github.com/localtunnel/localtunnel">their GitHub repository</a>. From there, you’ll also see that you can use an API as well. If you’re looking to share your localhost with little to no thinking or configuration, give Localtunnel a shot.</p>

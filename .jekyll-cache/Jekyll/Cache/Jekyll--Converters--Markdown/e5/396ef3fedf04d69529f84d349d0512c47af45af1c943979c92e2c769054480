@@ -1,0 +1,66 @@
+I"�<p><strong>UPDATE:</strong> <em>Since the initial publishing of the post, the approach has changed. This post has been updated to reflect the latest news</em>.</p>
+
+<p>In my last post, I took a <a href="https://daveabrock.com/2020/06/18/reduce-mental-energy-with-c-sharp">test drive through some C# 9 features</a> that might make your developer life easier. In it, I mentioned using logical patterns, such as the <code class="language-plaintext highlighter-rouge">not</code> keyword to throw an <code class="language-plaintext highlighter-rouge">ArgumentException</code>, if wanted:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">not</span> <span class="k">null</span> <span class="p">=&gt;</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">(</span><span class="s">$"Not sure what this is: </span><span class="p">{</span><span class="n">yourArgument</span><span class="p">}</span><span class="s">"</span><span class="p">,</span> <span class="k">nameof</span><span class="p">(</span><span class="n">yourArgument</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h1 id="championed-proposal-simplified-null-parameter-checking">Championed proposal: simplified null-parameter checking</h1>
+
+<p>As it turns out, there is a new championed proposal which appears to gain some traction called <a href="https://github.com/dotnet/csharplang/issues/2145">simplified null-parameter checking</a>. Some folks have written about this, making it seem like it’s a sure thing in C# 9, so I’d like to clarify some things I learned after doing some research (and, of course, hit up the comments if I’m incorrect as things are changing frequently).</p>
+
+<p>As for the proposal itself: let’s say you do what you’ve done quite a few times in regular C# code:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">void</span> <span class="nf">DoSomethingCool</span><span class="p">(</span><span class="kt">string</span> <span class="n">coolString</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">coolString</span> <span class="k">is</span> <span class="k">null</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">(</span><span class="s">$"Ooh, can't do anything with </span><span class="p">{</span><span class="n">coolString</span><span class="p">}</span><span class="s">"</span><span class="p">,</span> <span class="k">nameof</span><span class="p">(</span><span class="n">coolString</span><span class="p">));</span>
+    <span class="p">}</span>
+
+    <span class="c1">// proceed to do some cool things</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="initial-approach-add--to-your-parameter-name">Initial approach: add <code class="language-plaintext highlighter-rouge">!</code> to your parameter name</h2>
+
+<p>In this C# 9 proposal, you can add <code class="language-plaintext highlighter-rouge">!</code> to your parameter name to simplify things. Try this one instead:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">void</span> <span class="nf">DoSomethingCool</span><span class="p">(</span><span class="kt">string</span> <span class="n">coolString</span><span class="p">!)</span>
+<span class="p">{</span>
+    <span class="c1">// proceed to do some cool things</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>I have mixed feelings about this proposal.</p>
+
+<p>Not only are you <em>super excited</em> about your parameter, you’re also asking the C# parameter to trigger standard null checks for it. It is important to mention this is for runtime checks only and does not impact the type system. Therefore, the check is on the value and not the type. I love the clarity.</p>
+
+<p>But, there’s a lot here:</p>
+
+<ul>
+  <li>Adding <code class="language-plaintext highlighter-rouge">!</code> in a C-based language might confuse developers who have a mental model of the negation operator</li>
+  <li>It’s very single-use and not very extensible</li>
+  <li>There seems to be other approaches that make more sense like a <code class="language-plaintext highlighter-rouge">[NullCheck]</code> attribute, as was suggested, or using asserts, or even a project file directive</li>
+</ul>
+
+<h2 id="new-approach-use--instead">New approach: use <code class="language-plaintext highlighter-rouge">!!</code> instead</h2>
+
+<p>Late last week, around June 25-<em>ish</em> of 2020, the C# team will be changing to use <code class="language-plaintext highlighter-rouge">!!</code> instead (<a href="https://github.com/dotnet/csharplang/blob/master/meetings/2020/LDM-2020-06-24.md#parameter-null-checking">meeting notes here</a>).</p>
+
+<p>The general rules are:</p>
+
+<ul>
+  <li>If this is used on a parameter, throw <code class="language-plaintext highlighter-rouge">ArgumentNullException(nameof(paramName))</code></li>
+  <li>If used elsewhere, throw <code class="language-plaintext highlighter-rouge">InvalidOperationException</code>. A <code class="language-plaintext highlighter-rouge">NullOperationException</code> might be clearer, and others have noticed this as well</li>
+</ul>
+
+<p>This behavior could also be used as an operator. If you review the <a href="https://github.com/dotnet/csharplang/issues/2145">GitHub issue on the topic</a>, Jared Parsons notes:</p>
+<blockquote>
+  <p>The decision was limited to using !! as parameter null checking. While LDM recognizes that !! could be useful as an operator, and in previous meetings we had sketched out how that would work, in this meeting we only decided on the parameter form.</p>
+</blockquote>
+
+<p>I do think this is better, but not <em>that much better</em>. The confusion surrounding how <code class="language-plaintext highlighter-rouge">!</code> is used has been eliminated, but it still isn’t an extensible solution. Adding a keyword might help here, but I personally would like to see more flexibility with more than just parameters, such as a <code class="language-plaintext highlighter-rouge">{ get; set!; }</code> construct.</p>
+
+<p>Anyway, if you look at the <a href="https://github.com/dotnet/roslyn/blob/master/docs/Language%20Feature%20Status.md">Language Feature Status</a> and even the <a href="https://github.com/dotnet/csharplang/issues/2145">spirited issue itself</a>, it is very much in progress. If you’re looking to simplify null checking in C# 9, for now, I would depend on using logical patterns until this is ironed out some more.</p>
+:ET

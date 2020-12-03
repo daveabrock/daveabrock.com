@@ -1,0 +1,209 @@
+I"9^<p><img src="https://raw.githubusercontent.com/daveabrock/daveabrock.github.io/master/THE%20.NET%20STACKS.png" alt="Newsletter image" /></p>
+
+<p>We had a tremendously busy week in .NET and it shows in this week’s edition.</p>
+
+<p>This week, we:</p>
+
+<ul>
+  <li>Discuss the latest in .NET 5</li>
+  <li>Think about what it’s like to be a beginner in the .NET ecosystem</li>
+  <li>Kick off an interview with Jeremy Likness, Microsoft’s Sr. PM of .NET Data</li>
+  <li>Take a trip around the community</li>
+</ul>
+
+<p>Also, say 👋🏻 to my parents! They just subscribed and this is the only line they’ll understand. 🤓</p>
+
+<h2 id="net-5-is-close-so-close">.NET 5 is close, so close</h2>
+
+<p>This week, we hit the preview 7 release for .NET 5 (see the notes for <a href="https://devblogs.microsoft.com/dotnet/announcing-net-5-0-preview-7">.NET 5 Preview 7</a>, <a href="https://devblogs.microsoft.com/dotnet/announcing-entity-framework-core-ef-core-5-0-preview-7">EF Core 5 Preview 7</a>, and <a href="https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-preview-7/">ASP.NET Core updates in the new preview</a>, as well as Steven Toub’s post on <a href="https://devblogs.microsoft.com/dotnet/performance-improvements-in-net-5/">.NET 5 performance improvements</a>). The next release for .NET 5 will be Release 8, and then there will the two RCs (each with “go live” licenses). .NET 5 is slated for official release in early November.</p>
+
+<p>What’s new in these previews? A few items of note:</p>
+
+<ul>
+  <li>Blazor WASM apps now target .NET 5</li>
+  <li>Blazor improvements in debugging, accessibility, and performance</li>
+  <li>In EF, a <code class="language-plaintext highlighter-rouge">DbContextFactory</code>, ability to clear the <code class="language-plaintext highlighter-rouge">DbContext</code> state, and transaction savepoints</li>
+</ul>
+
+<p>It looks like single-file apps, the ability for .NET Core apps to be <a href="https://github.com/dotnet/runtime/issues/36590">published and distributed as a single executable file</a>, is coming in the next release (release 8).</p>
+
+<h2 id="how-would-you-help-a-beginner-get-started-on-net">How would <em>you</em> help a beginner get started on .NET?</h2>
+
+<p>Dustin Gorski published a great post last week called <a href="https://dusted.codes/dotnet-for-beginners">.NET for Beginners</a>. It certainly isn’t a quick read, but I would recommend giving it a read when you get a few minutes. He discusses why many feel that .NET isn’t very approachable for newcomers. It opened my eyes: I was aware of most of his criticisms, but I’ve been dealing with them for so long I haven’t thought about how difficult it can be for newcomers coming into .NET for the first time.</p>
+
+<p>From my perspective, what I agreed most with was:</p>
+
+<ul>
+  <li>How you have to know a lot to get started</li>
+  <li>How feature bloat really prevents beginners from knowing the best way to do something, when there are so many ways to do it (with varying performance impacts)</li>
+  <li>How the constant change and re-architecting of the platform makes it almost impossible to keep up</li>
+</ul>
+
+<p>Think about it: if someone can to you and asked how to get started in .NET using a sample application, <em>what would you say?</em></p>
+
+<p>Would you start by explaining .NET Core and how it’s different than .NET Framework? And mention .NET Standard as a bridge between them? Or get them excited about .NET 5? Would you also bring up C# and F# and VB and the differences between them? What about Xamarin and Mono? What about a simple web site? Should they get started with Blazor? Traditional MVC? Razor Pages? One of my biggest takeaways from the piece: <em>you have to know a lot of trivia to start developing in .NET.</em></p>
+
+<p>Feature bloat is real, especially when it comes to C#. Take, for example, the promise of immutability in C# 9 with records (<a href="https://daveabrock.com/2020/07/06/c-sharp-9-deep-dive-records">which I’ve written about</a>). Records are similar to—but have immutable features over—structs. The exact reasons aren’t important here (that records are meant for immutability and prevent boilerplate code) but a <a href="https://stackoverflow.com/questions/61939693/when-to-use-c9-records">valid complaint shows</a>: why are we introducing a new construct into the language where we could have improved on what already exists? If someone wanted to use immutability in .NET, what would you say now? Use records in C# 9? Use readonly structs? What about a tuple class? Or use F#?</p>
+
+<p>This is not to say Microsoft isn’t aware of all these challenges and isn’t trying to improve. They definitely are! You can head over to <a href="https://try.dot.net/"><em>try.dot.net</em></a> to run C# in the browser (<a href="https://dotnet.microsoft.com/learn/dotnet/in-browser-tutorial/">with an in-browser tutorial</a>). You can run code in the docs and in Microsoft Learn modules. C# 9 top-level statements take away that pesky <code class="language-plaintext highlighter-rouge">Main</code> method in console apps (<a href="https://daveabrock.com/2020/07/09/c-sharp-9-top-level-programs">yet another shameless plug</a>).</p>
+
+<p>Coming from the slow-moving days from the bloated <code class="language-plaintext highlighter-rouge">System.Web</code> namespace, I never thought I would be hearing (and agreeing) about gripes of .NET moving too fast. This is a testament to the hard work by the folks at Microsoft. Taking hints from .NET 5, I hope .NET allows developers to focus on what’s important, not try to be everything to everyone, and avoid feature bloat in C#. I think a continued focus on approachability positively impacts all .NET developers.</p>
+
+<h2 id="dev-discussions-jeremy-likness-sr-pm-of-data-at-microsoft">Dev Discussions: Jeremy Likness, Sr. PM of Data at Microsoft</h2>
+
+<p>If you’ve worked on Azure or .NET for awhile—like Azure Functions and Entity Framework—you’re probably familiar with Jeremy Likness, the senior PM for .NET data at Microsoft. He’s spoken at several conferences (remember those?), <a href="https://blog.jeremylikness.com/">writes about various topics at his site</a>, is a familiar face on various .NET-related videos, and, as of late, can be seen in the Entity Framework community standups (and more!).</p>
+
+<p>I caught up with Jeremy to talk about his path to software development and all that’s going on with Entity Framework and .NET 5. After you get through this week’s interview, I think we can all agree his path to Microsoft is both inspiring and absolutely crazy.</p>
+
+<p>Jeremy was very generous with his time! Because there’s so much to cover, I’ve split this into two different parts. This week, we get to know Jeremy. Next week, we’ll get into his work and discuss Entity Framework and .NET 5.</p>
+
+<p><img src="http://localhost:4001/images/jeremy-likness.jpg" alt="Jeremy Likness" /></p>
+
+<p><strong>As a developer at heart, what kind of projects have you been tinkering with?</strong></p>
+
+<p>My first consulting projects … involved XAML via WPF then Silverlight. I was a strong advocate of Silverlight because I had built some very complex web apps using JavaScript and managing them across browsers was a nightmare. … Silverlight was an implicit promise to write C# code that could run anywhere, and for many reasons probably more political than technical, the promise was not fulfilled.</p>
+
+<p>I believe it has been realized with .NET Core and more specifically, Blazor. I resisted Blazor when it came out due to the existence of mature web frameworks available like Angular, React, Vue.js and Svelte, but colleagues convinced me to give it a spin and I was blown away by two things: first, how productive I could be and produce so much in a short period of time. Second, how many existing packages work with it and run inside the browser “as is.”</p>
+
+<p>I’ve been building a lot of Blazor apps to explore different protocols, ways of interacting with data, application of the MVVM pattern and more. I’m working to publish some reference applications that show how to use Blazor with Entity Framework Core <a href="https://blog.jeremylikness.com/series/blazor-and-ef-core/">and have published seven articles</a>.</p>
+
+<p>I am also diving into expressions. I <a href="https://blog.jeremylikness.com/blog/dynamically-build-linq-expressions/">published a blog post</a> about parsing JSON and turning it into an expression tree to evaluate. I’ve also <a href="https://blog.jeremylikness.com/blog/look-behind-the-iqueryable-curtain/">written about the inverse</a>: parsing an <code class="language-plaintext highlighter-rouge">IQueryable</code> LINQ expression to pull out the various pieces. Imagine you have a queryable source that you send to a component that then applies ordering, filtering, and sorting. How do you inspect the result to verify how the query was manipulated?</p>
+
+<p><strong>What is your one piece of programming advice?</strong></p>
+
+<p>After decades of building software my biggest piece of advice is that your first step shouldn’t be to find the library or framework or tool, but to solve the problem.</p>
+
+<p>Too often people add frameworks or tools or patterns because they’re recommended, rather than actually determining if they add value. Many times the overhead outweighs the benefit. I’m often told, “That solution isn’t right because you don’t have a business logic layer.” My response is, “So?” It’s not that I don’t see value in that layer for certain implementations, but that it’s not always necessary.</p>
+
+<p>Have you worked on that project that forced an architecture so that one change involves updating five projects and the majority of them are just default “pass through” implementations? I am a fan of solving for the solution, and only then if you find some code is repeated, refactor. Don’t over-engineer or complicate. One of my favorite starting points for a solution is to consider, “What is the ideal way I’d like to code for this?”</p>
+
+<p>This is just a small portion of my interview with Jeremy. There is <a href="https://daveabrock.com/2020/07/25/dev-discussions-jeremy-likness-1">so much more at my site</a>, including Jeremy’s unusual path and a crazy story about his interview!</p>
+
+<h2 id="-last-week-in-the-net-world">🌎 Last week in the .NET world</h2>
+
+<h3 id="-the-top-3">🔥 The Top 3</h3>
+
+<ul>
+  <li>We’re getting so close to .NET 5: Jeremy Likness <a href="https://devblogs.microsoft.com/dotnet/announcing-entity-framework-core-ef-core-5-0-preview-7/">announces EF Core 5 Preview 7</a>, Richard Lander <a href="https://devblogs.microsoft.com/dotnet/announcing-net-5-0-preview-7/">announces .NET 5 Preview 7</a>, and Microsoft also announces <a href="https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-preview-7/">ASP.NET Core updates in .NET 5 Preview 7</a>.</li>
+  <li>The .NET Foundation <a href="https://dotnetfoundation.org/blog/2020/07/20/director-election-2020-voting-starts-tomorrow">has begun the voting process for board elections</a>.</li>
+  <li>Jon Hilton <a href="https://jonhilton.net/why-use-blazor-edit-forms/">asks if Blazor EditForms is essential or too much magic</a>.</li>
+</ul>
+
+<h3 id="-announcements">📢 Announcements</h3>
+
+<ul>
+  <li>Kayla Cinnamon <a href="https://devblogs.microsoft.com/commandline/windows-terminal-preview-1-2-release/">announces the release of Windows Terminal Preview 1.2</a>.</li>
+  <li>Tara Overfield <a href="https://devblogs.microsoft.com/dotnet/net-framework-july-2020-cumulative-update-preview/">announces the .NET Framework July 2020 update preview</a>.</li>
+  <li>It looks like <a href="https://github.com/dotnet/efcore/issues/19549#issuecomment-663237077">many-to-many is now working in the EF daily builds</a>.</li>
+  <li>The Azure Service Fabric 7.1 <a href="https://techcommunity.microsoft.com/t5/azure-service-fabric/azure-service-fabric-7-1-second-refresh-release/ba-p/1534246">announced a second refresh release</a>.</li>
+  <li>The Windows team <a href="https://devblogs.microsoft.com/commandline/windows-package-manager-preview-v0-1-41821/">announced the first update to the Windows Package Manager</a>.</li>
+  <li>Daniel Jurek <a href="https://devblogs.microsoft.com/azure-sdk/azure-sdk-release-july-2020/">talks about the July release of the Azure SDK</a>.</li>
+</ul>
+
+<h3 id="-community-and-events">📅 Community and events</h3>
+
+<ul>
+  <li>SciFiDevCon is <a href="https://www.scifidevcon.com/">coming next week</a>.</li>
+  <li>We had three community standups this week: Desktop <a href="https://www.youtube.com/watch?v=4QnbYkQ1WNw">discusses EF Core 5 updates</a>, Entity Framework <a href="https://www.youtube.com/watch?v=6Ux7EpgiWXE">discusses scaffolding with Handlebars</a>, and ASP .NET <a href="https://www.youtube.com/watch?v=j4yIHg9l4QQ">discusses web tools with Sayed Hashimi</a>.</li>
+  <li>The DotNet Docs Show talks <a href="https://www.youtube.com/watch?v=mWhSgasKVhE">.NET desktop app development with Olia Gavrysh</a>.</li>
+</ul>
+
+<h3 id="-blazor">😎 Blazor</h3>
+
+<ul>
+  <li>Lee Richardson <a href="http://www.leerichardson.com/2020/07/blazor-webassembly-vs-angular-client.html">compares Blazor WASM with Angular</a>.</li>
+  <li>Ramkumar Shanmugam <a href="https://www.syncfusion.com/blogs/post/bunit-for-blazor-and-how-to-integrate-it-in-azure-pipeline.aspx">discusses how to use bUnit for Blazor and integrating it into your Azure pipeline</a>.</li>
+  <li>Eilon Lipton <a href="https://devblogs.microsoft.com/aspnet/hybrid-blazor-mobile-blazor-bindings-july-update/">provides a monthly update for hybrid Blazor apps in Mobile Blazor Bindings</a>.</li>
+  <li>Marinko Spasojevic <a href="https://code-maze.com/blazor-webassembly-forms-form-validation/">discusses Blazor WebAssembly forms, form validation, and @ref directives</a>.</li>
+  <li>Andrea Chiarelli <a href="https://auth0.com/blog/securing-blazor-webassembly-apps/">secures Blazor WebAssembly apps</a>.</li>
+  <li>Marinko Spasojevic <a href="https://code-maze.com/blazor-webassembly-sorting/">sorts in Blazor WebAssembly and ASP.NET Core Web API</a>.</li>
+  <li>Matthew Jones <a href="https://exceptionnotfound.net/conways-game-of-life-with-emojis-in-csharp-and-blazor-webassembly">builds Conway’s Game of Life in C# and Blazor WASM</a>.</li>
+</ul>
+
+<h3 id="-net-core">🚀 .NET Core</h3>
+
+<ul>
+  <li>Michal Bialecki <a href="http://www.michalbialecki.com/2020/07/24/merging-migrations-in-entity-framework-core-5/">merges migrations in EF 5</a>.</li>
+  <li>David Grace <a href="https://www.roundthecode.com/dotnet/create-your-own-logging-provider-to-log-to-text-files-in-net-core">discusses creating your own logging provider to log to text files in .NET Core</a>.</li>
+  <li>Thomas Levesque <a href="https://thomaslevesque.com/2020/07/23/aspnet-core-iis-and-empty-http-headers/">works through ASP.NET Core 3, IIS, and empty HTTP headers</a>.</li>
+  <li>Carl Rippon <a href="https://www.carlrippon.com/integration-testing-on-asp.net-web-api-controllers-with-a-sql-backend/">does integration testing on ASP.NET Core Web API controllers with SQL</a>.</li>
+  <li>Michal Bialecki <a href="http://www.michalbialecki.com/2020/07/20/adding-entity-framework-core-5-migrations-to-net-5-project">adds EF Core 5 migrations to a .NET 5 project</a>.</li>
+  <li>Jon P. Smith <a href="https://www.thereformedprogrammer.net/ef-core-in-depth-tips-and-techniques-for-configuring-ef-core/">talks tips and techniques for configuring EF Core</a>.</li>
+  <li>Jason Gaylord <a href="https://www.jasongaylord.com/blog/2020/07/17/adding-newtonsoft-json-to-services">talks about adding Newtonsoft.JSON back to .NET Core 3.1 and later</a>.</li>
+  <li>David Grace <a href="https://www.roundthecode.com/dotnet/hosted-services-asp-net-core-create-a-most-viewed-background-service">uses hosted services in ASP.NET Core to create a “most viewed” background service</a>.</li>
+</ul>
+
+<h3 id="-the-cloud">⛅ The cloud</h3>
+
+<ul>
+  <li>Damien Bowden <a href="https://damienbod.com/2020/07/24/waiting-for-azure-durable-functions-to-complete/">waits for Azure Durable Functions to complete</a>.</li>
+  <li>Steve Fenton <a href="https://www.stevefenton.co.uk/2020/07/start-and-stop-an-azure-app-service-on-a-schedule-with-azure-logic-apps/">talks about how to start and stop an Azure App Service on a schedule with Azure Logic Apps</a>.</li>
+  <li>Angie Doyle <a href="https://techcommunity.microsoft.com/t5/azure-portal/azure-portal-july-2020-update/ba-p/1538786">provides a monthly update on the Azure Portal</a>.</li>
+  <li>Chris Noring <a href="https://techcommunity.microsoft.com/t5/apps-on-azure/learn-durable-functions-with-net-core-and-c-stateful-serverless/ba-p/1533559">learns durable functions with .NET Core and C#</a>.</li>
+  <li>Jason Gaylord <a href="https://www.jasongaylord.com/blog/2020/07/21/creating-alexa-skill-using-dotnet-azure">creates an Alexa skill using .NET Core and Azure</a>.</li>
+  <li>Daniel Krzyczkowski <a href="https://daniel-krzyczkowski.github.io/Event-Sourcing-With-Azure-SQL-And-Entity-Framework-Core/">talks event sourcing with Azure SQL and EF Core</a>.</li>
+  <li>Aaron Powell <a href="https://www.aaron-powell.com/posts/2020-07-21-graphql-on-azure-part-2-app-service-with-dotnet/">continues working with GraphQL on Azure</a>.</li>
+  <li>Microsoft appears to be <a href="https://www.zdnet.com/article/microsoft-is-working-on-an-azure-powered-cloud-pc-service/#ftag=RSSbaffb68">working on an Azure-powered cloud PC service</a>.</li>
+  <li>Steve Gordon <a href="https://www.stevejgordon.co.uk/dotnet-on-aws-introducing-docker-ecs-integration">introduces Docker ECS integration for AWS</a>.</li>
+  <li>Itay Podhajcer <a href="https://www.pulumi.com/blog/rabbitmq-azure/">deploys a serverless RabbitMQ cluster on Azure with .NET</a>.</li>
+  <li>Damien Bowden <a href="https://damienbod.com/2020/07/20/using-key-vault-and-managed-identities-with-azure-functions/">uses Azure Key Vault and managed identities with Azure Functions</a>.</li>
+  <li>Azure Tips and Tricks <a href="https://microsoft.github.io/AzureTipsAndTricks/blog/tip271.html">has a new article about Azure Functions and secure configuration with Azure Key Vault</a>.</li>
+  <li>Over at AWS, Steve Roberts <a href="https://aws.amazon.com/blogs/developer/a-new-more-simplified-setup-for-x-ray-tracing-of-net-applications/">talks about AWS X-Ray for tracing distributed .NET apps</a>.</li>
+</ul>
+
+<h3 id="-languages">📔 Languages</h3>
+
+<ul>
+  <li>Josef Ottosson <a href="https://josef.codes/how-csharp-records-will-change-my-life/">talks about how C# 9 records will change his life</a>.</li>
+  <li>Derek Comartin <a href="https://codeopinion.com/stop-throwing-exceptions-start-being-explicit">wants you to stop throwing exceptions and start being explicit</a>.</li>
+  <li>Khalid Abuhakmeh <a href="https://khalidabuhakmeh.com/linq-expression-visitors">has fun with LINQ expression visitors</a>.</li>
+  <li>Dave Brock <a href="https://daveabrock.com/2020/07/21/c-sharp-9-scavenger-hunt">goes on a C# 9 scavenger hunt</a>.</li>
+  <li>Jeremy Likness <a href="https://blog.jeremylikness.com/blog/look-behind-the-iqueryable-curtain/">looks behind the IQueryable curtain</a>.</li>
+  <li>Jonathan Allen <a href="https://www.infoq.com/news/2020/07/CSharp-Lambdas">talks about lambda improvements with C# 9</a>.</li>
+  <li>Anand Gupta <a href="https://hackernoon.com/net-garbage-collection-here-we-go-gl1q3uui?source=rss">dives deep on .NET garbage collection</a>.</li>
+  <li>Jonathan Allen <a href="https://www.infoq.com/news/2020/07/CSharp-9-Range-Patterns">talks about range operators and pattern-matching in C# 9</a>.</li>
+  <li>Ian Griffiths <a href="https://endjin.com/blog/2020/07/dotnet-csharp-8-nullable-references-supporting-older-runtimes.html">talks about supporting older runtimes with C# 8 nullable references</a>.</li>
+  <li>Jonathan Channon <a href="https://blog.jonathanchannon.com/2020-07-17-understanding-fsharp-applicatives-custom-operators/">talks about applicatives and custom operators in F#</a>.</li>
+</ul>
+
+<h3 id="-tools">🔧 Tools</h3>
+
+<ul>
+  <li>Khalid Abuhakmeh <a href="https://khalidabuhakmeh.com/write-xamarin-mac-apps-with-jetbrains-rider">writes Xamarin.Mac Apps With JetBrains Rider</a>.</li>
+  <li>Michael Shpilt <a href="https://michaelscodingspot.com/visual-studio-immediate-window/">offers some tricks on working with the Immediate Window in Visual Studio</a>.</li>
+  <li>Adam Storr <a href="https://adamstorr.azurewebsites.net/blog/why-i-love-resharper-2">loves Resharper 2</a>.</li>
+  <li>Joseph Guadagno <a href="https://www.josephguadagno.net/2020/07/20/debugging-azure-function-event-grid-trigger-locally-with-jetbrains-rider">debugs Azure Function Event Grid triggers locally with JetBrains Rider</a>.</li>
+  <li>Over at the NDepend blog, <a href="https://blog.ndepend.com/10-visual-studio-files-and-layout-productivity-tips/">some tips for working with Visual Studio files and layouts</a>.</li>
+  <li>j2i.net does a review <a href="https://blog.j2i.net/2020/07/18/windows-terminal-preview/">of the Windows Terminal Preview</a>.</li>
+  <li>Scott Hanselman <a href="https://www.hanselman.com/blog/ExploringTheNETOpenSourceHybridORMLibraryRepoDB.aspx">explores RepoDB, a .NET open source hybrid ORM library</a>.</li>
+</ul>
+
+<h3 id="-xamarin">📱 Xamarin</h3>
+
+<ul>
+  <li>David Ortinau <a href="https://devblogs.microsoft.com/xamarin/xamarin-forms-shapes-and-paths/">draws UI with Xamarin.Forms shapes and paths</a>.</li>
+  <li>Stefan Nenchev <a href="https://www.telerik.com/blogs/todo-sample-application-xamarin-forms-telerik-ui-mvvmfresh-microsoft-entityframeworkcore">builds a sample app with Xamarin.Forms, Telerik UI, MVVMFresh, and EF Core</a>.</li>
+  <li>Charlin Agramonte <a href="https://devblogs.microsoft.com/xamarin/mastering-multilingual-in-xamarin-forms/">works through multilingual support in Xamarin.Forms</a>.</li>
+  <li>Rendy Del Rosario <a href="https://www.xamboy.com/2020/07/20/creating-a-xamarin-binding-library-for-ios-and-android-part-1/">creates a Xamarin Binding Library for iOS And Android</a>.</li>
+  <li>Nick Randolph <a href="https://nicksnettravels.builttoroam.com/dotnetmaui-not-a-xaml-platform">says: Xamarin.Forms is not just a XAML platform</a>.</li>
+  <li>The Xamarin Podcast <a href="https://devblogs.microsoft.com/xamarin/xamarin-podcast-inverter-converter/">talks about Xamarin.Forms 4.7</a>.</li>
+</ul>
+
+<h3 id="-podcasts">🎤 Podcasts</h3>
+
+<ul>
+  <li>The .NET Rocks podcast <a href="https://www.dotnetrocks.com/default.aspx?ShowNum=1697">has a lively discussion with Sebastien Lambla about Microsoft’s role in the OSS ecosystem</a>.</li>
+  <li>The Microsoft 365 Developer Podcast <a href="https://www.m365devpodcast.com/e/using-blazor-to-create-microsoft-teams-tabs-with-thomy-golles/">discusses using Blazor to create Microsoft Teams tabs</a>.</li>
+  <li>The 6-Figure Developer podcast <a href="https://6figuredev.com/podcast/episode-153-github-actions-with-edward-thomson/">talks with Edward Thomson about GitHub Actions</a>.</li>
+  <li>The Coding Blocks Podcast <a href="https://www.codingblocks.net/podcast/the-devops-handbook-architecting-for-low-risk-releases/">talks about architecting for low-risk releases</a>.</li>
+  <li>At Technology and Friends, David Giard <a href="http://davidgiard.com/2020/07/20/DavePineOnNET5AndTheDocsTeam.aspx">talks with Dave Pine about .NET 5 and the Docs team</a>.</li>
+  <li>The Azure DevOps Podcast <a href="http://azuredevopspodcast.clear-measure.com/jimmy-bogard-on-automapper-and-mediatr-episode-98">talks with Jimmy Bogard about AutoMapper and MediatR</a>.</li>
+</ul>
+
+<h3 id="-videos">🎥 Videos</h3>
+
+<ul>
+  <li>The Xamarin Show <a href="https://channel9.msdn.com/Shows/XamarinShow/XamarinForms-47-Shapes-Paths-and-App-Themes">discusses shapes, paths, and app themes in 4.7</a>.</li>
+  <li>Data Exposed <a href="https://channel9.msdn.com/Shows/Data-Exposed/Azure-SQL-Automated-Backups-Part-1">talks about automated backups for Azure SQL</a>.</li>
+</ul>
+:ET

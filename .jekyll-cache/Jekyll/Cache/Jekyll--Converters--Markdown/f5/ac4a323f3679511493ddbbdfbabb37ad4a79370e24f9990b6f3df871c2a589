@@ -1,0 +1,255 @@
+I"A`<p>Last week, Microsoft introduced a preview of <a href="https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/">C# Source Generators</a>, to be released with the C# 9 release. While the tooling isn’t great (yet), it’s available for curious developers to play with—so long as you are on the <a href="https://dotnet.microsoft.com/download/dotnet/5.0">latest version of Visual Studio 2019 preview</a> and the <a href="https://dotnet.microsoft.com/download/dotnet/5.0">latest .NET 5 preview</a>, too. If you’ve been geeking out on C# for a while, you may remember this <a href="https://github.com/dotnet/roslyn/blob/12bd769ebcd3121b88f535e8559f5a42d9c0e873/docs/features/generators.md">was proposed as early as C# 6.</a></p>
+
+<p class="notice--warning"><strong>Heads up!</strong> as you can imagine, this is in preview so this content is definitely subject to change. Be aware, especially with feedback <a href="https://twitter.com/andrewlocknet/status/1255963536041402369">from</a> <a href="https://twitter.com/ChaseAucoin/status/1256259137291333632">the</a> <a href="https://twitter.com/daveabrock/status/1257847659525804032">community</a>, that the samples aren’t always working 100%.</p>
+
+<p>This post contains the following content.</p>
+
+<ul>
+  <li><a href="#source-generators-overview">Source generators overview</a></li>
+  <li><a href="#the-isourcegenerator-interface">The ISourceGenerator interface</a></li>
+  <li><a href="#try-it-out">Try it out</a>
+    <ul>
+      <li><a href="#your-first-source-generator">Your first source generator</a></li>
+      <li><a href="#implement-the-inotifypropertychangedpattern">Implement the INotifyPropertyChangedPattern</a></li>
+    </ul>
+  </li>
+  <li><a href="#wrapping-up">Wrapping up</a></li>
+  <li><a href="#references">References</a></li>
+</ul>
+
+<h1 id="source-generators-overview">Source generators overview</h1>
+
+<p>From the Microsoft blog post, they define source generators as “a piece of code that runs during compilation and can inspect your program to produce additional files that are compiled together with the rest of your code.” It’s a compilation step that generates code <em>for you</em> based on your existing code. The benefit here, <a href="https://github.com/dotnet/roslyn/blob/master/docs/features/source-generators.md">straight from Microsoft’s design document</a>, is that source generators can read the contents of the compilation before runtime and access any additional files—meaning C# can now read both C# code and files specific to source generation.</p>
+
+<p>So, in a step-by-step process, your application:</p>
+
+<ol>
+  <li>Kicks off compilation</li>
+  <li>Runs the source generator compilation step, analyzing your code and then generating code added as compilation input</li>
+  <li>Completes the source generator step and continues and eventually completes the compilation process</li>
+</ol>
+
+<p>If you’ve ever leaned on reflection in your projects, you might begin to see many use cases for these solutions—C# source generators provide a lot of advantages that reflection currently offers and few, if any, drawbacks. Reflection is extremely powerful when you want to query properties and attributes you don’t know about when you typically compile. Of course, getting type information at runtime can incur a large performance cost, so offloading this to compilation is definitely a game-changer in C#.</p>
+
+<p>How else can this help you? Microsoft is developing a <a href="https://github.com/dotnet/roslyn/blob/master/docs/features/source-generators.cookbook.md">source generators cookbook</a> that walks through a bunch of real-world scenarios, such as class generation, file transformation, interface implementation, and more.</p>
+
+<p>It is important to note that source generators are <em>additive only</em>, meaning generators add new code to your compilation but do not modify existing user code. You can <a href="https://github.com/dotnet/roslyn/blob/master/docs/features/source-generators.md">reference the design document</a> for details.</p>
+
+<h1 id="the-isourcegenerator-interface">The ISourceGenerator interface</h1>
+
+<p>Source generators implement the <code class="language-plaintext highlighter-rouge">ISourceGenerator</code> interface, in the <code class="language-plaintext highlighter-rouge">Microsoft.CodeAnalysis</code> namespace. It looks like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">interface</span> <span class="nc">ISourceGenerator</span>
+<span class="p">{</span>
+    <span class="k">void</span> <span class="nf">Initialize</span><span class="p">(</span><span class="n">InitializationContext</span> <span class="n">context</span><span class="p">);</span>
+    <span class="k">void</span> <span class="nf">Execute</span><span class="p">(</span><span class="n">SourceGeneratorContext</span> <span class="n">context</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">Initialize</code> method is called once by the host (in this case, the IDE or compiler). The passed in <code class="language-plaintext highlighter-rouge">InitializationContext</code> registers callbacks for future generation calls. Many times, you probably won’t mess with this. The <code class="language-plaintext highlighter-rouge">Execute</code> method, meanwhile, is where the magic happens: the passed-in <code class="language-plaintext highlighter-rouge">SourceGeneratorContext</code> provides access to the current compilation using the following properties.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">readonly</span> <span class="k">struct</span> <span class="nc">SourceGeneratorContext</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="n">ImmutableArray</span><span class="p">&lt;</span><span class="n">AdditionalText</span><span class="p">&gt;</span> <span class="n">AdditionalFiles</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span>
+
+        <span class="k">public</span> <span class="n">CancellationToken</span> <span class="n">CancellationToken</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span>
+
+        <span class="k">public</span> <span class="n">Compilation</span> <span class="n">Compilation</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span>
+
+        <span class="k">public</span> <span class="n">ISyntaxReceiver</span><span class="p">?</span> <span class="n">SyntaxReceiver</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span>
+
+        <span class="k">public</span> <span class="k">void</span> <span class="nf">ReportDiagnostic</span><span class="p">(</span><span class="n">Diagnostic</span> <span class="n">diagnostic</span><span class="p">)</span> <span class="p">{</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">NotImplementedException</span><span class="p">();</span> <span class="p">}</span>
+
+        <span class="k">public</span> <span class="k">void</span> <span class="nf">AddSource</span><span class="p">(</span><span class="kt">string</span> <span class="n">fileNameHint</span><span class="p">,</span> <span class="n">SourceText</span> <span class="n">sourceText</span><span class="p">)</span> <span class="p">{</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">NotImplementedException</span><span class="p">();</span> <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre></div></div>
+
+<p>OK, enough explanation—let’s try it out!</p>
+
+<h1 id="try-it-out">Try it out</h1>
+
+<p>In this post, we will get our feet wet by trying out:</p>
+
+<ul>
+  <li>A simple, “hello world” example</li>
+  <li>Implementing the <code class="language-plaintext highlighter-rouge">INotifyPropertyChanged</code> pattern</li>
+</ul>
+
+<h2 id="your-first-source-generator">Your first source generator</h2>
+
+<p>After you confirm you’re on the <a href="https://dotnet.microsoft.com/download/dotnet/5.0">latest version of Visual Studio 2019 preview</a> and the <a href="https://dotnet.microsoft.com/download/dotnet/5.0">latest .NET 5 preview</a>, crack open Visual Studio 2019 preview and create a new .NET Standard 2.0 class library. Call it something like <em>MyFirstGenerator</em>.</p>
+
+<p>So, tooling isn’t great. For now, you’ll need to edit the project file to the following structure:</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;Project</span> <span class="na">Sdk=</span><span class="s">"Microsoft.NET.Sdk"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;PropertyGroup&gt;</span>
+        <span class="nt">&lt;TargetFramework&gt;</span>netstandard2.0<span class="nt">&lt;/TargetFramework&gt;</span>
+        <span class="nt">&lt;LangVersion&gt;</span>preview<span class="nt">&lt;/LangVersion&gt;</span>
+    <span class="nt">&lt;/PropertyGroup&gt;</span>
+    <span class="nt">&lt;PropertyGroup&gt;</span>
+        <span class="nt">&lt;RestoreAdditionalProjectSources&gt;</span>https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet5/nuget/v3/index.json ;$(RestoreAdditionalProjectSources)<span class="nt">&lt;/RestoreAdditionalProjectSources&gt;</span>
+    <span class="nt">&lt;/PropertyGroup&gt;</span>
+    <span class="nt">&lt;ItemGroup&gt;</span>
+        <span class="nt">&lt;PackageReference</span> <span class="na">Include=</span><span class="s">"Microsoft.CodeAnalysis.CSharp.Workspaces"</span> <span class="na">Version=</span><span class="s">"3.6.0-3.20207.2"</span> <span class="na">PrivateAssets=</span><span class="s">"all"</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;PackageReference</span> <span class="na">Include=</span><span class="s">"Microsoft.CodeAnalysis.Analyzers"</span> <span class="na">Version=</span><span class="s">"3.0.0-beta2.final"</span> <span class="na">PrivateAssets=</span><span class="s">"all"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/ItemGroup&gt;</span>
+<span class="nt">&lt;/Project&gt;</span>
+</code></pre></div></div>
+
+<p>In your new class, add a <code class="language-plaintext highlighter-rouge">Generator</code> annotation to your class. If you have Visual Studio implement the interface for you, it’ll now look like this.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">Microsoft.CodeAnalysis</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">MyFirstGenerator</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="n">Generator</span><span class="p">]</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">Generator</span> <span class="p">:</span> <span class="n">ISourceGenerator</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="k">void</span> <span class="nf">Initialize</span><span class="p">(</span><span class="n">InitializationContext</span> <span class="n">context</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">NotImplementedException</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="k">public</span> <span class="k">void</span> <span class="nf">Execute</span><span class="p">(</span><span class="n">SourceGeneratorContext</span> <span class="n">context</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">NotImplementedException</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now, we can generate a silly class with some silly properties in our <code class="language-plaintext highlighter-rouge">Execute</code> implementation. We’ll leave <code class="language-plaintext highlighter-rouge">Initialize</code> alone.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">void</span> <span class="nf">Execute</span><span class="p">(</span><span class="n">SourceGeneratorContext</span> <span class="n">context</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">var</span> <span class="n">sourceText</span> <span class="p">=</span> <span class="n">SourceText</span><span class="p">.</span><span class="nf">From</span><span class="p">(</span><span class="s">@"
+        namespace GeneratedClass
+        {
+            public class SeattleCompanies
+            {
+                public string ForTheCloud =&gt; ""Microsoft"";
+                public string ForTheTwoDayShipping =&gt; ""Amazon"";
+                public string ForTheExpenses =&gt; ""Concur"";
+            }
+        }"</span><span class="p">,</span> <span class="n">Encoding</span><span class="p">.</span><span class="n">UTF8</span><span class="p">);</span>
+    <span class="n">context</span><span class="p">.</span><span class="nf">AddSource</span><span class="p">(</span><span class="s">"SeattleCompanies.cs"</span><span class="p">,</span> <span class="n">sourceText</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now, build it — with any luck the generated class should be added to your compilation.</p>
+
+<p>To test this out, create a new console project (let’s call it <code class="language-plaintext highlighter-rouge">MyFirstGeneratorTest</code> or something similar). Then, add a reference to the source project we just created (<code class="language-plaintext highlighter-rouge">MyFirstGenerator</code>). To get anything to run, you need to manually edit the project file to include <code class="language-plaintext highlighter-rouge">preview</code> as a <code class="language-plaintext highlighter-rouge">LangVersion</code> and <code class="language-plaintext highlighter-rouge">OutputItemType</code> and <code class="language-plaintext highlighter-rouge">ReferenceOutputAssembly</code> to your <code class="language-plaintext highlighter-rouge">ProjectReference</code>. It should look like this:</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;Project</span> <span class="na">Sdk=</span><span class="s">"Microsoft.NET.Sdk"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;PropertyGroup&gt;</span>
+    <span class="nt">&lt;OutputType&gt;</span>Exe<span class="nt">&lt;/OutputType&gt;</span>
+	<span class="nt">&lt;TargetFramework&gt;</span>netstandard2.0<span class="nt">&lt;/TargetFramework&gt;</span>
+	<span class="nt">&lt;LangVersion&gt;</span>preview<span class="nt">&lt;/LangVersion&gt;</span>
+  <span class="nt">&lt;/PropertyGroup&gt;</span>
+  <span class="nt">&lt;ItemGroup&gt;</span>
+    <span class="nt">&lt;ProjectReference</span> <span class="na">Include=</span><span class="s">"..\MyFirstSourceGenerator\MyFirstSourceGenerator.csproj"</span>                <span class="na">OutputItemType=</span><span class="s">"Analyzer"</span>                         <span class="na">ReferenceOutputAssembly=</span><span class="s">"false"</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;/ItemGroup&gt;</span>
+<span class="nt">&lt;/Project&gt;</span>
+</code></pre></div></div>
+
+<p>In your <code class="language-plaintext highlighter-rouge">Program</code> file, if you add your generated class to the using statement, you should be able to have IntelliSense pick up your generated class! Here’s my code:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">GeneratedClass</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">MyFirstSourceGeneratorConsole</span>
+<span class="p">{</span>
+    <span class="k">class</span> <span class="nc">Program</span>
+    <span class="p">{</span>
+        <span class="k">static</span> <span class="k">void</span> <span class="nf">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="kt">var</span> <span class="n">companies</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">SeattleCompanies</span><span class="p">();</span>
+            <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"Running code from a generated class!"</span><span class="p">);</span>
+            <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">$"My favorite cloud: </span><span class="p">{</span><span class="n">companies</span><span class="p">.</span><span class="n">ForTheCloud</span><span class="p">}</span><span class="s">"</span><span class="p">);</span>
+            <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"We're done here."</span><span class="p">);</span>
+            <span class="n">Console</span><span class="p">.</span><span class="nf">ReadLine</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><strong>Note</strong>: In many cases, as of now you may need to restart Visual Studio to get IntelliSense support.</p>
+
+<h2 id="implement-the-inotifypropertychangedpattern">Implement the INotifyPropertyChangedPattern</h2>
+
+<p>In the C# community, a common request is the ability to automatically implement interfaces for classes with an attribute attached to them. Source generators will make this possible, with the use of the <code class="language-plaintext highlighter-rouge">INotifyPropertyChanged</code> pattern. Let’s look at a basic use of this.</p>
+
+<p>Let’s say you have a class with some properties you need to monitor. You can decorate it with a source generator implementation of this, like so:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">NotifyMe</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">partial</span> <span class="k">class</span> <span class="nc">MyClass</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="n">NotifyMe</span><span class="p">]</span>
+    <span class="k">private</span> <span class="kt">bool</span> <span class="n">_boolProp</span><span class="p">;</span>
+
+    <span class="p">[</span><span class="n">NotifyMe</span><span class="p">]</span>
+    <span class="k">private</span> <span class="kt">string</span> <span class="n">_stringProp</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Then, the generator can give us this code:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.ComponentModel</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">NotifyMe</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="nf">AttributeUsage</span><span class="p">(</span><span class="n">AttributeTargets</span><span class="p">.</span><span class="n">Field</span><span class="p">,</span> <span class="n">Inherited</span> <span class="p">=</span> <span class="k">false</span><span class="p">,</span> <span class="n">AllowMultiple</span> <span class="p">=</span> <span class="k">false</span><span class="p">)]</span>
+    <span class="k">sealed</span> <span class="k">class</span> <span class="nc">AutoNotifyAttribute</span> <span class="p">:</span> <span class="n">Attribute</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="nf">AutoNotifyAttribute</span><span class="p">()</span>
+        <span class="p">{</span>
+        <span class="p">}</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">PropertyName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">partial</span> <span class="k">class</span> <span class="nc">MyClass</span> <span class="p">:</span> <span class="n">INotifyPropertyChanged</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">bool</span> <span class="n">BoolProp</span>
+    <span class="p">{</span>
+        <span class="k">get</span> <span class="p">=&gt;</span> <span class="n">_boolProp</span><span class="p">;</span>
+        <span class="k">set</span>
+        <span class="p">{</span>
+            <span class="n">_boolProp</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span>
+            <span class="n">PropertyChanged</span><span class="p">?.</span><span class="nf">Invoke</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="k">new</span> <span class="nf">PropertyChangedEventArgs</span><span class="p">(</span><span class="s">"UserBool"</span><span class="p">));</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">StringProp</span>
+    <span class="p">{</span>
+        <span class="k">get</span> <span class="p">=&gt;</span> <span class="n">_stringProp</span><span class="p">;</span>
+        <span class="k">set</span>
+        <span class="p">{</span>
+            <span class="n">_stringProp</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span>
+            <span class="n">PropertyChanged</span><span class="p">?.</span><span class="nf">Invoke</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="k">new</span> <span class="nf">PropertyChangedEventArgs</span><span class="p">(</span><span class="s">"UserString"</span><span class="p">));</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">event</span> <span class="n">PropertyChangedEventHandler</span> <span class="n">PropertyChanged</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>For a deeper dive, the Roslyn team <a href="https://github.com/dotnet/roslyn-sdk/blob/master/samples/CSharp/SourceGenerators/SourceGeneratorSamples/AutoNotifyGenerator.cs">has a good example of this in their GitHub repository</a>.</p>
+
+<h1 id="wrapping-up">Wrapping up</h1>
+
+<p>This is really early, but I hope you can see the obvious benefits C# source generators can offer you. To be honest: the developer experience is not refined yet, but once that happens you’ll really see the power they provide.</p>
+
+<h1 id="references">References</h1>
+
+<ul>
+  <li><a href="https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/">Introducing C# Source Generators</a> (Microsoft)</li>
+  <li><a href="https://github.com/dotnet/roslyn/blob/master/docs/features/source-generators.md">Source Generators design document</a> (Roslyn GitHub repo)</li>
+  <li><a href="https://github.com/dotnet/roslyn/blob/master/docs/features/source-generators.cookbook.md">Source Generators cookbook</a> (Roslyn GitHub repo)</li>
+  <li><a href="https://www.reddit.com/r/csharp/comments/gbox73/faster_than_reflection_microsoft_preview_source/">Discussion in r/csharp</a> (Reddit)</li>
+  <li><a href="https://dontcodetired.com/blog/post/C-Source-Generators-Less-Boilerplate-Code-More-Productivity">C# Source Generators: Less Boilerplate Code, More Productivity</a> (Jason Roberts)</li>
+</ul>
+:ET

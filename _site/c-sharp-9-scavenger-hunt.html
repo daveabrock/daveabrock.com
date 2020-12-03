@@ -1,0 +1,573 @@
+<p>Here we are, friends: our last post in our C# 9 deep dive series. We’ve discussed a lot of topics, so I thought it’d be fun to bundle all we’ve learned into a single post. (You can think of this as a <a href="https://en.wikipedia.org/wiki/CliffsNotes">CliffsNotes</a> of the 10,000 or so words I’ve written about C# 9 so far.)</p>
+
+<p>So, let’s go on a scavenger hunt! (I know I have readers from different countries and customs—where I’m from, it’s a fun game where you have to run around outside and find a number of miscellaneous things from a list). So this is how us nerds do it: inside, with air conditioning, geeking out about features that aren’t fully released yet.</p>
+
+<p>I’ll be focusing on the how, not the why—you can see all my other posts for the full details on the concepts.</p>
+
+<p>This is the sixth—and last!—post on my C# 9 deep dive series.</p>
+
+<ul>
+  <li>Post 1 - <a href="https://daveabrock.com/2020/06/29/c-sharp-9-deep-dive-inits">Init-only features</a></li>
+  <li>Post 2 - <a href="https://daveabrock.com/2020/07/06/c-sharp-9-deep-dive-records">Records</a></li>
+  <li>Post 3 - <a href="https://daveabrock.com/2020/07/06/c-sharp-9-pattern-matching">Pattern matching</a></li>
+  <li>Post 4 - <a href="https://daveabrock.com/2020/07/09/c-sharp-9-top-level-programs">Top-level programs</a></li>
+  <li>Post 5 - <a href="https://daveabrock.com/2020/07/14/c-sharp-9-target-typing-covariants">Target typing and covariant returns</a></li>
+  <li>Post 6 (<em>this post</em>) - Putting it all together with a scavenger hunt</li>
+</ul>
+
+<p>This post covers the following topics.</p>
+
+<ul>
+  <li><a href="#our-scavenger-hunt-the-list">Our scavenger hunt: the list</a></li>
+  <li><a href="#the-low-hanging-fruit-top-level-programs">The low-hanging fruit: top-level programs</a></li>
+  <li><a href="#init-only-properties">Init-only properties</a></li>
+  <li><a href="#init-accessors-and-readonly-fields">Init accessors and readonly fields</a></li>
+  <li><a href="#records">Records</a>
+    <ul>
+      <li><a href="#use-with-expressions">Use <code class="language-plaintext highlighter-rouge">with</code> expressions</a>
+        <ul>
+          <li><a href="#use-with-expressions-with-inheritance">Use <code class="language-plaintext highlighter-rouge">with</code> expressions with inheritance</a></li>
+          <li><a href="#use-value-based-equality-and-inheritance">Use value-based equality and inheritance</a></li>
+        </ul>
+      </li>
+      <li><a href="#positional-records">Positional records</a></li>
+    </ul>
+  </li>
+  <li><a href="#improved-pattern-matching">Improved pattern matching</a>
+    <ul>
+      <li><a href="#simple-type-patterns">Simple type patterns</a></li>
+      <li><a href="#relational-patterns">Relational patterns</a></li>
+      <li><a href="#logical-patterns">Logical patterns</a></li>
+    </ul>
+  </li>
+  <li><a href="#target-typing-with-new-expressions">Target typing with <code class="language-plaintext highlighter-rouge">new</code> expressions</a></li>
+  <li><a href="#covariant-returns">Covariant returns</a></li>
+  <li><a href="#and-thats-it-friends">And that’s it, friends</a></li>
+</ul>
+
+<h1 id="our-scavenger-hunt-the-list">Our scavenger hunt: the list</h1>
+
+<p>Here’s our list for our scavenger hunt. We’ll check it off as we go!</p>
+
+<p>(Target typing <code class="language-plaintext highlighter-rouge">??</code> and <code class="language-plaintext highlighter-rouge">?:</code> and data member simplification have been removed from the list, as they do not compile in today’s previews.)</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Init-only properties
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Init accessors and readonly fields</li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Records
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><code class="language-plaintext highlighter-rouge">with</code> expressions</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Value-based equality</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Positional records</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><code class="language-plaintext highlighter-rouge">with</code> expressions and inheritance</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Value-based equality and inheritance</li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Top-level programs</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Improved pattern matching
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Simple type patterns</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Relational patterns</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Logical patterns</li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Improved target typing
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Target-typed <code class="language-plaintext highlighter-rouge">new</code> expressions</li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Covariant returns</li>
+</ul>
+
+<h1 id="the-low-hanging-fruit-top-level-programs">The low-hanging fruit: top-level programs</h1>
+
+<p>For a quick win, let’s make a top-level program. If you remember, this allows us to run a program without that pesky <code class="language-plaintext highlighter-rouge">Main</code> method.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"I am Groot."</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Well, that was easy! Knock one off the list.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Init-only properties
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Init accessors and readonly fields</li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Records
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><code class="language-plaintext highlighter-rouge">with</code> expressions</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Value-based equality</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Positional records</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><code class="language-plaintext highlighter-rouge">with</code> expressions and inheritance</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Value-based equality and inheritance</li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Top-level programs</del></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Improved pattern matching
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Simple type patterns</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Relational patterns</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Logical patterns</li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Improved target typing
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Target-typed <code class="language-plaintext highlighter-rouge">new</code> expressions</li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Covariant returns</li>
+</ul>
+
+<h1 id="init-only-properties">Init-only properties</h1>
+
+<p>With init-only properties, we can use object initializers with immutable fields.</p>
+
+<p>Let’s create an <code class="language-plaintext highlighter-rouge">Avenger</code> class:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">Avenger</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now, we can use them with object initializers in C# 9.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+
+<span class="kt">var</span> <span class="n">ironMan</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Avenger</span> <span class="p">{</span> <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Tony"</span><span class="p">,</span> <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Stark"</span> <span class="p">};</span>
+<span class="kt">var</span> <span class="n">hulk</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Avenger</span> <span class="p">{</span> <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Bruce"</span><span class="p">,</span> <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Banner"</span> <span class="p">};</span>
+<span class="kt">var</span> <span class="n">blackWidow</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Avenger</span> <span class="p">{</span> <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Natasha"</span><span class="p">,</span> <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Romanova"</span><span class="p">};</span>
+
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">$"Iron Man is </span><span class="p">{</span><span class="n">ironMan</span><span class="p">.</span><span class="n">FirstName</span><span class="p">}</span><span class="s"> </span><span class="p">{</span><span class="n">ironMan</span><span class="p">.</span><span class="n">LastName</span><span class="p">}</span><span class="s">."</span><span class="p">);</span>
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">$"The Hulk is </span><span class="p">{</span><span class="n">hulk</span><span class="p">.</span><span class="n">FirstName</span><span class="p">}</span><span class="s"> </span><span class="p">{</span><span class="n">hulk</span><span class="p">.</span><span class="n">LastName</span><span class="p">}</span><span class="s">."</span><span class="p">);</span>
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">$"The Black Widow is </span><span class="p">{</span><span class="n">blackWidow</span><span class="p">.</span><span class="n">FirstName</span><span class="p">}</span><span class="s"> </span><span class="p">{</span><span class="n">blackWidow</span><span class="p">.</span><span class="n">LastName</span><span class="p">}</span><span class="s">."</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Now we have two more off the list, hooray!</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Init-only properties</del>
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Init accessors and readonly fields</li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Records
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><code class="language-plaintext highlighter-rouge">with</code> expressions</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Value-based equality</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Positional records</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><code class="language-plaintext highlighter-rouge">with</code> expressions and inheritance</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Value-based equality and inheritance</li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Top-level programs</del></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Improved pattern matching
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Simple type patterns</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Relational patterns</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Logical patterns</li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Improved target typing
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Target-typed <code class="language-plaintext highlighter-rouge">new</code> expressions</li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Covariant returns</li>
+</ul>
+
+<h1 id="init-accessors-and-readonly-fields">Init accessors and readonly fields</h1>
+
+<p>As we’ve learned, <code class="language-plaintext highlighter-rouge">init</code> accessors can only be called when you initialize. If you try it after, you’ll be greeted with this:</p>
+
+<pre><code class="language-dos">FirstName cannot be assigned to -- it is read-only
+</code></pre>
+
+<p>With these <code class="language-plaintext highlighter-rouge">init</code> accessors, you can also mutate read-only fields—which you previously could do with constructors. With only changing the <code class="language-plaintext highlighter-rouge">Avengers</code> class, do it this way:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Avenger</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="kt">string</span> <span class="n">firstName</span><span class="p">;</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="kt">string</span> <span class="n">lastName</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span>
+    <span class="p">{</span>
+        <span class="k">get</span> <span class="p">=&gt;</span> <span class="n">firstName</span><span class="p">;</span>
+        <span class="n">init</span> <span class="p">=&gt;</span> <span class="n">firstName</span> <span class="p">=</span> <span class="p">(</span><span class="k">value</span> <span class="p">??</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">(</span><span class="k">nameof</span><span class="p">(</span><span class="n">FirstName</span><span class="p">)));</span>
+    <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span>
+    <span class="p">{</span>
+        <span class="k">get</span> <span class="p">=&gt;</span> <span class="n">lastName</span><span class="p">;</span>
+        <span class="n">init</span> <span class="p">=&gt;</span> <span class="n">lastName</span> <span class="p">=</span> <span class="p">(</span><span class="k">value</span> <span class="p">??</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">(</span><span class="k">nameof</span><span class="p">(</span><span class="n">LastName</span><span class="p">)));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>OK, one more gone. On to records!</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Init-only properties</del>
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Init accessors and readonly fields</del></li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Records
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><code class="language-plaintext highlighter-rouge">with</code> expressions</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Value-based equality</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Positional records</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><code class="language-plaintext highlighter-rouge">with</code> expressions and inheritance</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Value-based equality and inheritance</li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Top-level programs</del></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Improved pattern matching
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Simple type patterns</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Relational patterns</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Logical patterns</li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Improved target typing
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Target-typed <code class="language-plaintext highlighter-rouge">new</code> expressions</li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Covariant returns</li>
+</ul>
+
+<h1 id="records">Records</h1>
+
+<p>Let’s convert our object to a record. This allows an entire object-like construct to be immutable and act like a value.</p>
+
+<p>Change the <code class="language-plaintext highlighter-rouge">Avenger</code> object to a record and our program should still run as expected:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">record</span> <span class="n">Avenger</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="use-with-expressions">Use <code class="language-plaintext highlighter-rouge">with</code> expressions</h2>
+
+<p>With records, we can leverage <em>non-destructive mutation</em>, or a way to create new values from existing ones to resemble new state. We can make a copy of a record, and then change what we need. What if the Hulk had a little boy, who joins him and also turns green when he’s angry?</p>
+
+<p>Change the main part of the program to this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+
+<span class="kt">var</span> <span class="n">hulk</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Avenger</span> <span class="p">{</span> <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Bruce"</span><span class="p">,</span> <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Banner"</span><span class="p">};</span>
+<span class="kt">var</span> <span class="n">babyHulk</span> <span class="p">=</span> <span class="n">hulk</span> <span class="n">with</span> <span class="p">{</span> <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Baby"</span> <span class="p">};</span>
+
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">$"The Hulk is </span><span class="p">{</span><span class="n">hulk</span><span class="p">.</span><span class="n">FirstName</span><span class="p">}</span><span class="s"> </span><span class="p">{</span><span class="n">hulk</span><span class="p">.</span><span class="n">LastName</span><span class="p">}</span><span class="s">."</span><span class="p">);</span>
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">$"The Baby Hulk is </span><span class="p">{</span><span class="n">babyHulk</span><span class="p">.</span><span class="n">FirstName</span><span class="p">}</span><span class="s"> </span><span class="p">{</span><span class="n">babyHulk</span><span class="p">.</span><span class="n">LastName</span><span class="p">}</span><span class="s">."</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h3 id="use-with-expressions-with-inheritance">Use <code class="language-plaintext highlighter-rouge">with</code> expressions with inheritance</h3>
+
+<p>Records support inheritance. Structs do not. We can even use it with the <code class="language-plaintext highlighter-rouge">with</code> expression.</p>
+
+<p>Change your program to this, and it works through the power of a hidden virtual method, which I showed off when <a href="https://daveabrock.com/2020/07/06/c-sharp-9-deep-dive-records">discussing records in-depth</a>.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+
+<span class="kt">var</span> <span class="n">hulk</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Hulk</span> <span class="p">{</span> <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Bruce"</span><span class="p">,</span> <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Banner"</span><span class="p">,</span> <span class="n">AngerLevel</span> <span class="p">=</span> <span class="m">90</span><span class="p">};</span>
+<span class="kt">var</span> <span class="n">babyHulk</span> <span class="p">=</span> <span class="n">hulk</span> <span class="n">with</span> <span class="p">{</span> <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Baby"</span> <span class="p">};</span>
+
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">$"The Hulk is </span><span class="p">{</span><span class="n">hulk</span><span class="p">.</span><span class="n">FirstName</span><span class="p">}</span><span class="s"> </span><span class="p">{</span><span class="n">hulk</span><span class="p">.</span><span class="n">LastName</span><span class="p">}</span><span class="s">, "</span> <span class="p">+</span>
+                    <span class="s">$"and anger level is </span><span class="p">{</span><span class="n">hulk</span><span class="p">.</span><span class="n">AngerLevel</span><span class="p">}</span><span class="s">."</span><span class="p">);</span>
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">$"The Baby Hulk is </span><span class="p">{</span><span class="n">babyHulk</span><span class="p">.</span><span class="n">FirstName</span><span class="p">}</span><span class="s"> </span><span class="p">{</span><span class="n">babyHulk</span><span class="p">.</span><span class="n">LastName</span><span class="p">}</span><span class="s">, "</span> <span class="p">+</span>
+                    <span class="s">$"and anger level is </span><span class="p">{</span><span class="n">babyHulk</span><span class="p">.</span><span class="n">AngerLevel</span><span class="p">}</span><span class="s">."</span><span class="p">);</span>
+
+<span class="n">record</span> <span class="n">Hulk</span> <span class="p">:</span> <span class="n">Avenger</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">int</span> <span class="n">AngerLevel</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">record</span> <span class="n">Avenger</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="use-value-based-equality-and-inheritance">Use value-based equality and inheritance</h3>
+
+<p>When it comes to records, C# 9 takes care of value-based equality for you through an <code class="language-plaintext highlighter-rouge">EqualityContract</code>. Every derived record overrides it and for equal comparison to occur the two objects must both have an <code class="language-plaintext highlighter-rouge">EqualityContract.</code></p>
+
+<p>Because we are being immutable, we can create a new record, set the value back, and see the object comparison returns equal.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+
+<span class="c1">// init-only properties</span>
+<span class="kt">var</span> <span class="n">hulk</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Hulk</span> <span class="p">{</span> <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Bruce"</span><span class="p">,</span> <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Banner"</span><span class="p">,</span> <span class="n">AngerLevel</span> <span class="p">=</span> <span class="m">90</span><span class="p">};</span>
+<span class="kt">var</span> <span class="n">babyHulk</span> <span class="p">=</span> <span class="n">hulk</span> <span class="n">with</span> <span class="p">{</span> <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Baby"</span> <span class="p">};</span>
+
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">Object</span><span class="p">.</span><span class="nf">ReferenceEquals</span><span class="p">(</span><span class="n">hulk</span><span class="p">,</span> <span class="n">babyHulk</span><span class="p">));</span> <span class="c1">// false</span>
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">Object</span><span class="p">.</span><span class="nf">Equals</span><span class="p">(</span><span class="n">hulk</span><span class="p">,</span> <span class="n">babyHulk</span><span class="p">));</span> <span class="c1">// false</span>
+
+<span class="kt">var</span> <span class="n">backToRegularHulk</span> <span class="p">=</span> <span class="n">babyHulk</span> <span class="n">with</span> <span class="p">{</span> <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Bruce"</span> <span class="p">};</span>
+
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">Object</span><span class="p">.</span><span class="nf">Equals</span><span class="p">(</span><span class="n">hulk</span><span class="p">,</span> <span class="n">backToRegularHulk</span><span class="p">));</span> <span class="c1">// true</span>
+
+<span class="n">record</span> <span class="n">Hulk</span> <span class="p">:</span> <span class="n">Avenger</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">int</span> <span class="n">AngerLevel</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">record</span> <span class="n">Avenger</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="positional-records">Positional records</h2>
+
+<p>We can take a positional approach, where we hand out data from constructor arguments and we can use deconstruction to extract data.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+
+<span class="kt">var</span> <span class="n">hulk</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Avenger</span><span class="p">(</span><span class="s">"Bruce"</span><span class="p">,</span> <span class="s">"Banner"</span><span class="p">);</span>
+<span class="kt">var</span> <span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">last</span><span class="p">)</span> <span class="p">=</span> <span class="n">hulk</span><span class="p">;</span>
+
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">first</span><span class="p">);</span>
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">last</span><span class="p">);</span>
+
+<span class="k">public</span> <span class="n">record</span> <span class="n">Avenger</span>
+<span class="p">{</span>
+    <span class="kt">string</span> <span class="n">FirstName</span><span class="p">;</span>
+    <span class="kt">string</span> <span class="n">LastName</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nf">Avenger</span><span class="p">(</span><span class="kt">string</span> <span class="n">firstName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">lastName</span><span class="p">)</span> 
+      <span class="p">=&gt;</span> <span class="p">(</span><span class="n">FirstName</span><span class="p">,</span> <span class="n">LastName</span><span class="p">)</span> <span class="p">=</span> <span class="p">(</span><span class="n">firstName</span><span class="p">,</span> <span class="n">lastName</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">Deconstruct</span><span class="p">(</span><span class="k">out</span> <span class="kt">string</span> <span class="n">firstName</span><span class="p">,</span> <span class="k">out</span> <span class="kt">string</span> <span class="n">lastName</span><span class="p">)</span> 
+      <span class="p">=&gt;</span> <span class="p">(</span><span class="n">firstName</span><span class="p">,</span> <span class="n">lastName</span><span class="p">)</span> <span class="p">=</span> <span class="p">(</span><span class="n">FirstName</span><span class="p">,</span> <span class="n">LastName</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>That should do it for records! How are we doing so far?</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Init-only properties</del>
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Init accessors and readonly fields</del></li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Records</del>
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del><code class="language-plaintext highlighter-rouge">with</code> expressions</del></li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Value-based equality</del></li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Positional records</del></li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del><code class="language-plaintext highlighter-rouge">with</code> expressions and inheritance</del></li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Value-based equality and inheritance</del></li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Top-level programs</del></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Improved pattern matching
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Simple type patterns</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Relational patterns</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Logical patterns</li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Improved target typing
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Target-typed <code class="language-plaintext highlighter-rouge">new</code> expressions</li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Covariant returns</li>
+</ul>
+
+<h1 id="improved-pattern-matching">Improved pattern matching</h1>
+
+<p>C# 9 offers improved pattern matching for simple type patterns, relational patterns, and logical patterns.</p>
+
+<p>In this example, we will calculate a monthly insurance cost depending on the Hulk’s <code class="language-plaintext highlighter-rouge">AngerLevel</code>. Our records look like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">record</span> <span class="n">Hulk</span> <span class="p">:</span> <span class="n">Avenger</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">int</span> <span class="n">AngerLevel</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">record</span> <span class="n">Avenger</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="simple-type-patterns">Simple type patterns</h2>
+
+<p>Using simple type patterns, we don’t need that discard (<code class="language-plaintext highlighter-rouge">_</code>) operator to just declare the type. Now, we can just say <code class="language-plaintext highlighter-rouge">Hulk =&gt; 1000</code> in <code class="language-plaintext highlighter-rouge">CalculateInsuranceCost</code>:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="kt">int</span> <span class="nf">CalculateInsuranceCost</span><span class="p">(</span><span class="kt">object</span> <span class="n">hulk</span><span class="p">)</span> <span class="p">=&gt;</span>
+    <span class="n">hulk</span> <span class="k">switch</span>
+    <span class="p">{</span>
+        <span class="n">Hulk</span> <span class="n">t</span> <span class="n">when</span> <span class="n">t</span><span class="p">.</span><span class="n">AngerLevel</span> <span class="p">&gt;</span> <span class="m">90</span> <span class="p">=&gt;</span> <span class="m">10000</span><span class="p">,</span>
+        <span class="n">Hulk</span> <span class="n">t</span> <span class="n">when</span> <span class="n">t</span><span class="p">.</span><span class="n">AngerLevel</span> <span class="p">&lt;</span> <span class="m">20</span> <span class="p">=&gt;</span> <span class="m">100</span><span class="p">,</span>
+        <span class="n">Hulk</span> <span class="p">=&gt;</span> <span class="m">1000</span><span class="p">,</span>
+
+        <span class="n">_</span> <span class="p">=&gt;</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentException</span><span class="p">(</span><span class="s">"Not a known hulk"</span><span class="p">,</span> <span class="k">nameof</span><span class="p">(</span><span class="n">hulk</span><span class="p">))</span>
+    <span class="p">;</span>
+</code></pre></div></div>
+
+<h2 id="relational-patterns">Relational patterns</h2>
+
+<p>With relational patterns, we can use <code class="language-plaintext highlighter-rouge">&lt;</code>, <code class="language-plaintext highlighter-rouge">&gt;</code>, and so on with pattern matching. Take a look at this <code class="language-plaintext highlighter-rouge">CalculateInsuranceCost</code> method:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="kt">int</span> <span class="nf">CalculateInsuranceCost</span><span class="p">(</span><span class="n">Hulk</span> <span class="n">hulk</span><span class="p">)</span> <span class="p">=&gt;</span>
+  <span class="n">hulk</span><span class="p">.</span><span class="n">AngerLevel</span> <span class="k">switch</span>
+  <span class="p">{</span>
+    <span class="p">&gt;</span> <span class="m">90</span> <span class="p">=&gt;</span> <span class="m">10000</span><span class="p">,</span>
+    <span class="p">&lt;</span> <span class="m">20</span> <span class="p">=&gt;</span> <span class="m">100</span><span class="p">,</span>
+    <span class="n">_</span> <span class="p">=&gt;</span> <span class="m">1000</span><span class="p">,</span>
+  <span class="p">};</span>
+</code></pre></div></div>
+
+<h2 id="logical-patterns">Logical patterns</h2>
+
+<p>With logical patterns, you can use <code class="language-plaintext highlighter-rouge">and</code>, <code class="language-plaintext highlighter-rouge">or</code>, and <code class="language-plaintext highlighter-rouge">not</code>:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="kt">int</span> <span class="nf">CalculateInsuranceCost</span><span class="p">(</span><span class="n">Hulk</span> <span class="n">hulk</span><span class="p">)</span> <span class="p">=&gt;</span>
+  <span class="n">hulk</span><span class="p">.</span><span class="n">AngerLevel</span> <span class="k">switch</span>
+  <span class="p">{</span>
+    <span class="p">&gt;</span> <span class="m">90</span> <span class="p">=&gt;</span> <span class="m">10000</span><span class="p">,</span>
+    <span class="p">&gt;</span> <span class="m">20</span> <span class="n">and</span> <span class="p">&lt;</span> <span class="m">90</span> <span class="p">=&gt;</span> <span class="m">100</span><span class="p">,</span>
+    <span class="n">_</span> <span class="p">=&gt;</span> <span class="m">1000</span><span class="p">,</span>
+  <span class="p">};</span>
+</code></pre></div></div>
+
+<p>How’s our scavenger hunt going? Are we done yet?</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Init-only properties</del>
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Init accessors and readonly fields</del></li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Records</del>
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del><code class="language-plaintext highlighter-rouge">with</code> expressions</del></li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Value-based equality</del></li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Positional records</del></li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del><code class="language-plaintext highlighter-rouge">with</code> expressions and inheritance</del></li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Value-based equality and inheritance</del></li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Top-level programs</del></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Improved pattern matching</del>
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Simple type patterns</del></li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Relational patterns</del></li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Logical patterns</del></li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Improved target typing
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Target-typed <code class="language-plaintext highlighter-rouge">new</code> expressions</li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Covariant returns</li>
+</ul>
+
+<h1 id="target-typing-with-new-expressions">Target typing with <code class="language-plaintext highlighter-rouge">new</code> expressions</h1>
+
+<p>Great! Let’s scratch another quick one off the list with some target typing.</p>
+
+<p>Let’s have an <code class="language-plaintext highlighter-rouge">Avenger</code> class like so:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">Avenger</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="kt">string</span> <span class="n">_firstName</span><span class="p">;</span>
+    <span class="k">private</span> <span class="kt">string</span> <span class="n">_lastName</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">Avenger</span><span class="p">(</span><span class="kt">string</span> <span class="n">firstName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">lastName</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">_firstName</span> <span class="p">=</span> <span class="n">firstName</span><span class="p">;</span>
+        <span class="n">_lastName</span> <span class="p">=</span> <span class="n">lastName</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now we can use it with <code class="language-plaintext highlighter-rouge">new</code> expressions:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+
+<span class="n">Avenger</span> <span class="n">ironMan</span> <span class="p">=</span> <span class="k">new</span> <span class="p">(</span><span class="s">"Tony"</span><span class="p">,</span> <span class="s">"Stark"</span><span class="p">);</span>
+<span class="n">Avenger</span> <span class="n">hulk</span> <span class="p">=</span> <span class="k">new</span> <span class="p">(</span><span class="s">"Bruce"</span><span class="p">,</span> <span class="s">"Banner"</span><span class="p">);</span>
+<span class="n">Avenger</span> <span class="n">blackWidow</span> <span class="p">=</span> <span class="k">new</span> <span class="p">(</span><span class="s">"Natasha"</span><span class="p">,</span> <span class="s">"Romanova"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>We can also see its benefit when creating collections:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+
+<span class="kt">var</span> <span class="n">avengerList</span> <span class="p">=</span> <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">Avenger</span><span class="p">&gt;</span>
+<span class="p">{</span>
+  <span class="k">new</span> <span class="p">(</span><span class="s">"Tony"</span><span class="p">,</span> <span class="s">"Stark"</span><span class="p">),</span>
+  <span class="k">new</span> <span class="p">(</span><span class="s">"Bruce"</span><span class="p">,</span> <span class="s">"Banner"</span><span class="p">),</span>
+  <span class="k">new</span> <span class="p">(</span><span class="s">"Natasha"</span><span class="p">,</span> <span class="s">"Romanova"</span><span class="p">),</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<h1 id="covariant-returns">Covariant returns</h1>
+
+<p>One item left: covariant returns. If you read the last post, this should be familiar to you. With return type covariance, you can override a base class method (that has a less-specific type) with one that returns a more specific type. To return some new objects, you could try this.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">virtual</span> <span class="n">Avenger</span> <span class="nf">GetHero</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// this is the parent (or base) class</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">Avenger</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">override</span> <span class="n">Hulk</span> <span class="nf">GetHero</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// better!</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">Hulk</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>We did it!</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Init-only properties</del>
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Init accessors and readonly fields</del></li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Records</del>
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del><code class="language-plaintext highlighter-rouge">with</code> expressions</del></li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Value-based equality</del></li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Positional records</del></li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del><code class="language-plaintext highlighter-rouge">with</code> expressions and inheritance</del></li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Value-based equality and inheritance</del></li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Top-level programs</del></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Improved pattern matching</del>
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Simple type patterns</del></li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Relational patterns</del></li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Logical patterns</del></li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Improved target typing</del>
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Target-typed <code class="language-plaintext highlighter-rouge">new</code> expressions</del></li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><del>Covariant returns</del></li>
+</ul>
+
+<h1 id="and-thats-it-friends">And that’s it, friends</h1>
+
+<p>Thank you so much for reading and providing feedback on all these articles. This won’t be the last I write about C#, obviously, but it does conclude my first pass on C# 9 features. As always, I’m excited to hear how things are going for you—don’t be shy!</p>

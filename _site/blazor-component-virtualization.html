@@ -1,0 +1,260 @@
+<p>When measuring web performance—especially on page load—it’s not always about a consistent metric, such as how quickly the entire HTML tree loads from the server. It’s helpful to think in terms of <a href="https://developer.mozilla.org/en-US/docs/Learn/Performance/perceived_performance">perceived performance</a>—do you understand what needs to be rendered now, and what can be rendered later? End users should never have to wait for something that, well, can wait.</p>
+
+<p>The ASP.NET Core team recently rolled out <a href="https://docs.microsoft.com/aspnet/core/blazor/components/virtualization?view=aspnetcore-5.0">Blazor component virtualization</a>, a technique for limiting UI rendering to the visible page elements only. You can easily leverage this through a built-in <code class="language-plaintext highlighter-rouge">Virtualize</code> component.</p>
+
+<p>Here’s a common scenario: let’s say you have a requirement to list a bunch of items on a table, and you might be stuck with a lot of data. If you’re listing several thousand items on a page, users often have to sit and wait for the entire site to load. With Blazor component virtualization, the app will load only the records in the user’s window, then render more only when scrolling.</p>
+
+<p>This post will discuss the following content.</p>
+
+<ul>
+  <li><a href="#prerequisites">Prerequisites</a></li>
+  <li><a href="#the-up-and-running-in-30-seconds-solution">The “up and running in 30 seconds” solution</a></li>
+  <li><a href="#our-sample-app">Our sample app</a></li>
+  <li><a href="#additional-parameters">Additional parameters</a>
+    <ul>
+      <li><a href="#overscancount">OverscanCount</a></li>
+      <li><a href="#lazy-loading-with-itemsprovider-and-placeholder">Lazy loading with <code class="language-plaintext highlighter-rouge">ItemsProvider</code> and <code class="language-plaintext highlighter-rouge">Placeholder</code></a></li>
+      <li><a href="#itemsize">ItemSize</a></li>
+    </ul>
+  </li>
+  <li><a href="#reminder-this-isnt-a-catch-all">Reminder: this isn’t a catch-all</a></li>
+  <li><a href="#wrap-up">Wrap up</a></li>
+  <li><a href="#references">References</a></li>
+</ul>
+
+<p class="notice--warning"><strong>Heads up!</strong> This post assumes you have <a href="https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor">some familiarity with Blazor</a>, like how to create and render a basic component.</p>
+
+<h1 id="prerequisites">Prerequisites</h1>
+
+<p>To work with Blazor component virtualization, you need .NET 5 RC1 or greater. Head on over to the <a href="https://dotnet.microsoft.com/download/dotnet/5.0">.NET 5 SDK downloads</a>, or have Visual Studio 2019 Preview 3 (v16.8) or greater installed.</p>
+
+<h1 id="the-up-and-running-in-30-seconds-solution">The “up and running in 30 seconds” solution</h1>
+
+<p>Assume you have a collection called <code class="language-plaintext highlighter-rouge">people</code> that’s a list of <code class="language-plaintext highlighter-rouge">Person</code> objects with properties like <code class="language-plaintext highlighter-rouge">FirstName</code>, <code class="language-plaintext highlighter-rouge">LastName</code>, and so on. In your component’s <code class="language-plaintext highlighter-rouge">.razor</code> file, replace your traditional for-each loop…</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">@foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">person</span> <span class="k">in</span> <span class="n">people</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="p">&lt;</span><span class="n">p</span><span class="p">&gt;</span>
+        <span class="n">@person</span><span class="p">.</span><span class="n">FirstName</span> <span class="n">@person</span><span class="p">.</span><span class="n">LastName</span> <span class="k">is</span> <span class="n">only</span> <span class="n">fun</span> <span class="k">on</span> <span class="n">Fridays</span><span class="p">.</span>
+    <span class="p">&lt;/</span><span class="n">p</span><span class="p">&gt;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>… with the <code class="language-plaintext highlighter-rouge">Virtualize</code> component, and pass the collection into the <code class="language-plaintext highlighter-rouge">Items</code> parameter and use <code class="language-plaintext highlighter-rouge">context</code> to access your object’s properties:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;Virtualize</span> <span class="na">Items=</span><span class="s">"@people"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;p&gt;</span>
+        @context.FirstName @context.LastName is only fun on Fridays.
+    <span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;/Virtualize&gt;</span>
+</code></pre></div></div>
+
+<p>Additionally, you could explicitly specify a context in your component:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;Virtualize</span> <span class="na">Context=</span><span class="s">"person"</span> <span class="na">Items=</span><span class="s">"@people"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;p&gt;</span>
+        @person.FirstName @person.LastName is only fun on Fridays.
+    <span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;/Virtualize&gt;</span>
+</code></pre></div></div>
+
+<p>The component does the hard work of getting the height of your container and the size of the items to render. When we speak of the “container” we are talking about the rendered element: it can be one or more Razor components, a mix of HTML and Razor components, or plain old Razor code.</p>
+
+<p>That’s really how easy it is, and will cover a majority of your use cases. Keep reading to understand the <code class="language-plaintext highlighter-rouge">Virtualize</code> component in greater detail—and how you can customize and extend it for your specific needs.</p>
+
+<h1 id="our-sample-app">Our sample app</h1>
+
+<p>To further illustrate the need for Blazor component virtualization, let’s kick things up a notch. In the sample Blazor app’s <code class="language-plaintext highlighter-rouge">FetchData</code> component (or any component you’d like), let’s make a bunch of objects in memory when the page loads (in <code class="language-plaintext highlighter-rouge">OnInitializedAsync</code>). In the <code class="language-plaintext highlighter-rouge">@code</code> block of the component, we’ll populate a list of 10,000 cars to display on the page. (To state the obvious, we should never <em>actually</em> do this.)</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">private</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">Car</span><span class="p">&gt;</span> <span class="n">cars</span><span class="p">;</span>
+
+<span class="k">protected</span> <span class="k">override</span> <span class="k">async</span> <span class="n">Task</span> <span class="nf">OnInitializedAsync</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="n">cars</span> <span class="p">=</span> <span class="k">await</span> <span class="nf">MakeTenThousandCars</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="k">private</span> <span class="k">async</span> <span class="n">Task</span><span class="p">&lt;</span><span class="n">List</span><span class="p">&lt;</span><span class="n">Car</span><span class="p">&gt;&gt;</span> <span class="nf">MakeTenThousandCars</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="n">List</span><span class="p">&lt;</span><span class="n">Car</span><span class="p">&gt;</span> <span class="n">myCarList</span> <span class="p">=</span> <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">Car</span><span class="p">&gt;();</span>
+
+  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="p">&lt;</span> <span class="m">10000</span><span class="p">;</span> <span class="n">i</span><span class="p">++)</span>
+  <span class="p">{</span>
+    <span class="kt">var</span> <span class="n">car</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Car</span><span class="p">()</span>
+    <span class="p">{</span>
+      <span class="n">Id</span> <span class="p">=</span> <span class="n">Guid</span><span class="p">.</span><span class="nf">NewGuid</span><span class="p">(),</span>
+      <span class="n">Name</span> <span class="p">=</span> <span class="s">$"Car </span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="s">"</span><span class="p">,</span>
+      <span class="n">Cost</span> <span class="p">=</span> <span class="n">i</span> <span class="p">*</span> <span class="m">100</span>
+    <span class="p">};</span>
+
+    <span class="n">myCarList</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="n">car</span><span class="p">);</span>
+  <span class="p">}</span>  
+  <span class="k">return</span> <span class="k">await</span> <span class="n">Task</span><span class="p">.</span><span class="nf">FromResult</span><span class="p">(</span><span class="n">myCarList</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">Car</span>
+<span class="p">{</span>
+  <span class="k">public</span> <span class="n">Guid</span> <span class="n">Id</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+  <span class="k">public</span> <span class="kt">string</span> <span class="n">Name</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+  <span class="k">public</span> <span class="kt">int</span> <span class="n">Cost</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Then, in the markup: when we get all our cars, we’ll lay them out in a single table.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@if (cars == null)
+{
+  <span class="nt">&lt;p&gt;&lt;em&gt;</span>Loading so many cars...<span class="nt">&lt;/em&gt;&lt;/p&gt;</span>
+}
+else
+{
+  <span class="nt">&lt;table</span> <span class="na">class=</span><span class="s">"table"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;thead&gt;</span>
+      <span class="nt">&lt;tr&gt;</span>
+        <span class="nt">&lt;th&gt;</span>Id<span class="nt">&lt;/th&gt;</span>
+        <span class="nt">&lt;th&gt;</span>Name<span class="nt">&lt;/th&gt;</span>
+        <span class="nt">&lt;th&gt;</span>Cost<span class="nt">&lt;/th&gt;</span>
+      <span class="nt">&lt;/tr&gt;</span>
+    <span class="nt">&lt;/thead&gt;</span>
+    <span class="nt">&lt;tbody&gt;</span>
+      @foreach (var car in cars)
+      {
+        <span class="nt">&lt;tr&gt;</span>
+            <span class="nt">&lt;td&gt;</span>@car.Id<span class="nt">&lt;/td&gt;</span>
+            <span class="nt">&lt;td&gt;</span>@car.Name<span class="nt">&lt;/td&gt;</span>
+            <span class="nt">&lt;td&gt;</span>@car.Cost<span class="nt">&lt;/td&gt;</span>
+        <span class="nt">&lt;/tr&gt;</span>
+       }
+    <span class="nt">&lt;/tbody&gt;</span>
+  <span class="nt">&lt;/table&gt;</span>
+}
+</code></pre></div></div>
+
+<p>Launch your app, fire up your favorite dev tools, and head over to the <strong>Fetch data</strong> link at <code class="language-plaintext highlighter-rouge">http://localhost:xxxx/fetchdata</code>.</p>
+
+<p>According to my dev tools with the cache disabled, load ranges anywhere from 2.5 to 4 seconds (I refreshed ten times) and quite a bit of lag.</p>
+
+<p>As before, I can do is replace my for-loop with the following, then re-launch my application.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;Virtualize</span> <span class="na">Items=</span><span class="s">"cars"</span> <span class="na">Context=</span><span class="s">"car"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;tr&gt;</span>
+    <span class="nt">&lt;td&gt;</span>@car.Id<span class="nt">&lt;/td&gt;</span>
+    <span class="nt">&lt;td&gt;</span>@car.Name<span class="nt">&lt;/td&gt;</span>
+    <span class="nt">&lt;td&gt;</span>@car.Cost<span class="nt">&lt;/td&gt;</span>
+  <span class="nt">&lt;/tr&gt;</span>
+<span class="nt">&lt;/Virtualize&gt;</span>
+</code></pre></div></div>
+
+<p>Now, we’re looking at 1.2 to 1.9 seconds uncached, about twice the speed.</p>
+
+<p>In the following video, keep an eye on Chrome Developer tools. You’ll see how the elements change as I scroll.</p>
+
+<video autoplay="" controls="" muted="" loop="">
+  <source src="http://localhost:4001/videos/Twitter.mp4" type="video/mp4" />
+</video>
+
+<p>The <code class="language-plaintext highlighter-rouge">Items</code> and <code class="language-plaintext highlighter-rouge">Context</code> are the most common parameters to use here, but there’s plenty more you can utilize.</p>
+
+<h1 id="additional-parameters">Additional parameters</h1>
+
+<p>We’ll talk through four additional parameters: <code class="language-plaintext highlighter-rouge">OverscanCount</code>, <code class="language-plaintext highlighter-rouge">ItemsDelegate</code>, <code class="language-plaintext highlighter-rouge">Placeholder</code>, and <code class="language-plaintext highlighter-rouge">ItemSize</code>.</p>
+
+<h2 id="overscancount">OverscanCount</h2>
+
+<p>You can also specify an <code class="language-plaintext highlighter-rouge">OverscanCount</code> parameter, which specifies how many more items to render before and after the viewable container. The default is currently three items (<a href="https://github.com/dotnet/aspnetcore/blob/686150953f7ccd3f56afd4d7b2f0a934c3557a10/src/Components/Web/src/Virtualization/Virtualize.cs#L100">src</a>). You may want to tweak this to prevent excessive rendering when you know there will be a lot of scrolling.</p>
+
+<p>Here’s how we would do it in our first example:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;Virtualize</span> <span class="na">Items=</span><span class="s">"@cars"</span> <span class="na">Context=</span><span class="s">"car"</span> <span class="na">OverscanCount=</span><span class="s">"5"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;tr&gt;</span>
+    <span class="nt">&lt;td&gt;</span>@car.Id<span class="nt">&lt;/td&gt;</span>
+    <span class="nt">&lt;td&gt;</span>@car.Name<span class="nt">&lt;/td&gt;</span>
+    <span class="nt">&lt;td&gt;</span>@car.Cost<span class="nt">&lt;/td&gt;</span>
+  <span class="nt">&lt;/tr&gt;</span>
+<span class="nt">&lt;/Virtualize&gt;</span>
+</code></pre></div></div>
+
+<p>Obviously, the higher the number the more elements you’ll render—so use this cautiously.</p>
+
+<h2 id="lazy-loading-with-itemsprovider-and-placeholder">Lazy loading with <code class="language-plaintext highlighter-rouge">ItemsProvider</code> and <code class="language-plaintext highlighter-rouge">Placeholder</code></h2>
+
+<p>To the casual observer, it might seem like the rendering fetches data periodically. In reality all data is queued up in memory by default. If you don’t want to do this, you can work with an item provider delegate method—in C#, <a href="https://docs.microsoft.com/dotnet/csharp/programming-guide/delegates/">a delegate</a> is a type that refers to methods with a parameter list and return type.</p>
+
+<p>For example, you might be calling an external API (or any other service) and not always know how much data you’re getting back. With the <code class="language-plaintext highlighter-rouge">ItemsProvider</code> parameter, you can ask for requested items on demand.</p>
+
+<p>The provider asks for an <code class="language-plaintext highlighter-rouge">ItemsProviderRequest</code>, which contains a <code class="language-plaintext highlighter-rouge">StartIndex</code> (where to start) and  <code class="language-plaintext highlighter-rouge">Count</code> (how many items to provide), and a <code class="language-plaintext highlighter-rouge">CancellationToken</code>. After fetching the data, the data returns an <code class="language-plaintext highlighter-rouge">ItemsProviderResult&lt;TItem&gt;</code> along with a total item count.</p>
+
+<p>Let’s add this method to our <code class="language-plaintext highlighter-rouge">@code</code> block in our Razor file:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">private</span> <span class="k">async</span> <span class="n">ValueTask</span><span class="p">&lt;</span><span class="n">ItemsProviderResult</span><span class="p">&lt;</span><span class="n">Car</span><span class="p">&gt;&gt;</span> <span class="nf">LoadCars</span><span class="p">(</span><span class="n">ItemsProviderRequest</span> <span class="n">request</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">var</span> <span class="n">cars</span> <span class="p">=</span> <span class="k">await</span> <span class="nf">MakeTenThousandCars</span><span class="p">();</span>
+  <span class="k">return</span> <span class="k">new</span> <span class="n">ItemsProviderResult</span><span class="p">&lt;</span><span class="n">Car</span><span class="p">&gt;(</span><span class="n">cars</span><span class="p">.</span><span class="nf">Skip</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="n">StartIndex</span><span class="p">).</span><span class="nf">Take</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="n">Count</span><span class="p">),</span> <span class="n">cars</span><span class="p">.</span><span class="nf">Count</span><span class="p">());</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>If you aren’t familiar with the <a href="https://docs.microsoft.com/dotnet/csharp/programming-guide/concepts/linq/">LINQ syntax</a>:</p>
+
+<ul>
+  <li>The <code class="language-plaintext highlighter-rouge">Skip</code> operator <a href="https://docs.microsoft.com/dotnet/api/system.linq.queryable.skip?view=netcore-3.1">skips over</a> elements until we get to the <code class="language-plaintext highlighter-rouge">StartIndex</code> and return the remainder</li>
+  <li>The <code class="language-plaintext highlighter-rouge">Take</code> operator takes the next <em>x</em> elements from what <code class="language-plaintext highlighter-rouge">Skip</code> returned, where <em>x</em> is the <code class="language-plaintext highlighter-rouge">Count</code> to return</li>
+</ul>
+
+<p>Before we update the Razor code, let’s talk about <code class="language-plaintext highlighter-rouge">Placeholder</code>.</p>
+
+<p>Typically with Blazor components that run on initialization, you’ll see this pattern to display a message while the collection is populating.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@if (cars == null)
+{
+  <span class="nt">&lt;p&gt;&lt;em&gt;</span>Loading so many cars...<span class="nt">&lt;/em&gt;&lt;/p&gt;</span>
+}
+</code></pre></div></div>
+
+<p>In our case, you can remove that block and replace it with a <code class="language-plaintext highlighter-rouge">Placeholder</code>. Here’s the updated code.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;Virtualize</span> <span class="na">Context=</span><span class="s">"car"</span> <span class="na">ItemsProvider=</span><span class="s">"@LoadCars"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;ItemContent&gt;</span>
+        <span class="nt">&lt;tr&gt;</span>
+            <span class="nt">&lt;td&gt;</span>@car.Id<span class="nt">&lt;/td&gt;</span>
+            <span class="nt">&lt;td&gt;</span>@car.Name<span class="nt">&lt;/td&gt;</span>
+            <span class="nt">&lt;td&gt;</span>@car.Cost<span class="nt">&lt;/td&gt;</span>
+        <span class="nt">&lt;/tr&gt;</span>
+    <span class="nt">&lt;/ItemContent&gt;</span>
+    <span class="nt">&lt;Placeholder&gt;</span>
+        <span class="nt">&lt;p&gt;</span>Loading so many cars...<span class="nt">&lt;/p&gt;</span>
+    <span class="nt">&lt;/Placeholder&gt;</span>
+<span class="nt">&lt;/Virtualize&gt;</span>
+</code></pre></div></div>
+
+<h2 id="itemsize">ItemSize</h2>
+
+<p>You can also specify the size of each item, in pixels. The default is 50px (<a href="https://github.com/dotnet/aspnetcore/blob/686150953f7ccd3f56afd4d7b2f0a934c3557a10/src/Components/Web/src/Virtualization/Virtualize.cs#L79">src</a>).</p>
+
+<p>Here’s how we’d do it in our example:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;Virtualize</span> <span class="na">Items=</span><span class="s">"@cars"</span> <span class="na">Context=</span><span class="s">"car"</span> <span class="na">ItemSize=</span><span class="s">"15"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;tr&gt;</span>
+    <span class="nt">&lt;td&gt;</span>@car.Id<span class="nt">&lt;/td&gt;</span>
+    <span class="nt">&lt;td&gt;</span>@car.Name<span class="nt">&lt;/td&gt;</span>
+    <span class="nt">&lt;td&gt;</span>@car.Cost<span class="nt">&lt;/td&gt;</span>
+  <span class="nt">&lt;/tr&gt;</span>
+<span class="nt">&lt;/Virtualize&gt;</span>
+</code></pre></div></div>
+
+<h1 id="reminder-this-isnt-a-catch-all">Reminder: this isn’t a catch-all</h1>
+
+<p>Considering how easy it is to use <code class="language-plaintext highlighter-rouge">Virtualize</code> it might be easy to use it as a catch-all: <em>I have to load a bunch of stuff, so I’ll drop it here</em>. It’s important to use this component thoughtfully. For example, all items must be a known height so that Blazor can calculate the total scroll range and, therefore, what to render.</p>
+
+<p>For example, you might have elements that wrap unexpectedly when using different window sizes. In these cases, the virtualization logic won’t work as you expect (<a href="https://github.com/dotnet/aspnetcore/issues/26099">there’s some chatter about how to handle this</a>).</p>
+
+<p>As with anything else in your codebase, it’s a story of tradeoffs. Understand them before you implement.</p>
+
+<h1 id="wrap-up">Wrap up</h1>
+
+<p>In this post, we talked about the <code class="language-plaintext highlighter-rouge">Virtualize</code> component and how it can help you. We worked through a quick and dirty example, then worked through a list with a lot of records. Then, we talked about other parameters available to you, such as <code class="language-plaintext highlighter-rouge">OverscanCount</code> and <code class="language-plaintext highlighter-rouge">ItemSize</code>. We then discussed how to perform lazy loading with the <code class="language-plaintext highlighter-rouge">ItemsDelegate</code> and <code class="language-plaintext highlighter-rouge">Placeholder</code> parameters.</p>
+
+<h1 id="references">References</h1>
+
+<ul>
+  <li><a href="https://docs.microsoft.com/aspnet/core/blazor/components/virtualization?view=aspnetcore-5.0">ASP.NET Core Blazor component virtualization</a> (Microsoft Docs)</li>
+  <li><a href="https://github.com/dotnet/aspnetcore/blob/master/src/Components/Web/src/Virtualization/Virtualize.cs#L79">Virtualize component source code</a> (GitHub)</li>
+</ul>

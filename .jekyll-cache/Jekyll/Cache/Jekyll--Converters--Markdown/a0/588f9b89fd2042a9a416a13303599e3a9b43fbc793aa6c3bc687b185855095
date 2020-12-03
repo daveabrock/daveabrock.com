@@ -1,0 +1,202 @@
+I"�]<p><img src="https://raw.githubusercontent.com/daveabrock/daveabrock.github.io/master/THE%20.NET%20STACKS.png" alt="Newsletter image" /></p>
+
+<p>Welcome to the start of another week—I hope you are well and safe. We had an insanely busy week in the .NET world, so let’s get to it.</p>
+
+<h2 id="its-the-final--preview">It’s the final … preview</h2>
+
+<p>Are you ready for .NET 5? This week, Microsoft <a href="https://devblogs.microsoft.com/dotnet/announcing-net-5-0-preview-8/">announced the release</a> of .NET 5 Preview 8 (and also <a href="https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-preview-8/">ASP.NET Core</a> and <a href="https://devblogs.microsoft.com/dotnet/announcing-entity-framework-core-ef-core-5-0-preview-8/">EF 5</a> updates). This means that .NET 5 is more-or-less feature complete with the exception of bug fixes. Up next, we have two go-live release candidates, and then the official release in November.</p>
+
+<p>You’ll want to hit up the links (<a href="https://github.com/dotnet/runtime/issues/37269">and GitHub</a>) for all the gory details, but here’s a quick recap of what’s coming in .NET 5 from a high level:</p>
+
+<ul>
+  <li><a href="https://github.com/dotnet/runtime/issues/36590">Single file applications</a></li>
+  <li><a href="https://devblogs.microsoft.com/dotnet/performance-improvements-in-net-5/">Increased performance</a></li>
+  <li><a href="https://twitter.com/terrajobst/status/1296566363880742917">Nullable reference type annotations</a></li>
+  <li><a href="https://github.com/dotnet/runtime/issues/36699">Windows ARM64 support</a></li>
+  <li><a href="https://webassembly.org/">Web Assembly support</a></li>
+  <li><a href="https://github.com/dotnet/runtime/issues/41313">JsonSerializer API improvements</a></li>
+  <li><a href="https://devblogs.microsoft.com/dotnet/welcome-to-c-9-0/">C# 9</a> and <a href="https://devblogs.microsoft.com/dotnet/f-5-and-f-tools-update-for-june/">F# 5</a></li>
+</ul>
+
+<p>We <a href="https://daveabrock.com/2020/08/22/dotnet-stacks-13">discussed this a few weeks back</a>, but for the preview itself, the ASP.NET Core side is jam-packed with Blazor improvements and capabilities. There’s CSS isolation, lazy loading, UI focus, and more. From the EF 5 side, there’s table-per-type mapping, table-valued functions, and more—and, <a href="https://daveabrock.com/2020/08/29/dotnet-stacks-14">as mentioned last week</a>, many-to-many is now in the daily builds.</p>
+
+<h2 id="speed-up-runtime-with-c-source-generators">Speed up runtime with C# source generators</h2>
+
+<p>While not directly linked to C# 9, I’m getting excited about C# source generators (I <a href="https://daveabrock.com/2020/05/08/first-look-c-sharp-generators">wrote a “first look” post back in May</a>).</p>
+
+<p>These generators are basically code that runs during compilation and can produce additional files that are compiled together with the rest of your code. It’s a complication step that generates code <em>for you</em> based on your code.</p>
+
+<p>Here’s a big benefit that I wrote about:</p>
+
+<blockquote>
+  <p>If you’ve ever leaned on reflection in your projects, you might begin to see many use cases for these solutions—C# source generators provide a lot of advantages that reflection currently offers and few, if any, drawbacks. Reflection is extremely powerful when you want to query properties and attributes you don’t know about when you typically compile. Of course, getting type information at runtime can incur a large performance cost, so offloading this to compilation is definitely a game-changer in C#.</p>
+</blockquote>
+
+<p>This week, Microsoft <a href="https://devblogs.microsoft.com/dotnet/new-c-source-generator-samples/">announced some new C# source generator samples</a>. You can also check out the <a href="https://github.com/dotnet/roslyn/blob/master/docs/features/source-generators.md">design document</a> and a <a href="https://github.com/dotnet/roslyn/blob/master/docs/features/source-generators.cookbook.md">source generators cookbook</a>. If you’ve tried it, let me know your thoughts!</p>
+
+<h2 id="dev-discussions-luis-quintanilla">Dev Discussions: Luis Quintanilla</h2>
+
+<p>Machine learning is a fascinating world and, to many, a complicated one. As .NET developers, we definitely see the benefit in training our data but between the learning curve and using other languages like Python for machine learning—a language .NET devs might not be familiar with—ML is often sent to a developer’s “I should look into that sometime” queue.</p>
+
+<p>That changed in 2018, when Microsoft launched ML.NET—a free, open source, x-plat machine learning framework for .NET. With ML.NET, you can use your favorite languages like C# or F# to work with your custom machine learning models. The idea is to meet you where you are and make ML more accessible.</p>
+
+<p>There’s no one better to talk to about this than Luis Quintanilla. Luis has been with ML.NET since the beginning and was eventually scooped up by Microsoft to work on the docs for ML.NET.</p>
+
+<p><img src="http://localhost:4001/images/luisquintanilla-picture.jpg" alt="Luis Quintanilla" /></p>
+
+<h3 id="what-made-you-focus-on-mlnet-over-other-development-tech">What made you focus on ML.NET over other development tech?</h3>
+
+<p>I could write an entire essay on why ML.NET but all of the reasons can be summarized in a single word, .NET. Now, to expand on that, here are a few reasons why I enjoy ML.NET so much!</p>
+
+<h4 id="languages">Languages</h4>
+
+<p>Though not unique to .NET, I like statically-typed languages. I’m sure many of the readers are able to build their applications and successfully run them without errors on the first try 😉. That, however, is usually not my experience. Therefore, I prefer catching as many errors as possible at compile time. Another reason I like types is they provide a way of documenting your code.</p>
+
+<p>This is of extreme importance when working in data science and machine learning scenarios. Although ultimately the data used by machine learning algorithms to train models is encoded as numbers, knowing your data schema and checking it at compile time may help reduce the number of errors in your code as you transform your data.</p>
+
+<p>Lately I’ve been doing more F# development and the more I use it, the more I like it. F# for me provides a nice balance between Python and C#. F# gives you the productivity and succinctness of a language like Python, while still having the compiler and many other neat features at your disposal.</p>
+
+<h4 id="runtime">Runtime</h4>
+
+<p>The .NET runtime is fast and performant. This is important in two scenarios, training machine learning models and deploying them. A good part of training machine learning models involves performing operations on vectors and matrices. .NET provides Single Instruction Multiple Data (SIMD) enabled types via the <a href="https://docs.microsoft.com//dotnet/standard/simd">System.Numerics</a>  namespace. ML.NET leverages these types where possible to increase the throughput of the training operations making training fast and efficient.</p>
+
+<h4 id="tooling">Tooling</h4>
+
+<p>.NET has world class tooling across the board and you can’t go wrong with any of your choices. <a href="https://visualstudio.microsoft.com/">Visual Studio</a> is an excellent IDE packed with tons of functionality to help developers be more productive. Alternatively, another great IDE for .NET is <a href="https://www.jetbrains.com/rider/">Jetbrains Rider</a>. If you’re looking for a more lightweight development environment, you can also use <a href="https://code.visualstudio.com/">Visual Studio Code</a>. When working with F#, you can use the <a href="http://ionide.io/">Ionide</a> extension which makes F# development a pleasant experience.</p>
+
+<p>Data science and machine learning workflows are very experimental. This means that you sometimes may want to have an interactive environment where you get feedback in near real-time of the outputs generated by your code. You’d also like a way to visualize your data inline. Within the data science community, a popular interactive computing environment is Jupyter Notebooks. You can leverage this interactive environment in .NET through .NET Interactive, which provides among many things, a kernel for you to run .NET code interactively.</p>
+
+<h4 id="extensible">Extensible</h4>
+
+<p>Although .NET is great, a large portion of the data science and machine learning space is predominantly made up of libraries and frameworks built in Python. That however does not limit 
+ML.NET because it is extensible. ML.NET supports working with TensorFlow and Open Neural Network Exchange (ONNX) models. <a href="https://www.tensorflow.org/">TensorFlow</a> is a popular platform for building machine learning models. Using <a href="https://github.com/SciSharp/TensorFlow.NET">TensorFlow.NET</a>, a set of C# bindings for TensorFlow, users can train and deploy TensorFlow models with ML.NET. <a href="https://onnx.ai/">ONNX</a> is an open format built to represent machine learning models. This means that you can train a model in other popular tools and frameworks like Azure Custom Vision, PyTorch, Scikit Learn. Then, you can export or convert that model to ONNX and consume it using ML.NET.</p>
+
+<h4 id="open-source--community">Open Source &amp; Community</h4>
+
+<p>ML.NET, like .NET, is open source. This allows for the community to collaborate and contribute to it. Users have various ways of contributing to ML.NET, whether it’s raising issues, updating documentation or submitting pull requests, they’re all valuable contributions that only help make the framework that much better for everyone to use.</p>
+
+<h3 id="correct-me-if-im-wrong-but-i-believe-a-big-mission-of-mlnet-is-making-machine-learning-accessiblethat-is-i-shouldnt-have-to-be-an-expert-in-machine-learning-to-do-it-in-net-even-still-how-much-should-i-know-before-i-get-started">Correct me if I’m wrong, but I believe a big mission of ML.NET is making machine learning accessible—that is, I shouldn’t have to be an expert in machine learning to do it in .NET. Even still: how much should I know before I get started?</h3>
+
+<p>That’s right! ML.NET provides many ways of interacting with it depending on what you’re most comfortable with. The easiest way to get started is by using the tooling. The tooling provides a low-code way of training and consuming ML.NET models. If you prefer a graphical user interface, you can try <a href="https://dotnet.microsoft.com/apps/machinelearning-ai/ml-dotnet/model-builder">Model Builder</a>, a Visual Studio extension that guides you through the steps involved in training a machine learning model. As long as you have a general sense of the problem you’re trying to solve (classify text, predict a number, categorize images) and you have a dataset, Model Builder takes care of the rest.</p>
+
+<p>Alternatively, if you prefer working on the command line you can use the <a href="https://www.nuget.org/packages/MLNet/">ML.NET CLI</a>, a .NET command line tool for training ML.NET model models and generating consumption code. The idea is very much the same as Model Builder, except now you interact with the tooling via the command line. The CLI is also a great choice for Machine Learning Operations (MLOps) scenarios where model training and deployment is done as part of a continuous integration (CI) or continuous deployment (CD) pipeline.</p>
+
+<p>For folks who want more control, prefer a code-first approach, or are more familiar with machine learning concepts, there’s other ways of using ML.NET. One is with the ML.NET Automated ML (Auto ML) API. The AutoML API is leveraged by the tooling to try to find the “best” model. The best model for your problem depends on many factors such as the quantity and distribution of your data and time to train. Therefore, it helps to try different algorithms with different parameters.</p>
+
+<p>If you want full control over your machine learning pipeline, you can use the ML.NET API. The API provides you with direct access to data loaders, transformations, trainers, and prediction components that you can configure as needed to solve your problem.</p>
+
+<p>One of the nice things is, none of the ways of using ML.NET is mutually exclusive. You can start off with the tooling to bootstrap the model training process and from there use the ML.NET API to make further refinements. In the end, it’s all about choice and depending on your experience with machine learning and preferred workflow, there’s an option for you.</p>
+
+<p><em><a href="https://daveabrock.com/2020/08/29/dev-discussions-luis-quintanilla-1">Check out the full interview with Luis at my site</a>.</em></p>
+
+<h2 id="-last-week-in-the-net-world">🌎 Last week in the .NET world</h2>
+
+<h3 id="-the-top-3">🔥 The Top 3</h3>
+
+<ul>
+  <li>.NET 5 Preview 8 all the things: Richard Lander <a href="https://devblogs.microsoft.com/dotnet/announcing-net-5-0-preview-8/">makes the announcement</a>, Daniel Roth <a href="https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-preview-8/">provides an update on ASP.NET Core updates in the new preview</a>, and Jeremy Likness <a href="https://devblogs.microsoft.com/dotnet/announcing-entity-framework-core-ef-core-5-0-preview-8/">announces the new preview for EF Core 5</a>.</li>
+  <li>Jonathon Marolf <a href="https://devblogs.microsoft.com/dotnet/automatically-find-latent-bugs-in-your-code-with-net-5/">talks about how to automatically find latent bugs in .NET 5</a>.</li>
+  <li>Andrew Lock asks: <a href="https://andrewlock.net/should-you-unit-test-controllers-in-aspnetcore/">should you unit-test API.MVC controllers in ASP.NET Core</a>?</li>
+</ul>
+
+<h3 id="-announcements">📢 Announcements</h3>
+
+<ul>
+  <li>Phillip Carter <a href="https://devblogs.microsoft.com/dotnet/f-5-update-for-august/">discusses new F# 5 updates</a>.</li>
+  <li>There’s a new <a href="https://devblogs.microsoft.com/commandline/windows-terminal-preview-1-3-release/">release for Windows Terminal, 1.3</a>.</li>
+  <li>Luca Bolognese <a href="https://devblogs.microsoft.com/dotnet/new-c-source-generator-samples/">introduces some new C# source generator samples</a>.</li>
+  <li>Microsoft is <a href="https://devblogs.microsoft.com/visualstudio/overhauling-the-visual-studio-feedback-system/">overhauling the Visual Studio feedback system</a>, and Visual Studio 2019 v16.8 Preview 2 <a href="https://devblogs.microsoft.com/visualstudio/visual-studio-2019-v16-8-preview-2/">has released some new features</a>.</li>
+  <li>Tara Overfield <a href="https://devblogs.microsoft.com/dotnet/august-2020-cumulative-update-preview/">provides the August cumulative update for .NET Framework</a>.</li>
+  <li>Bri Achtman <a href="https://devblogs.microsoft.com/dotnet/august-ml-net-api-and-tooling-updates/">provides August updates for ML.NET API and tooling</a>.</li>
+</ul>
+
+<h3 id="-community-and-events">📅 Community and events</h3>
+
+<p>Three community standups this week: ML.NET <a href="https://www.youtube.com/watch?v=2gjMrZ9XbRQ">joins the club</a>, Desktop <a href="https://www.youtube.com/watch?v=m-NdyJVBf2Y">runs through WinForms innovations and XAML tooling</a>, and ASP.NET <a href="https://www.youtube.com/watch?v=nci0ZMoGcLM">discusses Razor tooling</a>).</p>
+
+<h3 id="-blazor">😎 Blazor</h3>
+
+<ul>
+  <li>David Ramel <a href="https://visualstudiomagazine.com/articles/2020/08/27/blazor-updates.aspx">writes about Blazor WebAssembly getting lazy loading</a>.</li>
+  <li>David Grace <a href="https://www.roundthecode.com/dotnet/blazor/write-onclick-events-c-sharp-blazor-eliminate-javascript">writes OnClick events in C# using Blazor</a>.</li>
+</ul>
+
+<h3 id="-net-core">🚀 .NET Core</h3>
+
+<ul>
+  <li>Gunasekaran Thirumoorthy <a href="https://www.syncfusion.com/blogs/post/create-and-update-table-of-contents-in-word-documents-in-net-core-c.aspx">uses .NET Core and C# to create and update a table of contents in Word</a>.</li>
+  <li>Dave Brock (ahem) <a href="https://daveabrock.com/2020/08/27/microservices-with-tye-2">uses Project Tye to deploy a distributed application to k8s</a>.</li>
+  <li>Michał Białecki <a href="http://www.michalbialecki.com/2020/08/27/execute-a-stored-procedure-with-entity-framework-core-5">executes a stored procedure with EF Core 5</a>.</li>
+  <li>David Ramel <a href="https://visualstudiomagazine.com/articles/2020/08/26/net-5-preview-8.aspx">discusses the feature-completeness of the new .NET 5 preview</a>.</li>
+  <li>Jimmy Bogard <a href="https://jimmybogard.com/constrained-open-generics-support-merged-in-net-core-di-container">talks about his change to support constrained open generics in the .NET Core DI container</a>.</li>
+  <li>Camilo Reyes <a href="https://www.red-gate.com/simple-talk/dotnet/c-programming/build-a-rest-api-in-net-core/">builds a REST API in .NET Core</a>.</li>
+  <li>Thomas Ardal <a href="https://blog.elmah.io/lessons-learned-after-migrating-25-projects-to-net-core/">has some lessons learned after migrating 25+ projects to .NET Core</a>.</li>
+  <li>The Code Maze blog <a href="https://code-maze.com/fluentvalidation-in-aspnet/">discusses FluentValidation in ASP.NET Core</a>.</li>
+  <li>Damien Bowden <a href="https://damienbod.com/2020/08/22/encrypting-texts-for-an-identity-in-asp-net-core-razor-pages-using-aes-and-rsa/">encrypts texts for an identity in ASP.NET Core Razor Pages using AES and RSA</a>.</li>
+</ul>
+
+<h3 id="-the-cloud">⛅ The cloud</h3>
+
+<ul>
+  <li>JoeG <a href="https://www.josephguadagno.net/2020/08/22/securing-azure-containers-and-blobs-with-managed-identities">secures Azure containers and blobs with managed identities</a>.</li>
+  <li>Julie Lerman <a href="http://thedatafarm.com/dotnet/aws-for-net-developers/">talks about her experience using AWS for .NET</a>.</li>
+  <li>Anupam Maiti <a href="https://www.c-sharpcorner.com/article/delete-blobs-using-timer-trigger-azure-function-in-net-core/">deletes blobs using an Azure Function with timer triggers</a>.</li>
+  <li>Jiří Činčura <a href="https://www.tabsoverspaces.com/233836-running-aspnet-core-app-on-azure-b1ls-vm-penny-pinching">penny-pinches his ASP.NET Core app on Azure VMs</a>.</li>
+  <li>Christos Matskas <a href="https://devblogs.microsoft.com/azure-sdk/secretless-azure-functions-dev-with-the-new-azure-identity-libraries/">builds an Azure Function using the latest Azure SDKs securely using Azure.Identity libraries</a>.</li>
+  <li>Sruti Guhathakurta introduces <a href="https://aws.amazon.com/blogs/developer/introducing-paginators-in-aws-sdk-for-net-v3-5">paginators in AWS SDK for .NET v3.5</a>.</li>
+</ul>
+
+<h3 id="-languages">📔 Languages</h3>
+
+<ul>
+  <li>Khalid Abuhakmeh <a href="https://khalidabuhakmeh.com/use-range-and-index-in-csharp-8">uses the Range and Index classes in C# 8</a>, and also <a href="https://khalidabuhakmeh.com/iasyncdisposable-dispose-resources-asynchronously">disposes of resources asynchronously with IAsyncDisposable</a>.</li>
+  <li>Giorgi Dalakishvili <a href="https://developer.okta.com/blog/2020/08/24/simple-graphql-csharp">writes a simple GraphQL tutorial using C#</a>.</li>
+  <li>Thomas Claudius Huber <a href="https://www.thomasclaudiushuber.com/2020/08/25/c-9-0-init-only-properties/">writes about C# 9 init-only properties</a>.</li>
+  <li>Maarten Balliauw <a href="https://blog.maartenballiauw.be/post/2020/08/26/producer-consumer-pipelines-with-system-threading-channels.html">discusses Producer/consumer pipelines with System.Threading.Channels</a>.</li>
+  <li>Matthew Jones <a href="https://exceptionnotfound.net/creating-csharp-enums-from-a-sql-database-using-t4-text-templates">creates C# enums from a SQL database using T4 text templates</a>.</li>
+  <li>Josef Ottosson <a href="https://josef.codes/custom-dictionary-string-object-jsonconverter-for-system-text-json/">writes a custom Dictionary&lt;string, object&gt; JsonConverter for System.Text.Json</a>.</li>
+</ul>
+
+<h3 id="-tools">🔧 Tools</h3>
+
+<ul>
+  <li>The Code Maze blog <a href="https://code-maze.com/deep-dive-validators-fluentvalidation/">dives into different validators with FluentValidation</a>.</li>
+  <li>Mike Shepard <a href="https://powershellstation.com/2020/08/25/git-the-5-percent-that-i-always-use/">talks about how he uses Git (the 5 percent)</a>.</li>
+  <li>ErikEK discusses <a href="https://erikej.github.io/efcore/2020/08/24/ef-core-power-tools-advanced-options.html">reverse engineering advanced options for EF Core Power Tools</a>.</li>
+  <li>Paul Michaels <a href="https://www.pmichaels.net/2020/08/22/manually-creating-a-test-harness-in-net/">manually creates a test harness in .NET</a>.</li>
+  <li>Josef Ottosson <a href="https://josef.codes/csvhelper-read-column-value-into-a-list-property/">uses CSVHelper to read a column value into a List property</a>.</li>
+  <li>Jason Roberts <a href="http://dontcodetired.com/blog/post/Simplify-and-Reduce-Test-Code-with-AutoFixture">simplifies and reduces test code with AutoFixture</a>.</li>
+  <li>John Juback <a href="https://www.grapecity.com/blogs/building-cross-platform-desktop-apps-with-electron-dot-net">builds cross-platform desktop apps with Electron.NET</a>.</li>
+  <li>Jonathan Pereira <a href="https://www.telerik.com/blogs/use-fiddler-everywhere-to-inspect-your-web-traffic">uses Fiddler Everywhere to inspect web traffic</a>.</li>
+  <li>Michał Białecki <a href="http://www.michalbialecki.com/2020/08/21/how-to-create-a-nuget-package-targeting-multiple-frameworks">creates a NuGet package targeting multiple frameworks</a>.</li>
+</ul>
+
+<h3 id="-xamarin">📱 Xamarin</h3>
+
+<ul>
+  <li>Leomaris Reyes <a href="https://www.syncfusion.com/blogs/post/replicating-a-drink-and-food-menu-ui-in-xamarin-forms.aspx">replicates a drink and food menu UI</a>.</li>
+  <li>Bohdan Benetskyi <a href="https://medium.com/@benetskyybogdan/xamarin-forms-month-and-year-picker-105550772222">creates a native month and year picker</a>.</li>
+</ul>
+
+<h3 id="-podcasts">🎤 Podcasts</h3>
+
+<ul>
+  <li>The .NET Rocks podcast <a href="https://www.dotnetrocks.com/default.aspx?ShowNum=1702">talks about building serverless .NET apps on AWS</a>.</li>
+  <li>The Xamarin Podcast <a href="https://devblogs.microsoft.com/xamarin/drawing-xamarin-podcast/">talks about drawing, Visual Studio 2019, and more</a>.</li>
+  <li>The 6-Figure Developer podcast <a href="https://6figuredev.com/podcast/episode-158-project-tye-with-glenn-condron/">talks about Project Tye with Glenn Condron</a>.</li>
+  <li>The .NET Core Show <a href="https://dotnetcore.show/episode-58-practical-debugging-for-net-developers-with-michael-shplit/">talks with Michael Shpilt about practical debugging</a>.</li>
+  <li>The Merge Conflict podcast <a href="https://www.mergeconflict.fm/216">geeks out on GUIDs and UUIDs</a>.</li>
+</ul>
+
+<h3 id="-videos">🎥 Videos</h3>
+
+<ul>
+  <li>Data Exposed <a href="https://channel9.msdn.com/Shows/Data-Exposed/What-is-Azure-SQL-Edge">explores Azure SQL Edge</a>.</li>
+  <li>The Xamarin Show <a href="https://channel9.msdn.com/Shows/XamarinShow/XamarinForms-New-Drawing-API-Part-2">continues talking about the new Drawing API</a>.</li>
+  <li>The ON.NET Show introduces <a href="https://channel9.msdn.com/Shows/On-NET/Getting-started-PeachPie">PeachPie</a>.</li>
+  <li>Scott Hanselman <a href="https://www.youtube.com/watch?v=0oEsMwSxBsk">explains Docker</a> and also <a href="https://www.youtube.com/watch?v=4P0KXWC3V0U">talks about ports and processes</a>.</li>
+  <li>Jeff Fritz <a href="https://www.youtube.com/watch?v=-E2xB4kOSV0">discusses C# methods, events, and delegates for beginners</a>.</li>
+  <li>The ASP.NET Monsters <a href="https://www.youtube.com/watch?v=QFarimuMujg">work with AsyncLocal</a>.</li>
+  <li>Azure Friday <a href="https://channel9.msdn.com/Shows/Azure-Friday/Learn-how-to-deploy-NET-Core-apps-to-Azure-with-GitHub-Actions">deploys .NET Core apps to Azure with GitHub Actions</a>.</li>
+</ul>
+:ET

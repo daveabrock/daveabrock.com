@@ -1,0 +1,155 @@
+I"�C<p><img src="https://raw.githubusercontent.com/daveabrock/daveabrock.github.io/master/THE%20.NET%20STACKS.png" alt="Newsletter image" /></p>
+
+<p>Happy Monday, everyone! Current status: still wondering if I’m <a href="https://twitter.com/thomas_k_r/status/1291076179693363206">just a JSON pusher</a> (<strong>warning</strong>: link has a naughty word).</p>
+
+<p>This week, we:</p>
+
+<ul>
+  <li>Discuss how Azure DevOps and GitHub Actions will be ironed out</li>
+  <li>Discuss the .NET Foundation election results</li>
+  <li>Check out a busy week in the community</li>
+</ul>
+
+<h2 id="github-actions-or-azure-devops">GitHub Actions or Azure DevOps?</h2>
+
+<p>Hopefully by now, in 2020, you know that <a href="https://damianbrady.com.au/2018/02/01/friends-dont-let-friends-right-click-publish/">friends don’t let friends right-click publish</a>. There are so many tools you can use to work with <a href="https://www.infoworld.com/article/3271126/what-is-cicd-continuous-integration-and-continuous-delivery-explained.html">continuous integration and continuous deployment</a> pipelines—I’d like to talk about two under Microsoft’s ownership: Azure DevOps and GitHub Actions.</p>
+
+<p>As a .NET developer, you’re probably familiar with <a href="https://azure.microsoft.com/services/devops/">Azure DevOps</a> (previously Team Foundation Server). It’s got a decade of battle-tested use in enterprises, with well-featured CI/CD pipelines. If you want best-in-class Microsoft tooling with either your on-prem or cloud deployments, it’s always been a clear choice.</p>
+
+<p>The lines blurred a little when, in 2018, <a href="https://news.microsoft.com/announcement/microsoft-acquires-github/">Microsoft acquired GitHub</a>. GitHub, traditionally known for being the community’s preferred way to share code, was now bought by a company invested in open source development and an interest in bringing Microsoft-ness to new audiences. GitHub’s own CI/CD solution, GitHub Actions, is getting a lot of well-deserved recognition. And with <a href="https://github.blog/2020-03-16-npm-is-joining-github/">npm joining GitHub</a>, GitHub will definitely help improve experiences with dependency management. To further blur the lines, a lot of folks don’t know about their GitHub Enterprise offering, an on-prem solution that even has integration capabilities with Active Directory!</p>
+
+<p>So what does this say for the future of Microsoft CI/CD pipelines? As a long-term strategy, Microsoft can’t expect to run two similar products with internal competition. I actually <a href="https://twitter.com/daveabrock/status/1253462315397251074">wondered about this not so long ago</a> and was referred to an <a href="http://azpodcast.com/post/Episode-321-GitHub">insightful conversation that occurred on the Azure Podcast with GitHub PM Sasha Rosenbaum</a>.</p>
+
+<p>She agreed that, yes, the investments will be geared toward GitHub and its vibrant community and long-term GitHub will probably win out. This isn’t to say that you need to migrate in 6 months or anything—she even mentioned a 5-year timeframe—but the future is definitely with GitHub Actions. As such, her recommendation was that there’s nothing wrong with using Azure DevOps today, but if you’re starting a new project to look into using GitHub.</p>
+
+<p>Until the time comes when Microsoft has one CI/CD tool, you’ll likely see GitHub Actions build out with a stronger feature set. It’s already robust—and with its CI capabilities are right there with Azure DevOps—but has some work to do until it’s on-par with its continuous deployment functionality (release pipelines, gates, advanced permissions, and whatnot).</p>
+
+<h2 id="net-foundation-board-of-directors-election-results-are-in">.NET Foundation Board of Directors election results are in</h2>
+
+<p>This week, we found out who <a href="https://dotnetfoundation.org/blog/2020/08/04/net-foundation-board-of-directors-election-results-2020">would serve on the .NET Foundation Board of Directors</a>. Out of 17 nominees, these six folks came out on top (with Beth Massi on the 7th spot as Microsoft’s one appointed board member):</p>
+
+<ul>
+  <li><a href="https://twitter.com/rlittlesii">Rodney Littles, II</a></li>
+  <li><a href="https://twitter.com/jglozano">Javier Lozano</a></li>
+  <li><a href="https://twitter.com/LaylaCodesIt">Layla Porter</a></li>
+  <li><a href="https://twitter.com/jeffreystrauss">Jeff Strauss</a></li>
+  <li><a href="https://twitter.com/billwagner">Bill Wagner</a></li>
+  <li><a href="https://twitter.com/shawnwildermuth">Shawn Wildermuth</a></li>
+</ul>
+
+<p>It’s great to see an entirely new Board and am looking forward to seeing what comes from these fresh perspectives.</p>
+
+<h2 id="-last-week-in-the-net-world">🌎 Last week in the .NET world</h2>
+
+<h3 id="the-top-3">The Top 3</h3>
+
+<ul>
+  <li>The .NET Foundation <a href="https://dotnetfoundation.org/blog/2020/08/04/net-foundation-board-of-directors-election-results-2020">Board of Directors election results are in</a>.</li>
+  <li>Jon Hilton <a href="https://jonhilton.net/responsive-blazor-navbar/">makes a responsive navbar with Blazor and Tailwind</a>.</li>
+  <li>Andrew Lock <a href="https://andrewlock.net/exporing-the-code-behind-ihttpclientfactory/">goes deep on IHttpClientFactory</a>.</li>
+</ul>
+
+<h3 id="-announcements">📢 Announcements</h3>
+
+<ul>
+  <li>Microsoft announced <a href="https://devblogs.microsoft.com/visualstudio/visual-studio-2019-v16-7-releases/">the release of Visual Studio 2019 v16.7 and v16.8 Preview 1</a>. With v16.7, <a href="https://devblogs.microsoft.com/visualstudio/making-repeated-edits-easier-with-intellicode-suggestions/">IntelliCode helps to spot repetitions in your code</a>. Other VS news: Gabrielle Crevecoeur <a href="https://devblogs.microsoft.com/visualstudio/angular-language-service-for-visual-studio/">announces an Angular Language Service for Visual Studio</a> and <a href="https://devblogs.microsoft.com/visualstudio/visual-studio-2019-for-mac-version-8-7-is-now-available/">Visual Studio 2019 for Mac version 8.7 is now available</a>.</li>
+  <li>You can now <a href="https://devblogs.microsoft.com/cppblog/sign-up-for-the-private-preview-of-visual-studio-support-for-codespaces/">sign up for the private preview for Visual Studio Codespaces</a>.</li>
+  <li>You can now <a href="https://devblogs.microsoft.com/devops/azure-repos-default-branch-name/">choose the initial branch name for new repos in Azure Repos</a>.</li>
+  <li>Okta announced <a href="https://developer.okta.com/blog/2020/08/03/developer-certification">a developer certification program</a>.</li>
+  <li>Both <a href="https://cloudblogs.microsoft.com/opensource/2020/08/03/microsoft-joins-open-source-security-foundation/">Microsoft</a> and <a href="https://github.blog/2020-08-03-github-joins-the-open-source-security-foundation/">GitHub</a> have joined the Open Source Security Foundation.</li>
+  <li>The OpenTelemetry <a href="https://medium.com/opentelemetry/opentelemetry-net-beta-released-e1b070f0a5bc">.NET SDK has reached beta</a>.</li>
+</ul>
+
+<h3 id="-community-and-events">📅 Community and events</h3>
+
+<ul>
+  <li>Three community standups this week: Xamarin <a href="https://www.youtube.com/watch?v=4W6vXC6v-J8">talks about Forms 4.8</a>, Entity Framework talks about <a href="https://www.youtube.com/watch?v=b-zTazj2vuI">the EF Core in Depth video series</a>, and ASP.NET Core <a href="https://www.youtube.com/watch?v=r0Z02t_7gm8">has an update on Project Tye</a>.</li>
+  <li>The .NET Docs Show <a href="https://www.youtube.com/watch?v=UShy1RGCK0E">talks with Chase Aucoin</a>.</li>
+  <li>Troy Hunt <a href="https://www.troyhunt.com/im-open-sourcing-the-have-i-been-pwned-code-base/">plans on open sourcing Have I Been Pwned</a>.</li>
+</ul>
+
+<h3 id="-blazor">😎 Blazor</h3>
+
+<ul>
+  <li>Marinko Spasojevic <a href="https://code-maze.com/blazor-webassembly-registration-aspnetcore-identity/">works on Blazor WASM registration functionality with ASP.NET Core Identity</a> and also <a href="https://code-maze.com/authenticationstateprovider-blazor-webassembly/">uses AuthenticationStateProvider in Blazor WASM</a>.</li>
+  <li>Peter Vogel <a href="https://visualstudiomagazine.com/articles/2020/08/03/blazor-pwa.aspx">creates a progressive web app with Blazor Web Assembly</a>.</li>
+</ul>
+
+<h3 id="-net-core">🚀 .NET Core</h3>
+
+<ul>
+  <li>David Grace <a href="https://www.roundthecode.com/dotnet/entity-framework/log-data-changes-in-entity-framework-core-create-entities-dbcontext">logs data changes in EF Core</a> and also <a href="https://www.roundthecode.com/dotnet/how-to-add-google-authentication-to-a-asp-net-core-application">adds Google auth to an ASP.NET Core application</a>.</li>
+  <li>Atul Warade <a href="https://www.c-sharpcorner.com/article/implement-background-task-using-backgrounservice-class-in-asp-net-core/">works on background tasks in ASP.NET Core</a>.</li>
+  <li>Derek Comartin <a href="https://codeopinion.com/getting-started-apache-kafka-with-net-core/">gets started with Apache Kafka with .NET Core</a>.</li>
+  <li>Martijn Boland <a href="https://blogs.taiga.nl/martijn/2020/08/03/easy-asp-net-core-localization-with-apptext/">uses AppText for easy ASP.NET Core localization</a>.</li>
+  <li>Khalid Abuhakmeh <a href="https://khalidabuhakmeh.com/handle-http-status-codes-with-razor-pages">handles HTTP status codes with Razor Pages</a>.</li>
+  <li>ErikEJ <a href="https://erikej.github.io/efcore/2020/08/03/ef-core-call-stored-procedures-out-parameters.html">calls stored procedures with OUTPUT params with FromSqlRaw in EF Core</a>.</li>
+  <li>Shahed Chowdhuri <a href="https://wakeupandcode.com/release-asp-net-core-3-1-a-z-ebook/">has rolled out his ASP.NET Core 3.1 A-Z e-book</a>.</li>
+</ul>
+
+<h3 id="-the-cloud">⛅ The cloud</h3>
+
+<ul>
+  <li>Kevin Griffin <a href="https://consultwithgriff.com/i-love-azure-static-web-apps">loves Azure Static Web Apps</a>.</li>
+  <li>Sacha Barber <a href="https://sachabarbs.wordpress.com/2020/08/04/azure-event-hubs-with-kafka/">looks at Azure Event Hubs with Kafka</a>.</li>
+  <li>Dror Helper <a href="https://helpercode.com/2020/08/03/creating-an-net-aws-serverless-application-using-api-gateway-with-api-key/">creates a .NET AWS serverless app using API Gateway with API Key</a>.</li>
+  <li>Chris Pietschmann <a href="https://build5nines.com/azure-cloud-shell-tips-and-tricks/">discusses some tips and tricks for the Azure Cloud Shell</a>.</li>
+  <li>Damien Bowden <a href="https://damienbod.com/2020/08/01/azure-durable-functions-monitoring-and-diagnostics/">works on monitoring and diagnostics in Azure Durable Functions</a>.</li>
+</ul>
+
+<h3 id="-languages">📔 Languages</h3>
+
+<ul>
+  <li>Khalid Abuhakmeh <a href="https://khalidabuhakmeh.com/csharp-preprocessor-directives">talks about preprocessor directives in C#.</a>.</li>
+  <li>Ian Griffiths <a href="https://endjin.com/blog/2020/08/dotnet-csharp-8-nullable-references-when-methods-dont-return.html">continues his C# nullable references series, discussing when methods don’t return</a>.</li>
+  <li>Rami Honig <a href="https://oz-code.com/blog/net-c-tips/ultimate-2020-guide-learning-debugging-c-net">has a guide for learning C# and .NET in 2020</a>.</li>
+  <li>Brian Lagunas <a href="https://brianlagunas.com/why-is-async-void-bad-and-how-do-i-await-a-task-in-an-object-constructor-in-c/">warns against async void in C#</a>.</li>
+  <li>Oren Eini <a href="https://ayende.com/blog/191585-B/what-is-default-object-used-for">explains the use of default(object)</a>.</li>
+  <li>Jiří Činčura <a href="https://www.tabsoverspaces.com/233833-best-way-to-create-an-empty-collection-array-and-list-in-csharp-net">looks at the best way to create an empty collection in C#</a>.</li>
+  <li>Carmel Eve <a href="https://endjin.com/blog/2020/08/fully-initialize-types-in-constructor-csharp-nullable-async-factory-pattern.html">talks about how to fully initialize types in constructors with C# nullable using the async factory pattern</a>.</li>
+  <li>Maxime Brugidou <a href="https://medium.com/criteo-labs/moving-net-to-linux-at-scale-d8ff49b42661">discusses moving .NET to Linux at scale</a>.</li>
+</ul>
+
+<h3 id="-tools">🔧 Tools</h3>
+
+<ul>
+  <li>Gunnar Peipman <a href="https://gunnarpeipman.com/aspnet-core-visual-studio-codespaces/">builds ASP.NET Core applications on Visual Studio Codespaces and VS Code</a>.</li>
+  <li>Justin Yoo <a href="https://techcommunity.microsoft.com/t5/apps-on-azure/configuring-codespaces-for-net-core-development/ba-p/1565330">sets up Visual Studio Codespaces for .NET Core</a>.</li>
+  <li>Munib Butt <a href="https://www.c-sharpcorner.com/article/learn-to-use-linqpad/">has a primer on getting started with LinqPad</a>.</li>
+  <li>Rick Strahl <a href="https://weblog.west-wind.com/posts/2020/Aug/05/Using-NET-Core-Tools-to-Create-Reusable-and-Shareable-Tools-Apps">uses .NET Core tools for reusable and shareable tools and apps</a>.</li>
+  <li>Matthias Koch <a href="https://ithrowexceptions.com/2020/08/04/implementing-and-debugging-custom-msbuild-tasks.html">implements and debugs custom MSBuild tasks</a>.</li>
+  <li>Mike Hadlow <a href="http://mikehadlow.blogspot.com/2020/08/restoring-from-azure-artifacts-nuget.html">restores from an Azure Artifacts NuGet feed from inside a Docker build</a>.</li>
+  <li>Gérald Barré enforces <a href="https://www.meziantou.net/enforcing-asynchronous-code-good-practices-using-a-roslyn-analyzer.htm">async code good practices using a Roslyn analyzer</a>.</li>
+  <li>Scott Hanselman works through <a href="https://www.hanselman.com/blog/THEEASYWAYHowToSSHIntoBashAndWSL2OnWindows10FromAnExternalMachine.aspx">an easy way to SSHG into Bash and WSL2 on Windows 10 from an external machine</a>.</li>
+  <li>Charles Flatt <a href="https://www.softwaremeadows.com/posts/net_framework_nuget_packages_-_versioning__dependency_resolution__and/">offers an in-depth look at .NET Framework NuGet packages</a>.</li>
+  <li>Shawn Wildermuth <a href="http://wildermuth.com/2020/08/02/NET-Core-Console-Apps---A-Better-Way">talks about Pinger, his app that pings a range of IP addresses</a>.</li>
+  <li>Matt Lacey <a href="https://www.mrlacey.com/2020/08/fixing-really-common-misunderstanding.html">clears up a thing or two about nuget.exe</a>.</li>
+  <li>Dan Clarke <a href="https://www.danclarke.com/cleaner-tests-with-iasynclifetime">works on cleaner tests with XUnit’s IAsyncLifetime and expression-bodied members</a>.</li>
+  <li>Justin Chen <a href="https://devblogs.microsoft.com/powershell/semantic-highlighting-in-the-powershell-preview-extension-for-visual-studio-code/">shows off semantic highlighting in the VS Code PowerShell Preview extension</a>.</li>
+</ul>
+
+<h3 id="-xamarin">📱 Xamarin</h3>
+
+<ul>
+  <li>Vicente Gerardo Guzmán Lucio <a href="https://www.syncfusion.com/blogs/post/new-features-in-xamarin-forms-4-7-multibinding-light-and-dark-modes.aspx">talks about new features in Xamarin.Forms 4.7</a>.</li>
+  <li>Leomaris Reyes <a href="https://askxammy.com/getting-started-with-excel-files-creation-in-xamarin-forms/">works on Excel file creation</a>.</li>
+  <li>Daniel Hindrikes <a href="https://danielhindrikes.se/index.php/2020/08/03/you-only-need-an-onetime-binding/">talks about OneTime bindings</a>.</li>
+  <li>Microsoft has a handy list <a href="https://devblogs.microsoft.com/xamarin/august-dotnet-virtual-events/">of Xamarin-related .NET virtual events in August</a>.</li>
+  <li>Charlin Agramonte <a href="https://xamgirl.com/show-hide-password-using-eventtrigger-in-xamarin-forms/">shows off show/hide password functionality using EventTrigger</a>.</li>
+  <li>Over at the Okta blog, Giorgi Dalakishvili <a href="https://developer.okta.com/blog/2020/07/31/xamarin-essentials-webauthenticator">works through Xamarin.Essentials and Web Authenticator</a>.</li>
+</ul>
+
+<h3 id="-podcasts">🎤 Podcasts</h3>
+
+<p>Over at the .NET Rocks podcast, <a href="https://www.dotnetrocks.com/default.aspx?ShowNum=1699">they discuss adding identity to your applications</a>.</p>
+
+<h3 id="-videos">🎥 Videos</h3>
+
+<ul>
+  <li>Data Exposed <a href="https://channel9.msdn.com/Shows/Data-Exposed/Learn-Azure-SQL">talks about transitioning your SQL Server skills to Azure SQL</a>.</li>
+  <li>A new <a href="https://channel9.msdn.com/Series/Azure-SQL-for-Beginners/Introduction-to-Azure-SQL-for-beginners-1-of-61">Azure SQL for Beginners video series launched</a>.</li>
+  <li>Scott Hanselman <a href="https://www.youtube.com/watch?v=dgOpnebZkRo">warns you about git push –force</a>.</li>
+  <li>The ON.NET Show <a href="https://channel9.msdn.com/Shows/On-NET/Packaging-and-deploying-NET-Core-for-Linux-Part-2">continues talking about packaging and deploying .NET Core for Linux</a>.</li>
+  <li>From .NET Conf, a bunch: <a href="https://www.youtube.com/watch?v=g-gOlkD9lKs">Cecil Phillip adds DAPR to .NET microservices</a>, <a href="https://www.youtube.com/watch?v=3meYereHHtM">David Dieruf works on .NET microservices with Steeltoe</a>, <a href="https://www.youtube.com/watch?v=98nIvg7ne7Q">Shayne Boyer builds and debugs microservices with Kubernetes and Visual Studio</a>, <a href="https://www.youtube.com/watch?v=Wbjh4T-cdv8">Elton Stoneman evolves .NET Framework monoliths with .NET 5 and Kubernetes</a>, and <a href="https://www.youtube.com/watch?v=HVq4TstHCEs">James Newton-King builds high-performance microservices with gRPC and .NET</a>.</li>
+</ul>
+:ET

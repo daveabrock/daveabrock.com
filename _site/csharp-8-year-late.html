@@ -1,0 +1,273 @@
+<p>After working in C# for the better part of a decade, last year I went on a hiatus from the .NET ecosystem and dove in head-first on Node.js, TypeScript, and React. Now, I’m back! Since I’ve been writing C# code again and shaking off the rust, Visual Studio 2019 (and more specifically, the Roslyn analyzers) keep reminding me: “<strong>Fun fact: did you know you can do this new thing?</strong>”</p>
+
+<p>After repeating this exercise approximately 26 times, I decided to do some actual research and see what’s changed with C# 8—I hope this helps you, too.</p>
+
+<p>This article, while on the long side (sorry!), just mentions a few of my favorite improvements to the language. If you want to geek out on everything, the <a href="https://docs.microsoft.com/dotnet/csharp/whats-new/csharp-8">What’s New in C# 8.0</a> article is a great place to start.</p>
+
+<p><strong>Worth mentioning</strong>: According <a href="https://docs.microsoft.com/dotnet/csharp/whats-new/csharp-8">to the article in question</a>, C# 8.0 is supported on .NET Core 3.<em>x</em> and .NET Standard 2.1 (see <a href="https://docs.microsoft.com/dotnet/csharp/language-reference/configure-language-version">the documentation</a> on language versioning).</p>
+
+<p>Also, a big thank you goes out to Microsoft’s <a href="https://twitter.com/davidpine7">David Pine</a> for his valuable feedback on this post.</p>
+
+<p>This post contains the following content.</p>
+
+<ul>
+  <li><a href="#simplified-using-declarations">Simplified using declarations</a></li>
+  <li><a href="#enhanced-pattern-matching">Enhanced pattern matching</a>
+    <ul>
+      <li><a href="#switch-statements-are-now-switch-expressions">Switch statements are now switch expressions</a></li>
+      <li><a href="#property-patterns">Property patterns</a></li>
+    </ul>
+  </li>
+  <li><a href="#default-interface-methods">Default interface methods</a></li>
+  <li><a href="#nullable-reference-types-and-null-coalescing">Nullable reference types and null-coalescing</a>
+    <ul>
+      <li><a href="#nullable-reference-types">Nullable reference types</a></li>
+      <li><a href="#null-coalescing">Null-coalescing</a></li>
+    </ul>
+  </li>
+  <li><a href="#async-streams">Async streams</a></li>
+  <li><a href="#indices-and-ranges">Indices and ranges</a>
+    <ul>
+      <li><a href="#indexes">Indexes</a></li>
+      <li><a href="#ranges">Ranges</a></li>
+    </ul>
+  </li>
+  <li><a href="#staying-current-with-c-developments">Staying current with C# developments</a></li>
+</ul>
+
+<h1 id="simplified-using-declarations">Simplified using declarations</h1>
+
+<p>When you use a <strong>using</strong> declaration, you are telling the C# compiler that the current variable should automatically be disposed at the end of the variable’s scope. Remember how your grandparents did this, way back in C# 7?</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// using System.IO;</span>
+
+<span class="k">static</span> <span class="k">void</span> <span class="nf">DoStuffWithAFile</span><span class="p">(</span><span class="kt">string</span> <span class="n">doingSomeStuff</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">using</span> <span class="p">(</span><span class="kt">var</span> <span class="n">file</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">StreamWriter</span><span class="p">(</span><span class="s">"MyFile.txt"</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="c1">// three for-eaches</span>
+        <span class="c1">// five logging statements</span>
+        <span class="c1">// nine if statements</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now, you can accomplish this with a simplified <strong>using var</strong> statement and avoid being caught up in bracket hell. It doesn’t seem like a huge deal, but definitely adds to code quality as it makes the code more readable and maintainable.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="k">void</span> <span class="nf">DoStuffWithAFile</span><span class="p">(</span><span class="kt">string</span> <span class="n">doingSomeStuff</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">using</span> <span class="nn">var</span> <span class="n">file</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">StreamWriter</span><span class="p">(</span><span class="s">"MyFile.txt"</span><span class="p">);</span>
+    <span class="c1">// three for-eaches</span>
+    <span class="c1">// nine if statements</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="enhanced-pattern-matching">Enhanced pattern matching</h1>
+
+<p>C# 8 introduces a lot of new pattern matching functionality, which helps provide a line of demarcation between data and functionality. My favorite improvements include a refined switch expression and simplified property patterns.</p>
+
+<h2 id="switch-statements-are-now-switch-expressions">Switch statements are now switch expressions</h2>
+
+<p>With your regular switch expression, you have to go through a lot of motions with typing out each <code class="language-plaintext highlighter-rouge">case</code>, some <code class="language-plaintext highlighter-rouge">break</code>s (if needed), and a <code class="language-plaintext highlighter-rouge">default</code> value.</p>
+
+<p>Let’s take a look at an admittedly simple switch statement we’ve all written more than we’d like to admit.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="nf">FindAProgrammingLanguage</span><span class="p">(</span><span class="kt">string</span> <span class="n">languageInput</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">string</span> <span class="n">languagePhrase</span><span class="p">;</span>
+
+    <span class="k">switch</span> <span class="p">(</span><span class="n">languageInput</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">case</span> <span class="s">"C#"</span><span class="p">:</span>
+            <span class="n">languagePhrase</span> <span class="p">=</span> <span class="s">"C# is fun!"</span><span class="p">;</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="k">case</span> <span class="s">"JavaScript"</span><span class="p">:</span>
+            <span class="n">languagePhrase</span> <span class="p">=</span> <span class="s">"JavaScript is mostly fun!"</span><span class="p">;</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="k">case</span> <span class="s">"TypeScript"</span><span class="p">:</span>
+            <span class="n">languagePhrase</span> <span class="p">=</span> <span class="s">"TypeScript makes JavaScript more fun!"</span><span class="p">;</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="k">case</span> <span class="s">"C++"</span><span class="p">:</span>
+            <span class="n">languagePhrase</span> <span class="p">=</span> <span class="s">"C++ has pointers!"</span><span class="p">;</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="k">default</span><span class="p">:</span>
+             <span class="k">throw</span> <span class="k">new</span> <span class="nf">Exception</span><span class="p">(</span><span class="s">"You code in something else I don't recognize."</span><span class="p">);</span>
+    <span class="p">};</span>
+    <span class="k">return</span> <span class="n">languagePhrase</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>With syntax improvements in C# 8, we can:</p>
+
+<ul>
+  <li>Replace the <code class="language-plaintext highlighter-rouge">case</code> and <code class="language-plaintext highlighter-rouge">:</code> elements with a more concise <code class="language-plaintext highlighter-rouge">=&gt;</code></li>
+  <li>Replace the <code class="language-plaintext highlighter-rouge">default</code> statement with <code class="language-plaintext highlighter-rouge">_</code>.</li>
+  <li>Turn the concept of a switch statement into a switch expression</li>
+</ul>
+
+<p>Look at us now!</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="nf">FindAProgrammingLanguage</span><span class="p">(</span><span class="kt">string</span> <span class="n">languageInput</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">string</span> <span class="n">languagePhrase</span> <span class="p">=</span> <span class="n">languageInput</span> <span class="k">switch</span>
+    <span class="p">{</span>
+        <span class="s">"C#"</span> <span class="p">=&gt;</span> <span class="s">"C# is fun!"</span><span class="p">,</span>
+        <span class="s">"JavaScript"</span> <span class="p">=&gt;</span> <span class="s">"JavaScript is mostly fun!"</span><span class="p">,</span>
+        <span class="s">"TypeScript"</span> <span class="p">=&gt;</span> <span class="s">"TypeScript makes JavaScript more fun!"</span><span class="p">,</span>
+        <span class="s">"C++"</span> <span class="p">=&gt;</span> <span class="s">"C++ has pointers!"</span><span class="p">,</span>
+         <span class="n">_</span> <span class="p">=&gt;</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">Exception</span><span class="p">(</span><span class="s">"You code in something else I don't recognize."</span><span class="p">),</span>
+    <span class="p">};</span>
+    <span class="k">return</span> <span class="n">languagePhrase</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="property-patterns">Property patterns</h2>
+
+<p>Let’s use this switch <em>expression</em> to look at property patterns, which allow you to work with properties dependent on constant, predictable values.</p>
+
+<p>If we wanted to match if <code class="language-plaintext highlighter-rouge">programmer.PreferredLanguage</code> equals <code class="language-plaintext highlighter-rouge">C#</code>, we could do it like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">switch</span> <span class="p">(</span><span class="n">programmer</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">case</span> <span class="p">{</span> <span class="n">PreferredLanguage</span><span class="p">:</span> <span class="s">"C#"</span> <span class="p">}:</span>
+        <span class="c1">// do something</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>You can also use this on other pattern matching keywords introduced in earlier C# versions, like <code class="language-plaintext highlighter-rouge">is</code>.</p>
+
+<h1 id="default-interface-methods">Default interface methods</h1>
+
+<p>So, this is exciting: you can now define an implementation when you declare a member of an interface. A common scenario, coming <a href="https://docs.microsoft.com/dotnet/csharp/tutorials/default-interface-methods-versions">straight from Microsoft</a>, is if you want to make enhancements to your interfaces without breaking consumers of the existing implementation. Before C# 8, you couldn’t add members to an interface without breaking the classes that implement it.</p>
+
+<p>Take a look at <a href="https://devblogs.microsoft.com/dotnet/default-implementations-in-interfaces/">this article</a> for a brief example to get you started.</p>
+
+<h1 id="nullable-reference-types-and-null-coalescing">Nullable reference types and null-coalescing</h1>
+
+<p>Who doesn’t love working with null types? (Me, for one.) To express your intent to the compiler, you can do a few new things.</p>
+
+<h2 id="nullable-reference-types">Nullable reference types</h2>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">string</span><span class="p">?</span> <span class="n">firstName</span><span class="p">;</span>
+<span class="kt">string</span> <span class="n">lastName</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">firstName</code> variable is declared as a nullable reference type. We are used to doing this to nullable value types (which you’ve been doing since C# 2, by the way, when generics were the cat’s meow). Because the <code class="language-plaintext highlighter-rouge">?</code> is not appended in the <code class="language-plaintext highlighter-rouge">lastName</code> variable, the compiler sees it as a non-nullable reference type.</p>
+
+<p>According to <a href="https://docs.microsoft.com/dotnet/csharp/nullable-references">the Microsoft documentation</a>, the compiler uses static analysis to determine if a nullable reference is non-null. To provide some, well, flexibility, you can use a null-forgiving operator (<code class="language-plaintext highlighter-rouge">!</code>) following a variable name, like <code class="language-plaintext highlighter-rouge">lastName!.Length</code>.</p>
+
+<p>The next time I introduce an unintended null reference to the codebase, I’ll just tell my colleagues my app wasn’t very null-forgiving. Life is all about marketing, after all.</p>
+
+<h2 id="null-coalescing">Null-coalescing</h2>
+
+<p>This is quick, but also a quick win. If you wanted to conditionally assign a value to a variable whether it is null, you would conditionally check for null or maybe use a ternary operator. Now, it’s far easier. Just do this with the <code class="language-plaintext highlighter-rouge">??=</code> operator:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">List</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;</span> <span class="n">favoriteSongs</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+<span class="n">favoriteSongs</span> <span class="p">??=</span> <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;();</span>
+</code></pre></div></div>
+
+<p>The operator has two question marks for the double-take you will do when you first see the operator, but you’ll learn to love it.</p>
+
+<h1 id="async-streams">Async streams</h1>
+
+<p>Async improvements are not new to the language, as the <code class="language-plaintext highlighter-rouge">async/await</code> pattern was introduced way back in C# 5. With C# 8, though, we now have async streams, which allow you to write an async method to return multiple values.</p>
+
+<p>With async streams, they:</p>
+
+<ul>
+  <li>Are declared with an <code class="language-plaintext highlighter-rouge">async</code> keyword modifier</li>
+  <li>Return an <code class="language-plaintext highlighter-rouge">IAsyncEnumerable</code></li>
+  <li>Contain <code class="language-plaintext highlighter-rouge">yield</code> statements to return the stream elements</li>
+</ul>
+
+<p>You can see the benefits in cycling through a traditional <code class="language-plaintext highlighter-rouge">for</code> loop. Check out the <a href="https://docs.microsoft.com/dotnet/csharp/tutorials/generate-consume-asynchronous-stream">Microsoft Docs article</a> for a full demonstration.</p>
+
+<h1 id="indices-and-ranges">Indices and ranges</h1>
+
+<p>As a part of <a href="https://en.wikipedia.org/wiki/Syntactic_sugar">syntactic sugar</a>—a $500 word that only means expressing syntax more clearly—accessing indices and ranges is a lot easier and should require less brain cells to determine which index you are at, for example.</p>
+
+<p>C# 8 introduces:</p>
+
+<ul>
+  <li>Two new types: <code class="language-plaintext highlighter-rouge">System.Index</code> and <code class="language-plaintext highlighter-rouge">System.Range</code>, which signify an index and range of a sequence, respectively</li>
+  <li>An index from end (<code class="language-plaintext highlighter-rouge">^</code>) operator, and a range operator (<code class="language-plaintext highlighter-rouge">...</code>)</li>
+</ul>
+
+<p>As an example, let’s hypothetically say the world is forced to endure a pandemic and a programmer decides to catch up on all James Bond movies. Again, this is hypothetical, but you get the point.</p>
+
+<p>Here’s my array of movies:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">movies</span> <span class="p">=</span> <span class="k">new</span> <span class="kt">string</span><span class="p">[]</span>
+<span class="p">{</span>
+    <span class="s">"Dr. No"</span><span class="p">,</span>
+    <span class="s">"From Russia with Love"</span><span class="p">,</span> <span class="c1">// best one, obviously</span>
+    <span class="s">"Goldfinger"</span><span class="p">,</span>
+    <span class="s">"Thunderball"</span><span class="p">,</span>
+    <span class="s">"You Only Live Twice"</span><span class="p">,</span>
+    <span class="c1">//...</span>
+    <span class="s">"Die Another Day"</span><span class="p">,</span>
+    <span class="s">"Casino Royale"</span><span class="p">,</span>
+    <span class="s">"Quantum of Solace"</span><span class="p">,</span>
+    <span class="s">"Skyfall"</span><span class="p">,</span>
+    <span class="s">"Spectre"</span> <span class="c1">// eek</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<h2 id="indexes">Indexes</h2>
+
+<p>You should know how indexes work, hopefully—as arrays are zero-based, <em>Dr. No</em> would be 0, <em>From Russia with Love</em> would be 1, and all the way up to <em>Spectre</em> having an index of 9. What C# introduces now, though, is the <code class="language-plaintext highlighter-rouge">^</code> index from end operator, which works as the complete opposite.</p>
+
+<p>For example, the first element would have an index from end value as 10, the next element 9, and so on.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">movies</span> <span class="p">=</span> <span class="k">new</span> <span class="kt">string</span><span class="p">[]</span>
+<span class="p">{</span>
+    <span class="s">"Dr. No"</span><span class="p">,</span> <span class="c1">// ^10</span>
+    <span class="s">"From Russia with Love"</span><span class="p">,</span> <span class="c1">// ^9</span>
+    <span class="s">"Goldfinger"</span><span class="p">,</span> <span class="c1">// ^8</span>
+    <span class="s">"Thunderball"</span><span class="p">,</span> <span class="c1">// ^7</span>
+    <span class="s">"You Only Live Twice"</span><span class="p">,</span> <span class="c1">// ^6</span>
+    <span class="c1">//...</span>
+    <span class="s">"Die Another Day"</span><span class="p">,</span> <span class="c1">// ^5</span>
+    <span class="s">"Casino Royale"</span><span class="p">,</span> <span class="c1">// ^4</span>
+    <span class="s">"Quantum of Solace"</span><span class="p">,</span> <span class="c1">// ^3</span>
+    <span class="s">"Skyfall"</span><span class="p">,</span> <span class="c1">// ^2</span>
+    <span class="s">"Spectre"</span> <span class="c1">// ^1</span>
+    <span class="c1">// words.length value is ^0</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Now, you don’t have to do counting from an index and makes things a lot easier. For example, to get <em>Skyfall</em> (please use string interpolation to prove you aren’t a monster):</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">$"The second to last Bond movie is </span><span class="p">{</span><span class="n">movies</span><span class="p">[^</span><span class="m">2</span><span class="p">]}</span><span class="s">"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>See? You’ve already forgotten about <em>Spectre</em>.</p>
+
+<h2 id="ranges">Ranges</h2>
+
+<p>I don’t know about you, but 90% of my time getting a substring involves me saying to myself (or anyone who will listen): <strong>“Is the end inclusive? Is it exclusive? Why do I always have to Google this?”</strong></p>
+
+<p>With ranges in C# 8, remember this: the start of the range is included, and the end of the range isn’t. With that said, let’s grab Connery’s first three Bond films.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Returns first three movies (index 0, 1, 2 =&gt; Dr. No, From Russia, Goldfinger)</span>
+<span class="kt">var</span> <span class="n">conneryMovies</span> <span class="p">=</span> <span class="n">movies</span><span class="p">[</span><span class="m">0.</span><span class="p">.</span><span class="m">3</span><span class="p">];</span>
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">$"The first three Connery movies are: </span><span class="p">{</span><span class="kt">string</span><span class="p">.</span><span class="nf">Join</span><span class="p">(</span><span class="s">", "</span><span class="p">,</span> <span class="n">conneryMovies</span><span class="p">)}</span><span class="s">"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>You can use the <code class="language-plaintext highlighter-rouge">^</code> index from end operator, as discussed previously, to grab my favorite Daniel Craig films (<em>Skyfall</em>, <em>Quantum of Solace</em> (work with me here), and <em>Casino Royale</em>).</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">craigMovies</span> <span class="p">=</span> <span class="n">movies</span><span class="p">[^</span><span class="m">4.</span><span class="p">.^</span><span class="m">1</span><span class="p">];</span>
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">$"My favorite Craig movies are: </span><span class="p">{</span><span class="kt">string</span><span class="p">.</span><span class="nf">Join</span><span class="p">(</span><span class="s">", "</span><span class="p">,</span> <span class="n">craigMovies</span><span class="p">)}</span><span class="s">"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>You can also use the <code class="language-plaintext highlighter-rouge">Range</code> struct, which can then be used inside <code class="language-plaintext highlighter-rouge">[</code> and <code class="language-plaintext highlighter-rouge">]</code> to give you that array-like kind of feeling.</p>
+
+<p>Indices and ranges are not just for strings—according <a href="https://docs.microsoft.com/dotnet/csharp/tutorials/ranges-indexes#type-support-for-indices-and-ranges">to the documentation</a>, you can also use them with <code class="language-plaintext highlighter-rouge">Span&lt;T&gt;</code> and <code class="language-plaintext highlighter-rouge">ReadOnlySpan&lt;T&gt;</code>.</p>
+
+<h1 id="staying-current-with-c-developments">Staying current with C# developments</h1>
+
+<p>Did you know C# is open source and the design of the language has its own <a href="https://github.com/dotnet/csharplang">GitHub repo</a>? There, you can find active feature proposals, notes from design meetings, and the language version history. Community involvement is definitely encouraged.</p>
+
+<p>The .NET team recently had an <a href="https://www.youtube.com/embed/fIXujTOA6BE"><strong>All Things C#</strong> stream</a>, where some key designers of the language discussed what’s coming—I’ll be writing about some of these things shortly, but until then the video is definitely worth your time.</p>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/fIXujTOA6BE?start=550" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>

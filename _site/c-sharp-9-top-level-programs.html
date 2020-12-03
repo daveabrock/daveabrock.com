@@ -1,0 +1,325 @@
+<p>This is the fourth post in a six-post series on C# 9 features in-depth:</p>
+
+<ul>
+  <li>Post 1 - <a href="https://daveabrock.com/2020/06/29/c-sharp-9-deep-dive-inits">Init-only features</a></li>
+  <li>Post 2 - <a href="https://daveabrock.com/2020/07/06/c-sharp-9-deep-dive-records">Records</a></li>
+  <li>Post 3 - <a href="https://daveabrock.com/2020/07/06/c-sharp-9-pattern-matching">Pattern matching</a></li>
+  <li>Post 4 (<em>this post</em>) - Top-level programs</li>
+  <li>Post 5 - <a href="https://daveabrock.com/2020/07/14/c-sharp-9-target-typing-covariants">Target typing and covariant returns</a></li>
+  <li>Post 6 - <a href="https://daveabrock.com/2020/07/21/c-sharp-9-scavenger-hunt">Putting it all together with a scavenger hunt</a></li>
+</ul>
+
+<p>Typically, when you learn to write a new C# console application, you are required by law to start with something like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Program</span>
+<span class="p">{</span>
+    <span class="k">static</span> <span class="k">void</span> <span class="nf">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"Hello, world!"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Imagine you’re trying to teach someone how a program works. Before you even execute a line of code, you need to talk about:</p>
+
+<ul>
+  <li>What are classes?</li>
+  <li>What is a function?</li>
+  <li>What is this <code class="language-plaintext highlighter-rouge">args</code> string array?</li>
+</ul>
+
+<p>Sure, to you and me it likely won’t be long before that needs to come up but the barrier for entry becomes higher—especially when you look at how simple it is to get started with something like Python or JavaScript.</p>
+
+<p>This post covers the following topics.</p>
+
+<ul>
+  <li><a href="#the-simple-obligatory-hello-world-example">The simple, obligatory “Hello, world” example</a></li>
+  <li><a href="#return-a-status-code">Return a status code</a></li>
+  <li><a href="#await-things">Await things</a></li>
+  <li><a href="#access-command-line-arguments">Access command-line arguments</a></li>
+  <li><a href="#local-functions">Local functions</a></li>
+  <li><a href="#wrapping-up">Wrapping up</a></li>
+</ul>
+
+<h1 id="the-simple-obligatory-hello-world-example">The simple, obligatory “Hello, world” example</h1>
+
+<p>With C# 9 top-level programs, you can take away the <code class="language-plaintext highlighter-rouge">Main</code> method and condense it to something like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"Hello, world!"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>And, don’t worry: I know what you’re thinking. Let’s make this a one-liner.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">System</span><span class="p">.</span><span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"Hello, world!"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>If you look at what Roslyn generates, from <a href="https://sharplab.io">Sharplab</a>, nothing should shock you:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="n">CompilerGenerated</span><span class="p">]</span>
+<span class="k">internal</span> <span class="k">static</span> <span class="k">class</span> <span class="err">$</span><span class="nc">Program</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="k">void</span> <span class="err">$</span><span class="nf">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"Hello, world!"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>No surprise here. It’ll generate a <code class="language-plaintext highlighter-rouge">Program</code> class and the traditional main method for you.</p>
+
+<p>Can we be honest? I thought this was where it ended: a nice, clean way to simplify a console app. But! As I read the <a href="https://devblogs.microsoft.com/dotnet/welcome-to-c-9-0/"><em>Welcome to C# 9</em></a> announcement a little closer, Mads Torgersen writes:</p>
+
+<blockquote>
+  <p>If you want to return a status code you can do that. If you want to await things you can do that. And if you want to access command line arguments, args is available as a “magic” parameter…Local functions are a form of statement and are also allowed in the top level program.</p>
+</blockquote>
+
+<p>That is super interesting. Let’s try it out and see what happens in Sharplab.</p>
+
+<h1 id="return-a-status-code">Return a status code</h1>
+
+<p>We can return anything from our top-level program. If we return 0 like we did in the good old days, let’s do this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">System</span><span class="p">.</span><span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"Hello, world!"</span><span class="p">);</span>
+<span class="k">return</span> <span class="m">0</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Roslyn gives us this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="n">CompilerGenerated</span><span class="p">]</span>
+<span class="k">internal</span> <span class="k">static</span> <span class="k">class</span> <span class="err">$</span><span class="nc">Program</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="kt">int</span> <span class="err">$</span><span class="nf">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"Hello, world!"</span><span class="p">);</span>
+        <span class="k">return</span> <span class="m">0</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="await-things">Await things</h1>
+
+<p>Mads says we can <code class="language-plaintext highlighter-rouge">await</code> things. Let’s await something—let’s call the <a href="https://icanhazdadjoke.com/api"><code class="language-plaintext highlighter-rouge">icanhazdadjoke</code> API</a>, shall we?</p>
+
+<p>Let’s try this code:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System.Net.Http</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Net.Http.Headers</span><span class="p">;</span>
+
+<span class="k">using</span> <span class="p">(</span><span class="kt">var</span> <span class="n">httpClient</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">HttpClient</span><span class="p">())</span>
+<span class="p">{</span>
+    <span class="n">httpClient</span><span class="p">.</span><span class="n">DefaultRequestHeaders</span><span class="p">.</span><span class="n">Accept</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="k">new</span> <span class="nf">MediaTypeWithQualityHeaderValue</span><span class="p">(</span><span class="s">"text/plain"</span><span class="p">));</span>
+    <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">httpClient</span><span class="p">.</span><span class="nf">GetStringAsync</span><span class="p">(</span><span class="k">new</span> <span class="nf">Uri</span><span class="p">(</span><span class="s">"https://icanhazdadjoke.com"</span><span class="p">)).</span><span class="n">Result</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>As you can see, nothing it can’t handle:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="n">CompilerGenerated</span><span class="p">]</span>
+<span class="k">internal</span> <span class="k">static</span> <span class="k">class</span> <span class="err">$</span><span class="nc">Program</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="k">void</span> <span class="err">$</span><span class="nf">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">HttpClient</span> <span class="n">httpClient</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">HttpClient</span><span class="p">();</span>
+        <span class="k">try</span>
+        <span class="p">{</span>
+            <span class="n">httpClient</span><span class="p">.</span><span class="n">DefaultRequestHeaders</span><span class="p">.</span><span class="n">Accept</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="k">new</span> <span class="nf">MediaTypeWithQualityHeaderValue</span><span class="p">(</span><span class="s">"text/plain"</span><span class="p">));</span>
+            <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">httpClient</span><span class="p">.</span><span class="nf">GetStringAsync</span><span class="p">(</span><span class="k">new</span> <span class="nf">Uri</span><span class="p">(</span><span class="s">"https://icanhazdadjoke.com"</span><span class="p">)).</span><span class="n">Result</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">finally</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">httpClient</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="p">((</span><span class="n">IDisposable</span><span class="p">)</span><span class="n">httpClient</span><span class="p">).</span><span class="nf">Dispose</span><span class="p">();</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>OK, so I called <code class="language-plaintext highlighter-rouge">GetStringAsync</code> but I kinda lied—I haven’t done an await or returned a <code class="language-plaintext highlighter-rouge">Task</code>.</p>
+
+<p>If we do this thing:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System.Threading.Tasks</span><span class="p">;</span>
+
+<span class="k">await</span> <span class="n">Task</span><span class="p">.</span><span class="n">CompletedTask</span><span class="p">;</span>
+<span class="k">return</span> <span class="m">0</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Watch what happens! We’ve got a <code class="language-plaintext highlighter-rouge">TaskAwaiter</code> and an <code class="language-plaintext highlighter-rouge">AsyncStateMachine</code>. What, you thought async was easy? Good thing: it’s relatively easy with top-level functions.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="n">CompilerGenerated</span><span class="p">]</span>
+<span class="k">internal</span> <span class="k">static</span> <span class="k">class</span> <span class="err">$</span><span class="nc">Program</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="nf">StructLayout</span><span class="p">(</span><span class="n">LayoutKind</span><span class="p">.</span><span class="n">Auto</span><span class="p">)]</span>
+    <span class="k">private</span> <span class="k">struct</span> <span class="err">&lt;$</span><span class="nc">Main</span><span class="p">&gt;</span><span class="n">d__0</span> <span class="p">:</span> <span class="n">IAsyncStateMachine</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="kt">int</span> <span class="p">&lt;&gt;</span><span class="m">1</span><span class="n">__state</span><span class="p">;</span>
+
+        <span class="k">public</span> <span class="n">AsyncTaskMethodBuilder</span><span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;</span> <span class="p">&lt;&gt;</span><span class="n">t__builder</span><span class="p">;</span>
+
+        <span class="k">private</span> <span class="n">TaskAwaiter</span> <span class="p">&lt;&gt;</span><span class="n">u__1</span><span class="p">;</span>
+
+        <span class="k">private</span> <span class="k">void</span> <span class="nf">MoveNext</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="kt">int</span> <span class="n">num</span> <span class="p">=</span> <span class="p">&lt;&gt;</span><span class="m">1</span><span class="n">__state</span><span class="p">;</span>
+            <span class="kt">int</span> <span class="n">result</span><span class="p">;</span>
+            <span class="k">try</span>
+            <span class="p">{</span>
+                <span class="n">TaskAwaiter</span> <span class="n">awaiter</span><span class="p">;</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">num</span> <span class="p">!=</span> <span class="m">0</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="n">awaiter</span> <span class="p">=</span> <span class="n">Task</span><span class="p">.</span><span class="n">CompletedTask</span><span class="p">.</span><span class="nf">GetAwaiter</span><span class="p">();</span>
+                    <span class="k">if</span> <span class="p">(!</span><span class="n">awaiter</span><span class="p">.</span><span class="n">IsCompleted</span><span class="p">)</span>
+                    <span class="p">{</span>
+                        <span class="n">num</span> <span class="p">=</span> <span class="p">(&lt;&gt;</span><span class="m">1</span><span class="n">__state</span> <span class="p">=</span> <span class="m">0</span><span class="p">);</span>
+                        <span class="p">&lt;&gt;</span><span class="n">u__1</span> <span class="p">=</span> <span class="n">awaiter</span><span class="p">;</span>
+                        <span class="p">&lt;&gt;</span><span class="n">t__builder</span><span class="p">.</span><span class="nf">AwaitUnsafeOnCompleted</span><span class="p">(</span><span class="k">ref</span> <span class="n">awaiter</span><span class="p">,</span> <span class="k">ref</span> <span class="k">this</span><span class="p">);</span>
+                        <span class="k">return</span><span class="p">;</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+                <span class="k">else</span>
+                <span class="p">{</span>
+                    <span class="n">awaiter</span> <span class="p">=</span> <span class="p">&lt;&gt;</span><span class="n">u__1</span><span class="p">;</span>
+                    <span class="p">&lt;&gt;</span><span class="n">u__1</span> <span class="p">=</span> <span class="k">default</span><span class="p">(</span><span class="n">TaskAwaiter</span><span class="p">);</span>
+                    <span class="n">num</span> <span class="p">=</span> <span class="p">(&lt;&gt;</span><span class="m">1</span><span class="n">__state</span> <span class="p">=</span> <span class="p">-</span><span class="m">1</span><span class="p">);</span>
+                <span class="p">}</span>
+                <span class="n">awaiter</span><span class="p">.</span><span class="nf">GetResult</span><span class="p">();</span>
+                <span class="n">result</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">catch</span> <span class="p">(</span><span class="n">Exception</span> <span class="n">exception</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="p">&lt;&gt;</span><span class="m">1</span><span class="n">__state</span> <span class="p">=</span> <span class="p">-</span><span class="m">2</span><span class="p">;</span>
+                <span class="p">&lt;&gt;</span><span class="n">t__builder</span><span class="p">.</span><span class="nf">SetException</span><span class="p">(</span><span class="n">exception</span><span class="p">);</span>
+                <span class="k">return</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="p">&lt;&gt;</span><span class="m">1</span><span class="n">__state</span> <span class="p">=</span> <span class="p">-</span><span class="m">2</span><span class="p">;</span>
+            <span class="p">&lt;&gt;</span><span class="n">t__builder</span><span class="p">.</span><span class="nf">SetResult</span><span class="p">(</span><span class="n">result</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="k">void</span> <span class="n">IAsyncStateMachine</span><span class="p">.</span><span class="nf">MoveNext</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="c1">//ILSpy generated this explicit interface implementation from .override directive in MoveNext</span>
+            <span class="k">this</span><span class="p">.</span><span class="nf">MoveNext</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="p">[</span><span class="n">DebuggerHidden</span><span class="p">]</span>
+        <span class="k">private</span> <span class="k">void</span> <span class="nf">SetStateMachine</span><span class="p">(</span><span class="n">IAsyncStateMachine</span> <span class="n">stateMachine</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="p">&lt;&gt;</span><span class="n">t__builder</span><span class="p">.</span><span class="nf">SetStateMachine</span><span class="p">(</span><span class="n">stateMachine</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="k">void</span> <span class="n">IAsyncStateMachine</span><span class="p">.</span><span class="nf">SetStateMachine</span><span class="p">(</span><span class="n">IAsyncStateMachine</span> <span class="n">stateMachine</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="c1">//ILSpy generated this explicit interface implementation from .override directive in SetStateMachine</span>
+            <span class="k">this</span><span class="p">.</span><span class="nf">SetStateMachine</span><span class="p">(</span><span class="n">stateMachine</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="p">[</span><span class="nf">AsyncStateMachine</span><span class="p">(</span><span class="k">typeof</span><span class="p">(&lt;</span><span class="err">$</span><span class="n">Main</span><span class="p">&gt;</span><span class="n">d__0</span><span class="p">))]</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="n">Task</span><span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;</span> <span class="err">$</span><span class="nf">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="p">&lt;</span><span class="err">$</span><span class="n">Main</span><span class="p">&gt;</span><span class="n">d__0</span> <span class="n">stateMachine</span> <span class="p">=</span> <span class="k">default</span><span class="p">(&lt;</span><span class="err">$</span><span class="n">Main</span><span class="p">&gt;</span><span class="n">d__0</span><span class="p">);</span>
+        <span class="n">stateMachine</span><span class="p">.&lt;&gt;</span><span class="n">t__builder</span> <span class="p">=</span> <span class="n">AsyncTaskMethodBuilder</span><span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;.</span><span class="nf">Create</span><span class="p">();</span>
+        <span class="n">stateMachine</span><span class="p">.&lt;&gt;</span><span class="m">1</span><span class="n">__state</span> <span class="p">=</span> <span class="p">-</span><span class="m">1</span><span class="p">;</span>
+        <span class="n">stateMachine</span><span class="p">.&lt;&gt;</span><span class="n">t__builder</span><span class="p">.</span><span class="nf">Start</span><span class="p">(</span><span class="k">ref</span> <span class="n">stateMachine</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">stateMachine</span><span class="p">.&lt;&gt;</span><span class="n">t__builder</span><span class="p">.</span><span class="n">Task</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">static</span> <span class="kt">int</span> <span class="p">&lt;</span><span class="n">Main</span><span class="p">&gt;(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="err">$</span><span class="nf">Main</span><span class="p">(</span><span class="n">args</span><span class="p">).</span><span class="nf">GetAwaiter</span><span class="p">().</span><span class="nf">GetResult</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="access-command-line-arguments">Access command-line arguments</h1>
+
+<p>A nice benefit here is that, like with a command line program, you can specify command line arguments. This is typically done by parsing the <code class="language-plaintext highlighter-rouge">args[]</code> that you pass into your <code class="language-plaintext highlighter-rouge">Main</code> method, but how is this possible with no <code class="language-plaintext highlighter-rouge">Main</code> method to speak of?</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">args</code> are available as a “magic” parameter, meaning you should be able to access them without passing them in. MAGIC.</p>
+
+<p>Let’s say I wanted something like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+
+<span class="kt">var</span> <span class="n">param1</span> <span class="p">=</span> <span class="n">args</span><span class="p">[</span><span class="m">0</span><span class="p">];</span>
+<span class="kt">var</span> <span class="n">param2</span> <span class="p">=</span> <span class="n">args</span><span class="p">[</span><span class="m">1</span><span class="p">];</span>
+
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">$"Your params are </span><span class="p">{</span><span class="n">param1</span><span class="p">}</span><span class="s"> and </span><span class="p">{</span><span class="n">param2</span><span class="p">}</span><span class="s">."</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Here’s what Roslyn does:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="n">CompilerGenerated</span><span class="p">]</span>
+<span class="k">internal</span> <span class="k">static</span> <span class="k">class</span> <span class="err">$</span><span class="nc">Program</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="k">void</span> <span class="err">$</span><span class="nf">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">string</span> <span class="n">text</span> <span class="p">=</span> <span class="n">args</span><span class="p">[</span><span class="m">0</span><span class="p">];</span>
+        <span class="kt">string</span> <span class="n">text2</span> <span class="p">=</span> <span class="n">args</span><span class="p">[</span><span class="m">1</span><span class="p">];</span>
+        <span class="kt">string</span><span class="p">[]</span> <span class="n">array</span> <span class="p">=</span> <span class="k">new</span> <span class="kt">string</span><span class="p">[</span><span class="m">5</span><span class="p">];</span>
+        <span class="n">array</span><span class="p">[</span><span class="m">0</span><span class="p">]</span> <span class="p">=</span> <span class="s">"Your params are "</span><span class="p">;</span>
+        <span class="n">array</span><span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="p">=</span> <span class="n">text</span><span class="p">;</span>
+        <span class="n">array</span><span class="p">[</span><span class="m">2</span><span class="p">]</span> <span class="p">=</span> <span class="s">" and "</span><span class="p">;</span>
+        <span class="n">array</span><span class="p">[</span><span class="m">3</span><span class="p">]</span> <span class="p">=</span> <span class="n">text2</span><span class="p">;</span>
+        <span class="n">array</span><span class="p">[</span><span class="m">4</span><span class="p">]</span> <span class="p">=</span> <span class="s">"."</span><span class="p">;</span>
+        <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="kt">string</span><span class="p">.</span><span class="nf">Concat</span><span class="p">(</span><span class="n">array</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="local-functions">Local functions</h1>
+
+<p>Now, for my last trick, local functions.</p>
+
+<p>Let’s whip us this code to test out our top-level program.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+
+<span class="nf">DaveIsTesting</span><span class="p">();</span>
+
+<span class="k">void</span> <span class="nf">DaveIsTesting</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">void</span> <span class="nf">DaveIsTestingAgain</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"Dave is testing again."</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"Dave is testing."</span><span class="p">);</span>
+    <span class="nf">DaveIsTestingAgain</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>I have to admit, I’m pretty excited to see what Roslyn decides to do on this one:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="n">CompilerGenerated</span><span class="p">]</span>
+<span class="k">internal</span> <span class="k">static</span> <span class="k">class</span> <span class="err">$</span><span class="nc">Program</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="k">void</span> <span class="err">$</span><span class="nf">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="p">&lt;</span><span class="err">$</span><span class="n">Main</span><span class="p">&gt;</span><span class="n">g__DaveIsTesting</span><span class="p">|</span><span class="m">0</span><span class="nf">_0</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">internal</span> <span class="k">static</span> <span class="k">void</span> <span class="p">&lt;</span><span class="err">$</span><span class="n">Main</span><span class="p">&gt;</span><span class="n">g__DaveIsTesting</span><span class="p">|</span><span class="m">0</span><span class="nf">_0</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"Dave is testing."</span><span class="p">);</span>
+        <span class="p">&lt;</span><span class="err">$</span><span class="n">Main</span><span class="p">&gt;</span><span class="n">g__DaveIsTestingAgain</span><span class="p">|</span><span class="m">0</span><span class="nf">_1</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">internal</span> <span class="k">static</span> <span class="k">void</span> <span class="p">&lt;</span><span class="err">$</span><span class="n">Main</span><span class="p">&gt;</span><span class="n">g__DaveIsTestingAgain</span><span class="p">|</span><span class="m">0</span><span class="nf">_1</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"Dave is testing again."</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Or not. They are just split out into different functions in my class. Carry on.</p>
+
+<h1 id="wrapping-up">Wrapping up</h1>
+
+<p>In this post, we’ve put top-level programs through its paces by seeing how it works with status code, async calls, command line arguments, and local functions. I’ve found that this can be a lot more powerful that slimming down lines of code.</p>
+
+<p>What have you used it for, so far? Anything I miss? Let me know in the comments.</p>

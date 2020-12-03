@@ -1,0 +1,23 @@
+I"�<p>When working on legacy projects (or even new ones!) you are bound to come across code that is interesting—and trust me, your colleagues will say the same about your code from time to time!</p>
+
+<p>There’s always a balance between terseness and readability, and sometimes you can go overboard. Here’s one I see sometimes that I don’t particularly enjoy.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// C# syntax</span>
+<span class="k">public</span> <span class="kt">bool</span> <span class="nf">CheckABoolean</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">a</span> <span class="p">&gt;</span> <span class="m">42</span><span class="p">)</span>
+        <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+    <span class="k">else</span>
+        <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Instead, do this. Your eyes and your colleagues will thank you.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// C# syntax</span>
+<span class="k">public</span> <span class="kt">bool</span> <span class="nf">CheckABoolean</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="p">&gt;</span> <span class="m">42</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+:ET

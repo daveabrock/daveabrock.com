@@ -1,0 +1,218 @@
+I"�X<p>So far in this series, we’ve <a href="https://daveabrock.com/2020/10/26/blast-off-blazor-intro">walked through a project intro</a> and also <a href="https://daveabrock.com/2020/10/28/blast-off-blazor-404-page">got our feet wet with our first component</a>.</p>
+
+<p>Today, we’re going to take a look at a welcome .NET 5 feature in Blazor: the ability to <a href="https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-preview-8/#influencing-the-html-head-in-blazor-apps">update your HTML head on the fly</a> without the need for JavaScript interoperability.</p>
+
+<p>When I speak of updating the HTML head, I’m referring to what’s inside the <code class="language-plaintext highlighter-rouge">&lt;head&gt;</code> tag in your <code class="language-plaintext highlighter-rouge">index.html</code> file. You can now use the following native Blazor components to dynamically update the HTML head:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">&lt;Title&gt;</code> - the title of the document. You’d use this if you want to update your user on any updates, especially if they are busy with other tabs. You’ve probably seen this with updates for new email messages or new chat notifications.</li>
+  <li><code class="language-plaintext highlighter-rouge">&lt;Link&gt;</code> - gives you the ability to link to other resources. For example, you might want to dynamically update this to change stylesheets when the user clicks a button to specify light or dark mode.</li>
+  <li><code class="language-plaintext highlighter-rouge">&lt;Meta&gt;</code> - allows you to specify a variety of information for things like SEO, social cards, and RSS information.</li>
+</ul>
+
+<p>Since these are individual components, you can definitely use them together in your code. Following the email example, you could update the title bar with an unread message count and also change the “you have a message” favicon appropriately.</p>
+
+<p>In this post, we’re going to dynamically update the HTML <code class="language-plaintext highlighter-rouge">&lt;title&gt;</code> tag from our Blazor component. And since we’re already working with the browser’s title bar, I’ll walk you through adding favicons to our site.</p>
+
+<p>This post contains the following content.</p>
+
+<ul>
+  <li><a href="#dynamically-set-page-title">Dynamically set page title</a>
+    <ul>
+      <li><a href="#add-package-reference">Add package reference</a></li>
+      <li><a href="#add-script-reference">Add script reference</a></li>
+      <li><a href="#reference-the-project">Reference the project</a></li>
+      <li><a href="#set-the-page-title">Set the page title</a></li>
+      <li><a href="#how-it-all-works">How it all works</a></li>
+    </ul>
+  </li>
+  <li><a href="#add-favicons-to-our-app">Add favicons to our app</a></li>
+  <li><a href="#what-about-the-tests">What about the tests?</a></li>
+  <li><a href="#wrap-up">Wrap up</a></li>
+  <li><a href="#resources">Resources</a></li>
+</ul>
+
+<h1 id="dynamically-set-page-title">Dynamically set page title</h1>
+
+<p>As I mentioned, we’re going to dynamically update the <code class="language-plaintext highlighter-rouge">&lt;title&gt;</code> tag of our component. Before we do that, we’ll first need to add a package reference, add a script reference, and reference the new package in our project.</p>
+
+<h2 id="add-package-reference">Add package reference</h2>
+
+<p>From the <code class="language-plaintext highlighter-rouge">Client</code> directory of our project, open your terminal and add a package reference using the <code class="language-plaintext highlighter-rouge">dotnet</code> CLI.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dotnet add package Microsoft.AspNetCore.Components.Web.Extensions <span class="nt">--prerelease</span>
+</code></pre></div></div>
+
+<p class="notice--warning"><strong>Heads up!</strong> At this time, the <code class="language-plaintext highlighter-rouge">--prerelease</code> flag is required.</p>
+
+<h2 id="add-script-reference">Add script reference</h2>
+
+<p>In the <code class="language-plaintext highlighter-rouge">index.html</code> file in <code class="language-plaintext highlighter-rouge">wwwroot</code>, add the following reference:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"_content/Microsoft.AspNetCore.Components.Web.Extensions/headManager.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+</code></pre></div></div>
+
+<h2 id="reference-the-project">Reference the project</h2>
+
+<p>We can use one of two options to reference the new package in our app. Our first option is a direct <code class="language-plaintext highlighter-rouge">@using</code> in the <code class="language-plaintext highlighter-rouge">Index.razor</code> component:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@using Microsoft.AspNetCore.Components.Web.Extensions.Head
+</code></pre></div></div>
+
+<p>Or, we can include it in our <code class="language-plaintext highlighter-rouge">_Imports.razor</code> file. The <code class="language-plaintext highlighter-rouge">_Imports.razor</code> file, which sits at the root of our <code class="language-plaintext highlighter-rouge">Client</code> project, allows us to reference our app’s imports globally. That way, we won’t have to manually add shared references to all our components that need it. With my new addition, here’s what my <code class="language-plaintext highlighter-rouge">_Imports.razor</code> file looks like now:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@using System.Net.Http
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.AspNetCore.Components.WebAssembly.Http
+@using Microsoft.JSInterop
+@using Client
+@using Client.Shared
+@using Data
+@using Microsoft.AspNetCore.Components.Web.Extensions.Head
+</code></pre></div></div>
+
+<p>Either method works, but I’m going with the latter option for reusability. We’re now ready to set the page title.</p>
+
+<h2 id="set-the-page-title">Set the page title</h2>
+
+<p>Here’s what we’ll do: while I’m waiting for the NASA Astronomy Picture of the Day (APOD) API call to return, our title bar will say <em>Blasting off…</em>. Then, when we get a response back, it’ll say <em>New! From YEAR!</em>, where <em>YEAR</em> is the year of the image. This value comes from the <code class="language-plaintext highlighter-rouge">Year</code> property returned by the API.</p>
+
+<p>In the <code class="language-plaintext highlighter-rouge">@code</code> section of our <code class="language-plaintext highlighter-rouge">Index.razor</code> component, add the following code to parse the year from our <code class="language-plaintext highlighter-rouge">Date</code> property:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">private</span> <span class="kt">int</span> <span class="nf">GetYear</span><span class="p">(</span><span class="n">DateTime</span> <span class="n">date</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">date</span><span class="p">.</span><span class="n">Year</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Then, we can use a one-line ternary statement to return a message based on us whether we get a response from the API.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">private</span> <span class="kt">string</span> <span class="nf">GetPageTitle</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">image</span> <span class="k">is</span> <span class="k">null</span> <span class="p">?</span> <span class="s">"Blasting off..."</span> <span class="p">:</span> <span class="s">$"New! From </span><span class="p">{</span><span class="nf">GetYear</span><span class="p">(</span><span class="n">image</span><span class="p">.</span><span class="n">Date</span><span class="p">)}</span><span class="s">!"</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now, all that’s left is to drop the <code class="language-plaintext highlighter-rouge">&lt;Title&gt;</code> component at the top of our markup, and call our logic to change the title text.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;Title</span> <span class="na">Value=</span><span class="s">"@GetPageTitle()"</span><span class="nt">&gt;&lt;/Title&gt;</span>
+</code></pre></div></div>
+
+<p>Here’s a GIF of our update in action. (I set a <code class="language-plaintext highlighter-rouge">Thread.Sleep(1000)</code> for demonstration purposes, but I don’t recommend it in practice obviously.)</p>
+
+<p><img src="http://localhost:4001/images/SetTitleBar.gif" alt="Our title bar in action" /></p>
+
+<h2 id="how-it-all-works">How it all works</h2>
+
+<p>Before .NET 5, updating the HTML head dynamically required the use of JavaScript interoperability.</p>
+
+<p>You’d likely drop the following JavaScript at the bottom of your <code class="language-plaintext highlighter-rouge">index.html</code>:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
+    <span class="kd">function</span> <span class="nx">SetTitle</span><span class="p">(</span><span class="nx">title</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nb">document</span><span class="p">.</span><span class="nx">title</span> <span class="o">=</span> <span class="nx">title</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="o">&lt;</span><span class="sr">/script</span><span class="err">&gt;
+</span></code></pre></div></div>
+
+<p>Then, you’d have to inject JavaScript interop and probably create a special component for it:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">@inject</span> <span class="n">IJSRuntime</span> <span class="n">JSRuntime</span>
+
+<span class="c1">// markup here...</span>
+
+<span class="n">@code</span> <span class="p">{</span>
+    <span class="p">[</span><span class="n">Parameter</span><span class="p">]</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Value</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+
+    <span class="k">protected</span> <span class="k">override</span> <span class="k">async</span> <span class="n">Task</span> <span class="nf">OnAfterRenderAsync</span><span class="p">(</span><span class="kt">bool</span> <span class="n">firstRender</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">await</span> <span class="n">JSRuntime</span><span class="p">.</span><span class="nf">InvokeVoidAsync</span><span class="p">(</span><span class="s">"SetTitle"</span><span class="p">,</span> <span class="n">Value</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Then, you’d add the component on your page to update the title bar dynamically, where your <code class="language-plaintext highlighter-rouge">GetPageTitle</code> method would do what it needs to populate the title.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;PageTitle</span> <span class="na">Value=</span><span class="s">"@GetPageTitle()"</span> <span class="nt">/&gt;</span>
+</code></pre></div></div>
+
+<p>In .NET 5, this still happens—it’s just abstracted away from you. If you <a href="https://github.com/aspnet/AspLabs/blob/master/src/Components.Web.Extensions/HeadManagement/Title.cs">take a look at the source code</a> for the <code class="language-plaintext highlighter-rouge">&lt;Title&gt;</code> component, it injects an <code class="language-plaintext highlighter-rouge">IJSRuntime</code> and takes a <code class="language-plaintext highlighter-rouge">Value</code>—just as you’ve done before. Then, in the <code class="language-plaintext highlighter-rouge">OnAfterRenderAsync</code> <a href="https://docs.microsoft.com/aspnet/core/blazor/components/lifecycle?view=aspnetcore-3.1#after-component-render">component lifecycle method</a>, it sets the title by calling the <code class="language-plaintext highlighter-rouge">headManager.js</code> file, where you’ll see:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="kd">function</span> <span class="nx">setTitle</span><span class="p">(</span><span class="nx">title</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nb">document</span><span class="p">.</span><span class="nx">title</span> <span class="o">=</span> <span class="nx">title</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><strong>Note</strong>: The <a href="https://docs.microsoft.com/aspnet/core/blazor/components/lifecycle?view=aspnetcore-3.1#after-component-render"><code class="language-plaintext highlighter-rouge">OnAfterRenderAsync</code> method is called</a> after a component has finished rendering.</p>
+
+<p>So, this isn’t doing anything too magical. It’s doing it out-of-the-box and giving you one less component to maintain.</p>
+
+<p>With that done, let’s add favicons to our app.</p>
+
+<h1 id="add-favicons-to-our-app">Add favicons to our app</h1>
+
+<p>When you create a Blazor app (or any ASP.NET Core app, for that matter), a bland <code class="language-plaintext highlighter-rouge">favicon.ico</code> file is dropped in your <code class="language-plaintext highlighter-rouge">wwwroot</code> directory. (For the uninitiated, <a href="https://en.wikipedia.org/wiki/Favicon">a favicon</a> is the small icon in the top-left corner of your browser tab, right next to the page title.) This might lead you to believe that if you want to use favicons, you can either use that file or overwrite it with one of your own—then move on with your life.</p>
+
+<p>While you <em>can</em> do that, you probably shouldn’t. These days you’re dealing with different browser requirements and multiple platforms (Windows, iOS, Mac, Android) where just one <em>favicon.ico</em> will not get the job done. For example, iOS users can pin a site to their homescreen—and iOS will grab your favicon icon as the “app” image.</p>
+
+<p>Thanks to Andrew Lock’s <a href="https://andrewlock.net/adding-favicons-to-your-asp-net-core-website-with-realfavicongenerator/">wonderful post on the topic</a>, I went over to the <a href="https://realfavicongenerator.net/">RealFaviconGenerator</a> for assistance. (If you want more details on the process, like how to create your own, check out his post.)</p>
+
+<p>Before we do that, we’ll need to pick a new image.</p>
+
+<p>Did you know the .NET team has a <a href="https://github.com/dotnet/brand">branding GitHub repository</a> where you can look at logos, presentation templates, wallpapers, and a bunch of illustrations of the purple .NET bot? For our example, we’ll use the <a href="https://github.com/dotnet/brand/blob/master/dotnet-bot-illustrations/dotnet-bot/dotnet-bot_jetpack-faceing-right.png">bot using a jetpack</a> because—obviously. We’re blasting off, after all.</p>
+
+<p>Let’s also update our header icon to this image, too. After dropping the file in our <code class="language-plaintext highlighter-rouge">wwwroot/images</code> <a href="https://github.com/daveabrock/NASAImageOfDay/tree/main/Client/wwwroot/images">directory</a>, we can edit our <code class="language-plaintext highlighter-rouge">NavBar</code> component in our <code class="language-plaintext highlighter-rouge">Shared</code> directory to include our new file.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;nav</span> <span class="na">class=</span><span class="s">"flex items-center justify-between flex-wrap bg-black p-6 my-bar"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"flex items-center flex-shrink-0 text-white mr-6"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">"images/dotnet-bot-jetpack.png"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"font-semibold text-xl tracking-tight"</span><span class="nt">&gt;</span>Blast Off with Blazor<span class="nt">&lt;/span&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+    <span class="nt">&lt;</span><span class="err">!</span> <span class="na">--</span> <span class="na">more</span> <span class="na">html</span> <span class="na">left</span> <span class="na">out</span> <span class="na">for</span> <span class="na">brevity</span> <span class="na">--</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/nav&gt;</span>
+</code></pre></div></div>
+
+<p>I feel better and, as a bonus, the fine folks at NASA don’t have to worry about asking me to take their official logo down.</p>
+
+<p><img src="http://localhost:4001/images/new-site-icon.png" alt="Our title bar in action" /></p>
+
+<p>Now, we can head over the <a href="https://realfavicongenerator.net/">RealFaviconGenerator</a> site to upload our new icon. After adjusting any settings to our liking, it’ll give us a bunch of icons, which we’ll unzip to the root of our <code class="language-plaintext highlighter-rouge">wwwroot</code> directory.</p>
+
+<p>In <code class="language-plaintext highlighter-rouge">index.html</code> in the <code class="language-plaintext highlighter-rouge">wwwroot</code> directory, add the following inside the <code class="language-plaintext highlighter-rouge">&lt;head&gt;</code> tag:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">"apple-touch-icon"</span> <span class="na">sizes=</span><span class="s">"76x76"</span> <span class="na">href=</span><span class="s">"/apple-touch-icon.png"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">"icon"</span> <span class="na">type=</span><span class="s">"image/png"</span> <span class="na">sizes=</span><span class="s">"32x32"</span> <span class="na">href=</span><span class="s">"/favicon-32x32.png"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">"icon"</span> <span class="na">type=</span><span class="s">"image/png"</span> <span class="na">sizes=</span><span class="s">"16x16"</span> <span class="na">href=</span><span class="s">"/favicon-16x16.png"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">"manifest"</span> <span class="na">href=</span><span class="s">"/site.webmanifest"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">"mask-icon"</span> <span class="na">href=</span><span class="s">"/safari-pinned-tab.svg"</span> <span class="na">color=</span><span class="s">"#5bbad5"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">"msapplication-TileColor"</span> <span class="na">content=</span><span class="s">"#da532c"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">"theme-color"</span> <span class="na">content=</span><span class="s">"#ffffff"</span><span class="nt">&gt;</span>
+</code></pre></div></div>
+
+<p>While it’s not the worst idea to put this markup in a component or partial view, I’m fine with putting it right into my static <code class="language-plaintext highlighter-rouge">index.html</code> file—it’s a one-time step and this is the only file that needs it.</p>
+
+<h1 id="what-about-the-tests">What about the tests?</h1>
+
+<p>I’ve placed an emphasis on <a href="https://daveabrock.com/2020/10/28/blast-off-blazor-404-page#test-our-component-with-the-bunit-library">testing our components</a> with the bUnit library. We’ll work on testing this, and the rest of our <code class="language-plaintext highlighter-rouge">Index</code> component, in the next post. We need to mock a few things, like <code class="language-plaintext highlighter-rouge">HttpClient</code>, and I’m currently researching the best way to do so. Our next post will focus on testing Blazor components with <code class="language-plaintext highlighter-rouge">HttpClient</code> dependencies.</p>
+
+<h1 id="wrap-up">Wrap up</h1>
+
+<p>In this post, we dynamically updated the HTML head by setting the page title based on the image. Then, we updated our header icon and also showed how to include favicons in a Blazor WebAssembly project.</p>
+
+<p>Stay tuned for the next post where we work on writing tests for our <code class="language-plaintext highlighter-rouge">Index</code> component.</p>
+
+<h1 id="resources">Resources</h1>
+
+<ul>
+  <li><a href="https://jonhilton.net/blazor-update-html-head/">Update the HTML head from your Blazor components</a> (Jon Hilton)</li>
+  <li><a href="https://www.meziantou.net/dynamically-setting-the-page-title-in-a-blazor-application.htm">Dynamically setting the page title in a Blazor application</a> (Gérald Barré)</li>
+  <li><a href="https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-preview-8/#influencing-the-html-head-in-blazor-apps">Influencing the HTML head in Blazor apps</a> (Daniel Roth)</li>
+  <li><a href="https://github.com/dotnet/aspnetcore/issues/10450">Influencing HTML Head from a Blazor component</a> (GitHub issue)</li>
+  <li><a href="https://andrewlock.net/adding-favicons-to-your-asp-net-core-website-with-realfavicongenerator/">Adding favicons to your ASP.NET Core website with Real Favicon Generator</a> (Andrew Lock)</li>
+</ul>
+:ET

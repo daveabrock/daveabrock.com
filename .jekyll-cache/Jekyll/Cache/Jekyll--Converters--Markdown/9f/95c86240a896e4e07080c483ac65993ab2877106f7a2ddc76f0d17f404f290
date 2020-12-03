@@ -1,0 +1,93 @@
+I"1<p>For years, if we wanted to store local data we would look to using HTTP cookies—a convenient way to persist small amounts of data on a user’s machine. And we do mean <em>small</em>: cookies are limited to about 4KB apiece. Also, the cookie is passed along with every request and response even if it isn’t used, making for heavy HTTP messaging.</p>
+
+<p>Enter the <a href="https://www.w3.org/TR/webstorage/">web storage APIs</a>, a way for you to store key/value paired string values on a user’s machine. Local storage provides much more space—modern browsers support a minimum of 5MB, much more than the 4KB for cookies.</p>
+
+<p>When using web storage, we can implement either <code class="language-plaintext highlighter-rouge">localStorage</code> or <code class="language-plaintext highlighter-rouge">sessionStorage</code> from the <code class="language-plaintext highlighter-rouge">Storage</code> object. Let’s work through how to accomplish this.</p>
+
+<h3 id="checking-web-storage-compatibility">Checking web storage compatibility</h3>
+
+<p>Although most browsers <a href="http://caniuse.com/#feat=namevalue-storage">support web storage</a>, you still should be a good developer and verify that a user isn’t using an unusually old browser like <a href="http://www.saveie6.com/">IE6</a>:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">isWebStorageSupported</span><span class="p">()</span> <span class="p">{</span>
+   <span class="k">return</span> <span class="dl">'</span><span class="s1">localStorage</span><span class="dl">'</span> <span class="k">in</span> <span class="nb">window</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="when-to-use-localstorage-or-sessionstorage">When to use <code class="language-plaintext highlighter-rouge">localStorage</code> or <code class="language-plaintext highlighter-rouge">sessionStorage</code></h3>
+
+<p>The <code class="language-plaintext highlighter-rouge">localStorage</code> and <code class="language-plaintext highlighter-rouge">sessionStorage</code> APIs are nearly identical with one key exception: persistence.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">sessionStorage</code> object is only available for the duration of the browser session, and is deleted automatically when the window is closed. However, it does stick around for page reloads.</p>
+
+<p>Meanwhile, <code class="language-plaintext highlighter-rouge">localStorage</code> is persisted until it is explicitly by the site or the user. All changes made to <code class="language-plaintext highlighter-rouge">localStorage</code> are available for all current and future visits to the site.</p>
+
+<p>Whatever the case, both <code class="language-plaintext highlighter-rouge">localStorage</code> and <code class="language-plaintext highlighter-rouge">sessionStorage</code> work well when working with <strong>non-sensitive data</strong> needed within an application since data stored in <code class="language-plaintext highlighter-rouge">localStorage</code> and <code class="language-plaintext highlighter-rouge">sessionStorage</code> can easily be read or updated from a user’s browser.</p>
+
+<h3 id="web-storage-api-methods-and-properties">Web storage API methods and properties</h3>
+
+<p>The following is a <a href="https://developer.mozilla.org/en-US/docs/Web/API/Storage">list of methods and properties</a> available on global <code class="language-plaintext highlighter-rouge">Storage</code> object’s <code class="language-plaintext highlighter-rouge">localStorage</code> and <code class="language-plaintext highlighter-rouge">sessionStorage</code> variables.</p>
+
+<ul>
+  <li><strong><code class="language-plaintext highlighter-rouge">key(index)</code></strong> - finds a key at a given index. As with finding indexes in other code you write, you should check the length before finding an index to avoid any null or out-of-range exceptions.</li>
+  <li><strong><code class="language-plaintext highlighter-rouge">getItem(key)</code></strong> - retrieve a value by using the associated key.</li>
+  <li><strong><code class="language-plaintext highlighter-rouge">setItem(key, value)</code></strong> - stores a value by using the associated key. Whether you are setting a new value or updating an existing value, the syntax is the same.</li>
+  <li><strong><code class="language-plaintext highlighter-rouge">removeItem(key)</code></strong> - removes a value from local storage.</li>
+  <li><strong><code class="language-plaintext highlighter-rouge">clear()</code></strong> - removes all items from storage.</li>
+  <li><strong><code class="language-plaintext highlighter-rouge">length</code></strong> - a read-only property that gets the number of entries being stored.</li>
+</ul>
+
+<h3 id="storing-objects">Storing objects</h3>
+
+<p>While you can only have string values in web storage, you can store arrays or even JavaScript objects using the JSON notation and the available utility methods, like in the following example.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">player</span> <span class="o">=</span> <span class="p">{</span> <span class="na">firstName</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Kris</span><span class="dl">'</span><span class="p">,</span> <span class="na">lastName</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Bryant</span><span class="dl">'</span> <span class="p">};</span>
+<span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="dl">'</span><span class="s1">kris</span><span class="dl">'</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">player</span><span class="p">));</span>
+</code></pre></div></div>
+
+<p>You can then use the <code class="language-plaintext highlighter-rouge">parse()</code> method to deserialize the <code class="language-plaintext highlighter-rouge">kris</code> object.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">player</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="dl">'</span><span class="s1">kris</span><span class="dl">'</span><span class="p">));</span>
+</code></pre></div></div>
+
+<h3 id="keeping-web-storage-synchronized">Keeping web storage synchronized</h3>
+
+<p>How do you keep everything in sync when a user has multiple tabs or browser instances of your site open concurrently? To solve this problem, the web storage APIs have a storage event that is raised whenever an entry is updated (add/update/removed). Subscribing to this event can provide notifications when something has changed. This works for both <code class="language-plaintext highlighter-rouge">localStorage</code> and <code class="language-plaintext highlighter-rouge">sessionStorage</code>.</p>
+
+<p>Subscribers receive a <code class="language-plaintext highlighter-rouge">StorageEvent</code> object that contains data about what changed. The following properties are accessible from the <code class="language-plaintext highlighter-rouge">StorageEvent</code> object. The storage event cannot be canceled from a callback. The event is merely a notification mechanism: it informs subscribers when a change happens.</p>
+
+<ul>
+  <li><strong><code class="language-plaintext highlighter-rouge">key</code></strong> - gets the key. The key will be null if the event was triggered by <code class="language-plaintext highlighter-rouge">clear()</code></li>
+  <li><strong><code class="language-plaintext highlighter-rouge">oldValue</code></strong> - gets the initial value if the entry was updated or removed. Again, the value will be null if an old value did not previously exist, or if <code class="language-plaintext highlighter-rouge">clear()</code> is invoked.</li>
+  <li><strong><code class="language-plaintext highlighter-rouge">newValue</code></strong> - gets the new value for new and updated entries. The value is null if the event was triggered by the <code class="language-plaintext highlighter-rouge">removeItem()</code> or <code class="language-plaintext highlighter-rouge">clear()</code> methods.</li>
+  <li><strong><code class="language-plaintext highlighter-rouge">url</code></strong> - gets the URL of the page on the storage action</li>
+  <li><strong><code class="language-plaintext highlighter-rouge">storageArea</code></strong> - gets a reference to either the <code class="language-plaintext highlighter-rouge">localStorage</code> or <code class="language-plaintext highlighter-rouge">sessionStorage</code> object</li>
+</ul>
+
+<p>To begin listening for event notifications, you can add an event handler to the storage event as follows.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">respondToEvent</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+ <span class="nx">alert</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">newValue</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">storage</span><span class="dl">'</span><span class="p">,</span> <span class="nx">respondToChange</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>To trigger this event, perform an operation like the following in a new tab from the same site.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="dl">'</span><span class="s1">player</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">Kris</span><span class="dl">'</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h3 id="the-fine-print">The fine print</h3>
+
+<p>While web storage offers many benefits over cookies, it is not the end-all, be-all solution, and comes with serious drawbacks as <a href="https://hacks.mozilla.org/2012/03/there-is-no-simple-solution-for-local-storage/">others</a> have <a href="http://webreflection.blogspot.com/2012/03/whats-localstorage-about.html">noted</a>.</p>
+
+<ul>
+  <li><strong>Web storage is synchronous</strong> - because web storage runs synchronously, it can block the DOM from rendering while I/O is occurring.</li>
+  <li><strong>No indexing or transactional features</strong> - web storage does not have indexing, which may incur performance bottlenecks on large data queries. If a user is modifying the same storage data in multiple browser tabs, one tab could potentially overwrite the value in another.</li>
+  <li><strong>Web storage does I/O on your hard drive</strong> - because web storage writes to your hard drive, it can be an expensive operation depending on what your system is currently doing (virus scanning, indexing data, etc.) While you can store a lot more data in local storage, you’ll need to be cognizant of performance.</li>
+  <li><strong>Persistence</strong> - if a user no longer uses a site and storage is not explicitly deleted, storage is still loaded when you start the browser session</li>
+  <li><strong>First request memory loading</strong> - because browsers load data into memory, it could use a lot of memory if many tabs are utilizing web storage mechanisms.</li>
+</ul>
+
+<p>Web storage does offer you a simple, direct way to store user data, with caveats that it can degrade performance if you do not use it wisely thanks to its synchronous, I/O nature. Much like anything else you code, understand its utility and its nuances before using it, and <strong>don’t be greedy</strong>. It very well can bite you in the rear end if you expect too much.</p>
+:ET

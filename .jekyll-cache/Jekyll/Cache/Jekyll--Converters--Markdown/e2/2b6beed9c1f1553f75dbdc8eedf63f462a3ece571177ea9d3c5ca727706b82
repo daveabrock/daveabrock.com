@@ -1,0 +1,173 @@
+I"`J<p><img src="https://raw.githubusercontent.com/daveabrock/daveabrock.github.io/master/THE%20.NET%20STACKS.png" alt="Newsletter image" /></p>
+
+<p>Get yourself a teammate that looks at your code <a href="https://twitter.com/kieraneverson/status/1318602963921883138">like Prince William looks at KFC</a>.</p>
+
+<p>Here’s what we have this week:</p>
+
+<ul>
+  <li>Understand the release cycles of .NET</li>
+  <li>AWS releases open-source migration tool</li>
+  <li>An update on ASP.NET Core feedback for .NET 6</li>
+  <li>Last week in the .NET world</li>
+</ul>
+
+<h1 id="-understand-the-net-release-cycles-and-support">⏲ Understand the .NET release cycles and support</h1>
+
+<p>It’s hard to believe that two weeks from tomorrow, .NET 5 will be generally available. Week by week, we’ve been poking around the improvements between general .NET, ASP.NET Core and Blazor, and EF Core 5, which are all released together now. While the release candidates offer production licenses, on November 10 things will get real.</p>
+
+<p>To that end, you might be wondering when future releases will occur, how Microsoft is supporting .NET 5, and what that means for older versions of .NET Core and .NET Framework. (This isn’t as sexy as Blazor, <em>I suppose</em>, but is important to understand as you plan your app’s future.)</p>
+
+<p>In terms of future releases, new major releases will be released every November.</p>
+
+<p><img src="http://localhost:4001/images/release-schedule.png" alt=".NET release schedule" /></p>
+
+<p>As you can see, “LTS” and “Current” support will alternate between releases. As a refresher, let’s walk through those.</p>
+
+<ul>
+  <li><strong>Long Term Support (LTS) releases</strong> - supported for a minimum of three years (or 1 year after the next LTS ships, whatever is longer). The current LTS releases are .NET Core 2.1 (with end of support on August 21, 2021), and .NET Core 3.1 (December 3, 2022).</li>
+  <li><strong>Current releases</strong> - supported for 3 months after the next major or minor release ships</li>
+</ul>
+
+<p>.NET 5 is a “Current” release. Typically, you’d have three months to upgrade to 5.1 but Microsoft says <a href="https://twitter.com/terrajobst/status/1315032612914618368">they’re no longer doing point releases</a>. When it comes to .NET 6, it’ll be LTS (supported for three years after general availability)—giving you a less hands-on approach. There’s a <a href="https://twitter.com/terrajobst/status/1315029878001950720">Twitter discussion</a> on the benefits and drawbacks.</p>
+
+<p>Microsoft has published an <a href="https://dotnet.microsoft.com/platform/support/policy/dotnet-core">official .NET 5 support policy</a> if you want to explore this further.</p>
+
+<p><strong>What about .NET Framework?</strong> While .NET Framework is not dead, <a href="https://devblogs.microsoft.com/dotnet/net-core-is-the-future-of-net/">it’s basically done</a>. All new features will be built on .NET Core. With .NET Framework 4.8 being the last major release for .NET Framework, it’ll only be supported with reliability and security fixes. You aren’t being forced to move .NET Framework apps to .NET Core, and there are no plans to remove .NET Framework from Windows, but you won’t see any feature improvements.</p>
+
+<h1 id="-aws-open-sources-net-core-migration-tool">🔨 AWS open-sources .NET Core migration tool</h1>
+
+<p>This week, Amazon Web Services (AWS) <a href="https://github.com/aws/porting-assistant-dotnet-client/blob/main/README.md">open-sourced</a> their <a href="https://aws.amazon.com/porting-assistant-dotnet/">Porting Assistant for .NET</a> tool, which assists you in <a href="https://visualstudiomagazine.com/articles/2020/10/21/aws-net-porting-tool.aspx">porting your .NET Framework apps to .NET Core on Linux</a>. It was first released in July.</p>
+
+<p>AWS <a href="https://aws.amazon.com/blogs/aws/announcing-the-porting-assistant-for-net/">says their differentiator</a> is assessing the entire tree of package dependencies and functionality like incompatible APIs—it uses solution files as the starting point, preventing the need to analyze individual binary files. Interestingly, this single tool appears to be more robust than Microsoft’s migration tools.</p>
+
+<p>This begs the question: what does Microsoft offer? For their part, Microsoft has a <a href="https://docs.microsoft.com/dotnet/core/porting/">comprehensive document about migrating from .NET Framework to .NET Core</a>. They also have a <a href="https://docs.microsoft.com/dotnet/core/porting/tools">list of tools you can utilize</a>.</p>
+
+<ul>
+  <li>The <a href="https://docs.microsoft.com/dotnet/standard/analyzers/portability-analyzer">.NET Portability Analyzer</a>, which analyzes your code and provides a report about how portable your code is between Framework and Core</li>
+  <li>The <a href="https://docs.microsoft.com/dotnet/standard/analyzers/api-analyzer">.NET API Analyzer</a>, a Roslyn analyzer that detects compatibility in cross-platform libraries</li>
+  <li>The <a href="https://docs.microsoft.com/dotnet/standard/analyzers/platform-compat-analyzer">Platform Compatibility Analyzer</a>, another Roslyn analyzer that informs devs when using platform-specific APIs from call sites where API might not be supported</li>
+  <li>A <a href="https://www.nuget.org/packages/try-convert/"><code class="language-plaintext highlighter-rouge">try-convert</code> utility</a>, a .NET Core global tool that helps convert from the <code class="language-plaintext highlighter-rouge">project.json</code> model to the <code class="language-plaintext highlighter-rouge">.csproj</code> model. Microsoft makes clear it is not supported in any way.</li>
+</ul>
+
+<p>It reminds me of the old American football adage: if you have two quarterbacks, you have none. I’ve heard a common question: shouldn’t Microsoft be leading this charge since … they own .NET and are the most familiar with the platform? Why haven’t they invested in robust migration tooling? I see a few factors at play here.</p>
+
+<p>Considering .NET is a free product, the Microsoft play is to get you on Azure. What’s to prevent you from using their awesome conversion tool and heading over to the competition? From AWS’s standpoint, they’re quite incentivized to do this: the sell for .NET devs is hard enough and they need to make things as easy as possible. If you couple that with the complexities of this tooling, Microsoft seems to be a little leery of making any big investments in that space.</p>
+
+<h1 id="-an-update-on-aspnet-core-feedback-for-net-6">📓 An update on ASP.NET Core feedback for .NET 6</h1>
+
+<p>A few weeks ago, I <a href="https://daveabrock.com/2020/10/16/dotnet-stacks-21">wrote about</a> the <a href="https://github.com/dotnet/aspnetcore/issues/26625">GitHub issue</a> you can visit to chime in on the future of ASP.NET Core for .NET 6. I’d like to call out <a href="https://github.com/dotnet/aspnetcore/issues/26625">a comment by  Muhammad Rehan Saeed</a> that outlines core ASP.NET issues that <em>aren’t Blazor related</em>.</p>
+
+<p>While Blazor is awesome and the future of ASP.NET Core, there are tons of ASP.NET developers who aren’t using it for various reasons and are fine with using MVC or Razor Pages. If you’re interested in providing feedback on those issues, look at Muhammad’s comment—personally, I’m interested in <a href="https://github.com/dotnet/aspnetcore/issues/15271">HTTP/3 support</a>, <a href="https://github.com/dotnet/aspnetcore/issues/11558">streaming API support for MVC</a>, and <a href="https://github.com/dotnet/aspnetcore/issues/5680">C# 8 nullable reference type support</a>.</p>
+
+<h1 id="-last-week-in-the-net-world">🌎 Last week in the .NET world</h1>
+
+<h2 id="-the-top-3">🔥 The Top 3</h2>
+
+<ul>
+  <li>David Ramel <a href="https://visualstudiomagazine.com/articles/2020/10/21/aws-net-porting-tool.aspx">talks about how AWS has open-sourced the tool for porting .NET framework apps to .NET Core</a>.</li>
+  <li>Khalid Abuhakmeh <a href="https://blog.jetbrains.com/dotnet/2020/10/22/building-a-blazor-farm-animal-soundboard/">builds a Blazor farm animal soundboard</a>.</li>
+  <li>Microsoft Edge announced new <a href="https://blogs.windows.com/msedgedev/2020/10/20/microsoft-edge-dev-linux">preview builds for Linux</a>.</li>
+</ul>
+
+<h2 id="-announcements">📢 Announcements</h2>
+
+<ul>
+  <li>OData now supports <a href="https://devblogs.microsoft.com/odata/asp-net-odata-8-0-preview-for-net-5">.NET 5</a>.</li>
+  <li>My Blazor CSS isolation Microsoft doc <a href="https://docs.microsoft.com/aspnet/core/blazor/components/css-isolation?view=aspnetcore-5.0">has been published</a>.</li>
+  <li>Git 2.29 <a href="https://github.blog/2020-10-19-git-2-29-released/">is out</a>.</li>
+  <li>Tara Overfield <a href="https://devblogs.microsoft.com/dotnet/net-framework-october-2020-cumulative-update-preview-update">provides an October 2020 .NET Framework update</a>.</li>
+  <li>Jon Skeet <a href="https://codeblog.jonskeet.uk/2020/10/23/a-tour-of-the-net-functions-framework">tours the .NET Functions Framework</a>, a framework he built using Google Cloud Functions in C#.</li>
+</ul>
+
+<h2 id="-community-and-events">📅 Community and events</h2>
+
+<ul>
+  <li>The .NET Foundation <a href="https://opensource.org/node/1090">joins the Open Source Initiative’s Affiliate Program</a>.</li>
+  <li>GitHub announced <a href="https://github.blog/2020-10-22-introducing-the-npm-public-roadmap-and-a-new-feedback-process/">the npm public roadmap and a new feedback process</a>.</li>
+  <li>We had three .NET community standups this week: .NET tooling <a href="https://www.youtube.com/watch?v=zh-1x2gXfQw">discusses <code class="language-plaintext highlighter-rouge">dotnet</code> templates</a>, Machine Learning <a href="https://www.youtube.com/watch?v=ghqz3VO_Qo4">talks ML.NET in VS Code</a>, and ASP.NET <a href="https://www.youtube.com/watch?v=PtN5y7rF90Y">talks about distributed tracing</a>.</li>
+  <li>The .NET Docs Show talks about <a href="https://www.youtube.com/watch?v=xndK7E3oCd4">Reactive Extensions for UI frameworks with Rodney Littles II</a>.</li>
+</ul>
+
+<h2 id="-aspnet-core--blazor">😎 ASP.NET Core / Blazor</h2>
+
+<ul>
+  <li>Dave Brock (ahem) <a href="https://daveabrock.com/2020/10/20/blazor-component-virtualization">improves rendering performance with Blazor component virtualization</a>.</li>
+  <li>Safia Abdalla <a href="https://safia.rocks/blog/combing-through-component-base/">talks about <code class="language-plaintext highlighter-rouge">ComponentBase</code> in Blazor</a>.</li>
+  <li>Peter Vogel asks: <a href="https://www.telerik.com/blogs/is-blazor-safe-enterprise-bet">is Blazor safe for the enterprise?</a></li>
+  <li>Marinko Spasojevic <a href="https://code-maze.com/atribute-based-access-control-blazor-webassembly-identityserver4/">works with attribute-based access control with Blazor WebAssembly and IdentityServer4</a>, and also <a href="https://code-maze.com/blazor-webassembly-role-based-security-with-identityserver4/">integrates Blazor WebAssembly role-based security with IdentityServer4</a>.</li>
+  <li>Brian Lagunas <a href="https://brianlagunas.com/using-npm-packages-in-blazor/">uses NPM packages in Blazor</a>.</li>
+  <li>Tim Heuer <a href="https://timheuer.com/blog/filtering-data-table-with-blazor/">filters a Bootstrap table in C# and Blazor</a>.</li>
+  <li>Niels Swimberghe <a href="https://swimburger.net/blog/dotnet/real-time-applications-with-blazor-server-and-firestore">works on real-time apps with Blazor Server and Firestore</a>, and also <a href="https://swimburger.net/blog/dotnet/configure-servicepointmanager-securityprotocol-through-appsettings">configures ServicePointManager.SecurityProtocol through AppSettings</a>.</li>
+  <li>Damian Hickey <a href="https://dhickey.ie/2020/10/20/aspnet-core-3-nested-apps/">nests applications in ASP.NET Core 3.1</a>.</li>
+  <li>Khalid Abuhakmeh <a href="https://khalidabuhakmeh.com/add-headers-to-a-response-in-aspnet-5">adds headers to a response in ASP.NET 5</a>.</li>
+</ul>
+
+<h2 id="-the-cloud">⛅ The cloud</h2>
+
+<ul>
+  <li>Over at Code Maze, <a href="https://code-maze.com/deploying-aspnet-core-web-api-azure-api-apps/">they deploy an ASP.NET Core Web API to Azure API apps</a>.</li>
+  <li>David Grace <a href="https://www.roundthecode.com/dotnet/create-configure-sql-server-database-and-asp-net-core-web-api-in-azure">continues creating and configuring a SQL Server database and ASP.NET Core Web API in Azure</a>.</li>
+  <li>Damien Bowden <a href="https://damienbod.com/2020/10/22/using-encrypted-access-tokens-in-azure-with-microsoft-identity-web-and-azure-app-registrations/">uses encrypted access tokens in Azure with Microsoft.Identity.Web and Azure app registrations</a>, and also <a href="https://damienbod.com/2020/10/19/implement-a-full-text-search-using-azure-cognitive-search-in-asp-net-core/">implements a full-text search using Azure Cognitive Search in ASP.NET Core</a>.</li>
+  <li>Szymon Kulec <a href="https://blog.scooletz.com/2020/10/19/improving-Azure-Functions-performance">offers tips for improving Azure Functions performance</a>.</li>
+  <li>Daniel Krzyczkowski <a href="https://daniel-krzyczkowski.github.io/Monitor-Azure-Solution-With-Azure-Application-Insights/">monitors solutions with Azure Application Insights</a>, and also <a href="https://daniel-krzyczkowski.github.io/Manage-Release-Flow-Using-Pipelines-In-Azure-DevOps/">manages release flow using Azure DevOps pipelines</a>.</li>
+  <li><del>Hulk Hogan</del> Joe Guadagno <a href="https://www.josephguadagno.net/2020/10/24/working-with-microsoft-identity-react-native-client">authenticates an API secured with Azure AD, Microsoft Identity, and React Native</a>.</li>
+</ul>
+
+<h2 id="-c">📔 C#</h2>
+
+<ul>
+  <li>Mads Torgersen <a href="https://www-techrepublic-com.cdn.ampproject.org/c/s/www.techrepublic.com/google-amp/article/c-designer-torgersen-why-the-programming-language-is-still-so-popular-and-where-its-going-next/">talks about the direction of C#</a>.</li>
+  <li>Matthew Jones <a href="https://exceptionnotfound.net/csharp-in-simple-terms-9-inheritance-and-polymorphism">talks about inheritance and polymorphism in C#</a>, and also <a href="https://exceptionnotfound.net/csharp-in-simple-terms-8-structs-and-enums">works with structs and enums in C#</a>.</li>
+  <li>David Hayden <a href="https://www.davidhayden.me/blog/csharp-9-record-type">talks about C# 9 records</a>, and also <a href="https://www.davidhayden.me/blog/csharp-9-init-only-properties">discusses C# 9 init-only properties</a>.</li>
+  <li>Claudio Bernasconi <a href="https://www.claudiobernasconi.ch/2020/10/21/install-and-use-csharp-9-in-visual-studio-2019/">installs and uses C# 9 in Visual Studio 2019</a>.</li>
+  <li>Carmel Eve <a href="https://endjin.com/blog/2020/10/design-patterns-in-csharp-the-adapter-pattern.html">talks about the adapter pattern in C#</a>.</li>
+  <li>Ian Griffiths <a href="https://endjin.com/blog/2020/10/dotnet-csharp-8-nullable-references-empty-strings.html">warns against defeating Roslyn warnings with empty strings</a>.</li>
+  <li>Anthony Giretti <a href="https://anthonygiretti.com/2020/10/21/introducing-c-9-static-anonymous-functions/">discusses static anonymous functions in C# 9</a>, and also <a href="https://anthonygiretti.com/2020/10/19/introducing-c-9-attributes-on-local-functions/">runs through local function attributes in C# 9</a>.</li>
+  <li>Matthew MacDonald <a href="https://medium.com/young-coder/c-sharp-language-changes-from-1-0-to-9-0-b2282e8e30fd">runs through C# throughout its 20-year history</a>.</li>
+  <li>Jeremy Smith <a href="https://jeremybytes.blogspot.com/2020/10/abstract-classes-vs-interfaces-in-c.html">clears up some things about C# abstract classes and interfaces</a>.</li>
+</ul>
+
+<h2 id="-f">📗 F#</h2>
+
+<ul>
+  <li>Alican Demirtas <a href="https://www.compositional-it.com/news-blog/json-serialisation-in-f/">discusses JSON serialization in F#</a>.</li>
+  <li>CompositionalIT <a href="https://github.com/CompositionalIT/SAFE-Dojo">released a dojo to help you write SAFE applications</a>.</li>
+  <li>Patrick Tone <a href="https://patrickt.one/2020/10/20/in-a-bind-with-fsharp.html">walks through using <code class="language-plaintext highlighter-rouge">bind</code> in F#</a>.</li>
+</ul>
+
+<h2 id="-tools">🔧 Tools</h2>
+
+<ul>
+  <li>Scott Hanselman <a href="https://www.hanselman.com/blog/dont-ever-break-a-url-if-you-can-help-it">talks about how you shouldn’t break URLs</a>.</li>
+  <li>Joab Jackson <a href="https://thenewstack.io/the-dapr-distributed-runtime-nears-production-readiness/">writes how the Dapr runtime is almost production-ready</a>.</li>
+  <li>Jason Gaylord <a href="https://www.jasongaylord.com/blog/2020/10/22/query-snowflake-using-dotnet">queries Snowflake using .NET</a>.</li>
+  <li>Derek Comartin <a href="https://codeopinion.com/defining-service-boundaries-by-splitting-entities">discusses defining service boundaries with loosely coupled systems</a>.</li>
+  <li>Andrew Lock <a href="https://andrewlock.net/deploying-asp-net-core-applications-to-kubernetes-part-8-running-database-migrations-using-jobs-and-init-containers/">runs database migrations using jobs and init containers</a>.</li>
+  <li>Tyler Hakes <a href="https://www.7pace.com/blog/azure-devops-vs-github">compares GitHub Actions and Azure DevOps</a>.</li>
+</ul>
+
+<h2 id="-xamarin">📱 Xamarin</h2>
+
+<ul>
+  <li>Leomaris Reyes <a href="https://askxammy.com/adding-shortcuts-with-xamarin-essentials/">adds shortcuts with Xamarin Essentials</a>.</li>
+  <li>Delpin Susai Raj <a href="https://xamarinmonkeys.blogspot.com/2020/10/xamarinforms-network-speed-monitor.html">works on a network speed monitor</a>.</li>
+  <li>Glenn Versweyveld <a href="http://depblog.weblogs.us/2020/10/19/xamarin-forms-custom-visual-state-triggers-and-control-templates/">works on custom visual state triggers and control templates</a>.</li>
+</ul>
+
+<h2 id="-podcasts">🎤 Podcasts</h2>
+
+<ul>
+  <li>The Xamarin Podcast <a href="https://www.xamarinpodcast.com/80">talks about seeing AI</a>.</li>
+  <li>The .NET Rocks podcast <a href="https://www.dotnetrocks.com/default.aspx?ShowNum=1710">talks about the .NET Foundation with Layla Porter</a>.</li>
+  <li>The Azure Podcast <a href="http://azpodcast.azurewebsites.net/post/Episode-351-Azure-Spring-Cloud">discusses through Azure Spring Cloud</a>.</li>
+</ul>
+
+<h2 id="-videos">🎥 Videos</h2>
+
+<ul>
+  <li>The ON.NET Show talks about <a href="https://www.youtube.com/watch?v=RMGcaUjBk90">event-driven apps on Kubernetes with KEDA</a>.</li>
+  <li>The Xamarin Show <a href="https://www.youtube.com/watch?v=ttF80UnrJAg">talks about Xamarin.Forms 5</a>.</li>
+  <li>Michael Gilliland <a href="https://www.youtube.com/watch?v=mUs6elEwo_U&amp;ab_channel=MichaelGilliland">uses SAFE in F# to create a billiards app</a>.</li>
+  <li>Almir Mesic <a href="https://www.youtube.com/watch?v=nxuSMtWGZjc&amp;ab_channel=NDCConferences">talks about writing F# and Azure Functions apps for production</a>.</li>
+</ul>
+:ET

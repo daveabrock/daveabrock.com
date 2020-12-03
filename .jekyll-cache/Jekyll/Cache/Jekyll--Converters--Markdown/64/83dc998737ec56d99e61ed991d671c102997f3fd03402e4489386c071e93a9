@@ -1,0 +1,143 @@
+I"�'<p>If you do any work in open source, you probably live for GitHub. With all the time you spend using it, you can improve your experience by leveraging a variety of browser extensions.</p>
+
+<p>The following is a rundown of my favorite GitHub extensions on my preferred browser, Google Chrome. While I am focusing on Chrome extensions, you’ll find that there are plenty of GitHub extensions for other browsers, too.</p>
+
+<p>Do you prefer a GitHub extension not listed here? Let me know in the comments!</p>
+
+<h3 id="awesome-autocomplete-for-github">Awesome Autocomplete for GitHub</h3>
+
+<p>The <a href="https://chrome.google.com/webstore/detail/awesome-autocomplete-for/djkfdjpoelphhdclfjhnffmnlnoknfnd?hl=en">Awesome Autocomplete for GitHub extension,</a> by <a href="https://www.algolia.com/">Algolia,</a> is by far my favorite GitHub Chrome extension.</p>
+
+<p>This extension supercharges the top GitHub search bar by adding auto-completion, last active users, top public repositories, and more.</p>
+
+<p><img src="http://localhost:4001/images/Search.png" alt="Search" /></p>
+
+<p>You can even type <code class="language-plaintext highlighter-rouge">aa&lt;space&gt;</code> to find GitHub repositories directly from your Chrome address bar!</p>
+
+<ul>
+  <li><a href="https://github.com/algolia/github-awesome-autocomplete">GitHub project</a></li>
+  <li><a href="https://chrome.google.com/webstore/detail/awesome-autocomplete-for/djkfdjpoelphhdclfjhnffmnlnoknfnd?hl=en">Chrome extension</a></li>
+</ul>
+
+<h3 id="file-icon-for-github-gitlab-and-bitbucket">File Icon for GitHub, GitLab and Bitbucket</h3>
+
+<p>The default file icons in GitHub are so, so boring. Are you tired of seeing the default notepad icon next to every file, no matter the extension?</p>
+
+<p>The <a href="https://chrome.google.com/webstore/detail/file-icon-for-github-gitl/ficfmibkjjnpogdcfhfokmihanoldbfe?hl=en">File Icon for GitHub, GitLab and Gitbucket extension,</a> by <a href="https://twitter.com/xxhomey19">Homer Chen,</a> adds file icons to GitHub repositories. Personally, this makes it easier for me to find certain files in folders with many files.</p>
+
+<p><img src="http://localhost:4001/images/FileIcons.png" alt="FileIcons" /></p>
+
+<ul>
+  <li><a href="https://github.com/xxhomey19/github-file-icon">GitHub project</a></li>
+  <li><a href="https://chrome.google.com/webstore/detail/file-icon-for-github-gitl/ficfmibkjjnpogdcfhfokmihanoldbfe?hl=en">Chrome extension</a></li>
+</ul>
+
+<h3 id="github-code-folding">GitHub Code Folding</h3>
+
+<p>Any reasonable code editor gives you the ability to easily expand or collapse code blocks for readability. The <a href="https://chrome.google.com/webstore/detail/github-code-folding/lefcpjbffalgdcdgidjdnmabfenecjdf/">GitHub Code Folding extension</a>, by <a href="https://github.com/noam3127">Noam Lustiger</a>, allows you to do this inside the GitHub user interface.</p>
+
+<p><img src="http://localhost:4001/images/CodeFolding-1.gif" alt="CodeFolding-1" /></p>
+
+<ul>
+  <li><a href="https://github.com/noam3127/github-code-folding">GitHub project</a></li>
+  <li><a href="https://chrome.google.com/webstore/detail/github-code-folding/lefcpjbffalgdcdgidjdnmabfenecjdf/">Chrome extension</a></li>
+</ul>
+
+<h3 id="github-repository-size">GitHub Repository Size</h3>
+
+<p>The <a href="https://chrome.google.com/webstore/detail/github-repository-size/apnjnioapinblneaedefcnopcjepgkci?hl=en">GitHub Repository Size extension</a>, by <a href="https://twitter.com/harshjv">Harsh Vakharia</a>, is another extension that is short, sweet, and useful.</p>
+
+<p>The extension lists the size for an entire GitHub repository and also the size of each file.</p>
+
+<p><img src="http://localhost:4001/images/Size.png" alt="Size" /></p>
+
+<ul>
+  <li><a href="https://github.com/harshjv/github-repo-size">GitHub project</a></li>
+  <li><a href="https://chrome.google.com/webstore/detail/github-repository-size/apnjnioapinblneaedefcnopcjepgkci?hl=en">Chrome extension</a></li>
+</ul>
+
+<h3 id="hide-files-on-github">Hide Files on GitHub</h3>
+
+<p>The <a href="https://chrome.google.com/webstore/detail/hide-files-on-github/lpnakhpaodhdkleejaehlapdhbgjbddp">Hide Files on GitHub extension</a>, by <a href="https://twitter.com/sindresorhus">Sindre Sorhus</a>, hides nonessential project files and folders from the GitHub user interface (like Yarn lock files, the <em>.git</em> folder, and so on). Of course, you can customize which files to ignore.</p>
+
+<ul>
+  <li><a href="https://github.com/sindresorhus/hide-files-on-github">GitHub project</a></li>
+  <li><a href="https://chrome.google.com/webstore/detail/hide-files-on-github/lpnakhpaodhdkleejaehlapdhbgjbddp">Chrome extension</a></li>
+</ul>
+
+<h3 id="isometric-contributions">Isometric Contributions</h3>
+
+<p>The <a href="https://chrome.google.com/webstore/detail/isometric-contributions/mjoedlfflcchnleknnceiplgaeoegien">Isometric Contributions extension</a>, by <a href="https://twitter.com/jasonlong">Jason Long</a>, shows an isometric pixel art version of a user’s contribution chart. It also includes more granular user data, like a user’s busiest day, current streak, and longest streak.</p>
+
+<p>Of course, you can easily switch between the isometric view and the default view. This extension does not have certain functionality like hovering over a day for details.</p>
+
+<p><img src="http://localhost:4001/images/IsometricContributions.png" alt="IsometricContributions" /></p>
+
+<ul>
+  <li><a href="https://github.com/jasonlong/isometric-contributions">GitHub project</a></li>
+  <li><a href="https://chrome.google.com/webstore/detail/isometric-contributions/mjoedlfflcchnleknnceiplgaeoegien">Chrome extension</a></li>
+</ul>
+
+<h3 id="notifier-for-github">Notifier for GitHub</h3>
+
+<p>The <a href="https://chrome.google.com/webstore/detail/notifier-for-github/lmjdlojahmbbcodnpecnjnmlddbkjhnn?hl=en">Notifier for GitHub extension</a>, by <a href="https://twitter.com/sindresorhus">Sindre Sorhus</a>, displays your unread GitHub notifications count. This way, you can keep track of any missed notifications even when you don’t have GitHub open.</p>
+
+<p>(The screenshot grabbed from <a href="https://github.com/sindresorhus/notifier-for-github">the extension’s repository</a>.)</p>
+
+<p><img src="http://localhost:4001/images/screenshot.png" alt="screenshot" /></p>
+
+<ul>
+  <li><a href="https://github.com/sindresorhus/notifier-for-github">GitHub project</a></li>
+  <li><a href="https://chrome.google.com/webstore/detail/notifier-for-github/lmjdlojahmbbcodnpecnjnmlddbkjhnn?hl=en">Chrome extension</a></li>
+</ul>
+
+<h3 id="octotree">Octotree</h3>
+
+<p>I cannot do without <a href="https://chrome.google.com/webstore/detail/octotree/bkhaagjahfmjljalopjnoealnfndnagc?hl=en-US">the Octotree extension</a>. This extension offers an easy-to-navigate code tree, allowing for lightning-fast browsing of a repository’s files.</p>
+
+<p><img src="http://localhost:4001/images/Octotree.png" alt="Octotree" /></p>
+
+<ul>
+  <li><a href="https://github.com/ovity/octotree">GitHub project</a></li>
+  <li><a href="https://chrome.google.com/webstore/detail/octotree/bkhaagjahfmjljalopjnoealnfndnagc?hl=en-US">Chrome extension</a></li>
+</ul>
+
+<h3 id="refined-github">Refined GitHub</h3>
+
+<p>The <a href="https://chrome.google.com/webstore/detail/refined-github/hlepfoohegkhhmjieoechaddaejaokhf">Refined GitHub extension</a>, by <a href="https://twitter.com/sindresorhus">Sindre Sorhus</a>, offers a slew of features that is missing from GitHub. If you look at <a href="https://github.com/sindresorhus/refined-github">the repository</a>, you’ll see that GitHub has integrated functionality that was first developed in this extension.</p>
+
+<p>Some functionality includes the ability to mark issues and pull requests as unread, reaction avatars on comments, clickable references to issues and pull requests, and links to an issue’s closing commit or pull request.</p>
+
+<ul>
+  <li><a href="https://github.com/sindresorhus/refined-github">GitHub project</a></li>
+  <li><a href="https://chrome.google.com/webstore/detail/refined-github/hlepfoohegkhhmjieoechaddaejaokhf">Chrome extension</a></li>
+</ul>
+
+<h3 id="render-whitespace-on-github">Render Whitespace on GitHub</h3>
+
+<p>Where do you stand on the tabs vs. spaces argument? You can only pick one. (In an effort to keep all my readers, I will abstain from this one.)</p>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/SsoOG6ZeyUI" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+
+<p>The <a href="https://chrome.google.com/webstore/detail/render-whitespace-on-gith/ifdbipohclgnokjgpejhnbjdlgjkkhom">Render Whitespace on GitHub extension</a>, by <a href="https://twitter.com/glebm">Gleb Mazovetskiy</a>, allows you to quickly find out the formatting of a repository’s code.</p>
+
+<p><img src="http://localhost:4001/images/Whitespace.png" alt="Whitespace" /></p>
+
+<ul>
+  <li><a href="https://github.com/glebm/render-whitespace-on-github">GitHub project</a></li>
+  <li><a href="https://chrome.google.com/webstore/detail/render-whitespace-on-gith/ifdbipohclgnokjgpejhnbjdlgjkkhom">Chrome extension</a></li>
+</ul>
+
+<h3 id="twitter-for-github">Twitter for GitHub</h3>
+
+<p>When I discover a GitHub repository, I like to find out information about the author—generally this includes following the person on Twitter, which is often the best place to contact someone or and learn about them. If the author does not include their Twitter handle in his or her GitHub bio, it can be tedious and time-consuming to search on Twitter.</p>
+
+<p>The <a href="https://chrome.google.com/webstore/detail/twitter-for-github/joalalcafnlmimkfkihjbdgmphgedojc">Twitter for GitHub extension</a>, by <a href="https://twitter.com/nzgb">Nicolás Bevacqua</a>, attempts to find a user’s Twitter handle and display it on a GitHub profile.</p>
+
+<p><img src="http://localhost:4001/images/GitHubTwitter.png" alt="GitHubTwitter" /></p>
+
+<ul>
+  <li><a href="https://github.com/bevacqua/twitter-for-github">GitHub project</a></li>
+  <li><a href="https://chrome.google.com/webstore/detail/twitter-for-github/joalalcafnlmimkfkihjbdgmphgedojc">Chrome extension</a></li>
+</ul>
+:ET

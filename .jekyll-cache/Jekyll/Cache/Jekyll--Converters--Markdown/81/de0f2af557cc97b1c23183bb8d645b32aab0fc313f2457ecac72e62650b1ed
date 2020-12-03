@@ -1,0 +1,105 @@
+I"�2<p class="notice--success">This is an archive of my weekly (free!) newsletter, <em>The .NET Stacks</em>. Consider <a href="https://dotnetstacks.com">subscribing today</a> to get this content right away! Subscribers don’t have to wait a week to receive the content.</p>
+
+<p>On tap this week:</p>
+
+<ul>
+  <li>A look at the Azure SDKs</li>
+  <li>What’s your test automation maturity level?</li>
+  <li>The evolution (and optics) of how far .NET has come</li>
+  <li>Community roundup</li>
+</ul>
+
+<h2 id="a-look-at-the-azure-sdks">A look at the Azure SDKs</h2>
+
+<p>If you work with Azure SDKs, have you looked into the improvements lately in the last 6-9 months? (You can catch up quickly with a <a href="https://www.youtube.com/watch?v=38RYIx7a2M4">quick video Microsoft pushed out last month</a>.)</p>
+
+<p>Here’s the gist: before the new SDKs were released, each Azure team created their own SDKs in their own repositories, with their own CI process, with varying levels of OS support, language support, and so on. The new SDKs promise new common guidelines, centralized systems and repositories, and consistent security and support. These SDKs deliver language support for .NET, Java, Python, and JavaScript/TypeScript, with a promise of more languages to come. Most importantly, packages have been released to all the common package managers, meeting developers where they are—instead of asking them to conform to the whims of each API.</p>
+
+<p>Microsoft has a <a href="https://azure.github.io/azure-sdk/">landing page of sorts</a> where you can review releases, feature updates, and API information.</p>
+
+<h2 id="whats-your-test-automation-maturity-level">What’s your test automation maturity level?</h2>
+
+<p>From the Applitools blog, Angie Jones published a nice piece on <a href="https://applitools.com/blog/measure-your-test-automation-maturity">how to measure your test automation maturity</a>. While this is tech-agnostic, it’s worth a mention in this space as I found it valuable for me to think more critically about my own testing approach.</p>
+
+<p>I found it interesting that, in her research, she found that 60% of the teams no longer have a distinction between development and QA engineers. Score one for end-to-end ownership and the DevOps movement.</p>
+
+<p>As you read the article, you can give your team its own testing maturity score based on:</p>
+
+<ul>
+  <li>Your ability to automate unit tests, web tests, API tests, security tests, performance tests, and accessibility tests</li>
+  <li>If you test across browsers, devices, and screen sizes</li>
+  <li>If tests are executed in your CI/CD pipeline</li>
+  <li>If you use feature flags (<a href="https://daveabrock.com/2020/05/24/introducing-feature-management-copy">shameless plug for my series on .NET feature toggles</a>)</li>
+</ul>
+
+<p>What was your score?</p>
+
+<h2 id="the-evolution-and-optics-of-how-far-net-has-come">The evolution (and optics) of how far .NET has come</h2>
+
+<p>If you spend any time looking at #dotnet Twitter, this week was an interesting one. Billy Collins (@BlazorGuy) <a href="https://twitter.com/BlazorGuy/status/1279092538490736640">tweeted</a>, <em>“What’s up with non-.NET developers thinking C# is a Windows only, corporate bloatware language? It’s not 2005 anymore!”</em> This caused <a href="https://twitter.com/davidfowl/status/1279538339780063232">another discussion</a> spearheaded by ASP.NET Core architect David Fowler. Microsoft is definitely having to strike a fine balance of attracting modern development, yet supporting enterprise (legacy) customers.</p>
+
+<p>The big challenge Microsoft still faces is trying to get developers who haven’t worked on .NET in awhile—and have perhaps ditched it for faster, cross-platform solutions—that .NET has a cutting-edge platform again, and has been for the last 5 years. Their persistence to keep the .NET/ASP.NET name on every iteration of the platform has, I believe, done Microsoft a disservice. Let’s say I ditched .NET in the old Framework days and only have a passing interest in .NET. If I hear things like .NET Core, .NET Standard, and .NET 5, do I believe things have changed without researching more?</p>
+
+<p>As Fowler <a href="https://twitter.com/davidfowl/status/1279545670894936065">tweeted</a>, <em>“This is why timing and marketing is super important in product development. Not only is it hard to erase search history for something that’s been around for 20 years, but you have to deal with the impressions people has years ago about a “new product” with the same name. At the same time, you want to leverage the existing ecosystem so you’re not starting from scratch.”</em></p>
+
+<p>With all that said, <a href="https://devblogs.microsoft.com/dotnet/introducing-net-5/">.NET 5 promises a unified framework</a> and a stable, predictable release schedule—with a new major version every November. In many ways, this is a realization of a vision Microsoft developed many years ago with a unified, fast, cross-platform framework. And people can <a href="https://github.com/dotnet/runtime/issues/36590">run apps without a separate deploy of .NET Core</a>! These are exciting times. Hopefully, the community perception continues to improve as a result.</p>
+
+<h2 id="community-roundup">Community roundup</h2>
+
+<h3 id="from-microsoft">From Microsoft</h3>
+
+<ul>
+  <li>Phillip Carter <a href="https://devblogs.microsoft.com/dotnet/f-5-and-f-tools-update-for-june/">fills us in on an F# and F# 5 June update</a>.</li>
+  <li>Charlotte Yarkoni <a href="https://blogs.microsoft.com/blog/2020/07/01/skilling-for-the-future-new-investments-in-microsoft-learn/">discusses new investments in Microsoft Learn</a>.</li>
+  <li>James Montemagno <a href="https://devblogs.microsoft.com/xamarin/xamarin-forms-shell-back-navigation/">offers a quick tip for easy back navigation for Xamarin.Forms</a>.</li>
+  <li>Shayne Boyer works through <a href="https://techcommunity.microsoft.com/t5/apps-on-azure/building-a-path-to-success-for-microservices-and-net-core/ba-p/1502270">microservices with .NET Core, Project Tye, and GitHub Actions</a>.</li>
+  <li>Azure Data Lake Storage static websites <a href="https://azure.microsoft.com/en-us/updates/static-website-for-azure-data-lake-storage-now-in-public-preview/">are now in preview</a>.</li>
+  <li>Azure Functions <a href="https://cloudblogs.microsoft.com/opensource/2020/07/01/announcing-azure-functions-extension-for-dapr/">now has an extension for Dapr</a>.</li>
+  <li>An announcement <a href="https://devblogs.microsoft.com/python/announcing-pylance-fast-feature-rich-language-support-for-python-in-visual-studio-code/">for Pylance, Python support in Visual Studio Code</a>.</li>
+</ul>
+
+<h3 id="blog-posts">Blog posts</h3>
+
+<ul>
+  <li>Thomas Levesque <a href="https://thomaslevesque.com/2020/06/27/exposing-custom-type-as-json-string-in-asp-net-core-api/">exposes a custom type as a JSON string in ASP.NET Core</a>.</li>
+  <li>Mark Heath <a href="https://markheath.net/post/list-and-download-github-repo-cs">lists and downloads the contents of a GitHub repo in C#</a>.</li>
+  <li>Anthony Giretti <a href="https://anthonygiretti.com/2020/06/29/nano-services-with-asp-net-core-or-how-to-build-a-light-api/">writes a light API with ASP.NET Core</a>.</li>
+  <li>Ian Griffiths talks about <a href="https://endjin.com/blog/2020/06/dotnet-csharp-8-nullable-references-notnull">the C# 8 NotNull attribute</a>.</li>
+  <li>Joydip Kanjilal works with <a href="https://www.red-gate.com/simple-talk/dotnet/net-development/building-and-consuming-graphql-api-in-asp-net-core-3-1/">GraphQL APIs in ASP.NET Core 3.1</a>.</li>
+  <li>Shahed Chowdhuri wraps up his ASP.NET Core A-Z series <a href="https://wakeupandcode.com/zero-downtime-web-apps-for-asp-net-core-3-1/">with zero-downtime web apps</a>.</li>
+  <li>Changhui Xu <a href="https://codeburst.io/load-balancing-an-asp-net-core-web-app-using-nginx-and-docker-66753eb08204">load balances an ASP.NET Core web app with Nginx and Docker</a>.</li>
+  <li>Siddharth Patel diagnoses <a href="https://www.techblogcity.com/2020/06/27/net-api-analyzer-targeting-deprecated-apis-and-cross-platform-issues/">targeting deprecated APIs and cross-platform issues</a>.</li>
+  <li>Matthew Jones continues his series about <a href="https://exceptionnotfound.net/minesweeper-in-blazor-webassembly-part-2-the-blazor-component/">building Minesweeper in Blazor WebAssembly</a>.</li>
+  <li>Brandon Minnick talks about <a href="https://techcommunity.microsoft.com/t5/apps-on-azure/updating-to-azure-functions-v3-in-visual-studio/ba-p/1499785">updating to Azure Functions v3 from Visual Studio</a>.</li>
+  <li>Microsoft offers <a href="https://blogs.windows.com/windowsdeveloper/2020/06/30/3-ways-to-customize-your-windows-terminal/?WT.mc_id=DX_MVP4025064">three ways to customize your Windows terminal</a>.</li>
+  <li>AWS has a <a href="https://aws.amazon.com/blogs/aws/announcing-the-porting-assistant-for-net">new porting assistant for .NET</a>, and also <a href="https://aws.amazon.com/blogs/developer/environment-variables-with-net-core-and-elastic-beanstalk/">discusses environment variables with .NET Core and Elastic Beanstalk</a>.</li>
+  <li>Matthew Robbins <a href="https://www.mfractor.com/blogs/news/simplifying-grids-in-xamarin-forms">simplifies grids in Xamarin.Forms</a>.</li>
+  <li>Joseph Guadagno debugs a <a href="https://www.josephguadagno.net/2020/07/01/no-route-matches-the-supplied-values">pesky “no route matches the supplied values” error</a>.</li>
+  <li>Khalid Abuhakmeh discusses <a href="https://khalidabuhakmeh.com/azure-functions-on-macos-with-jetbrains-rider">Azure Functions on macOS with JetBrains Rider</a>.</li>
+  <li>Vladimir Pecanac talks <a href="https://code-maze.com/different-ways-concatenate-strings-csharp/">string concatenation in C#</a>.</li>
+  <li>Cezary Piatek discusses <a href="https://cezarypiatek.github.io/post/methods-with-special-signature/">the magical methods in C#</a>.</li>
+  <li>Matthias Koch talks about <a href="https://ithrowexceptions.com/2020/07/01/road-to-cross-platform-setup-and-bootstrapping-in-dotnet.html">cross-platform setup and bootstrapping in .NET</a>.</li>
+  <li>Muhammad Rehan Saeed discusses <a href="https://rehansaeed.com/the-easiest-way-to-version-nuget-packages/">the easiest way to version NuGet packages</a>.</li>
+  <li>David Grace <a href="https://www.roundthecode.com/dotnet/using-signalr-in-asp-net-core-react-to-send-messages">uses SignalR in ASP.NET Core and React to send messages</a>.</li>
+  <li>Simon Bisson talks about <a href="https://www.roundthecode.com/dotnet/using-signalr-in-asp-net-core-react-to-send-messages">future-proofing .NET app dev with Uno</a>.</li>
+</ul>
+
+<h3 id="podcastsvideos">Podcasts/videos</h3>
+
+<ul>
+  <li>Visual Studio Toolbox <a href="https://channel9.msdn.com/Shows/Visual-Studio-Toolbox/Entity-Framework-Core-In-Depth-Part-6">continues going in-depth on EF Core</a>.</li>
+  <li>The DotNet Docs Show talks about <a href="https://www.youtube.com/watch?v=GY5SQMYN_9o">securing .NET apps with Heather Downing</a>.</li>
+  <li>For community standups: Xamarin <a href="https://www.youtube.com/watch?v=FZmPwX1oRU8">discusses the 4.7 release</a>, <a href="https://www.youtube.com/watch?v=PRbk13u_-Mg">.NET has a Q&amp;A</a>, and ASP.NET has <a href="https://www.youtube.com/watch?v=EtJ8jkm6o1o">a bunch of random stuff</a>.</li>
+  <li>ON.NET <a href="https://channel9.msdn.com/Shows/On-NET/ASPNET-Core-Series-Getting-started-with-the-Worker-templates">talks about Worker templates</a> and <a href="https://channel9.msdn.com/Shows/On-NET/ASPNET-Core-Series-Deploying-your-Microservice-to-Azure-Container-Instances">deploys microservices to Azure Container Instances</a>.</li>
+  <li>Leslie Richardson and friends <a href="https://channel9.msdn.com/Shows/Visual-Studio-Toolbox/Finding-Code-Part-1">start a series on finding code in Visual Studio</a>.</li>
+  <li>At the Azure Podcast, <a href="http://azpodcast.azurewebsites.net/post/Episode-336-Microsoft-QA1">a Microsoft Q&amp;A</a>.</li>
+  <li>The Xamarin Show <a href="https://channel9.msdn.com/Shows/XamarinShow/FSharp-Fabulous-Beyond-MVU-Basics">goes beyond MVU basics</a>.</li>
+  <li>.NET Rocks <a href="https://www.dotnetrocks.com/default.aspx?ShowNum=1694">discusses nDepend with Patrick Smacchia</a>.</li>
+</ul>
+
+<h2 id="new-subscribers-and-feedback">New subscribers and feedback</h2>
+
+<p>Has this email been forwarded to you? Welcome! I’d love for you <a href="https://www.dotnetstacks.com">to subscribe</a> and join the community. I promise to guard your email address with my life.</p>
+
+<p>I would love to hear any feedback you have for The .NET Stacks! My goal is to make this the one-stop shop for weekly updates on developing in the .NET ecosystem, so I look forward to any feedback you can provide. You can directly reply to this email, or <a href="https://www.dotnetstacks.com">talk to me on Twitter as well</a>. See you next week!</p>
+:ET

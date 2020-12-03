@@ -1,0 +1,150 @@
+<p>In our previous post, we introduced <code class="language-plaintext highlighter-rouge">Microsoft.FeatureManagement</code> as a way to <a href="https://daveabrock.com/2020/05/24/introducing-feature-management-copy">manage feature flag functionality in your .NET applications</a>. As mentioned in the post, this library is compatible with any .NET Standard application.</p>
+
+<p>In this post, we’ll kick things up a notch and show how you can pair this with an ASP.NET Core-only library, <code class="language-plaintext highlighter-rouge">Microsoft.FeatureManagement.AspNetCore</code>, to perform the following tasks with minimal required configuration:</p>
+
+<ul>
+  <li>Filter out controller action methods and classes</li>
+  <li>Conditionally filter out HTML in your views</li>
+</ul>
+
+<p>This is part 2 in a four-part series on .NET native feature flags:</p>
+
+<ul>
+  <li>Part 1: <a href="https://daveabrock.com/2020/05/24/introducing-feature-management-copy">Introducing the <code class="language-plaintext highlighter-rouge">Microsoft.FeatureManagement</code> library</a></li>
+  <li>Part 2, this post: Use Microsoft.FeatureManagement.AspNetCore to filter actions and HTML</li>
+  <li>Part 3: <a href="https://daveabrock.com/2020/06/07/custom-filters-in-core-flags">Implement custom filters in your ASP.NET Core feature flags</a></li>
+  <li>Part 4: <a href="https://daveabrock.com/2020/06/17/use-feature-flags-azure-app-config">Manage feature flags with Azure App Configuration</a></li>
+</ul>
+
+<p>This post contains the following content.</p>
+
+<ul>
+  <li><a href="#set-up-the-sample-application">Set up the sample application</a></li>
+  <li><a href="#filter-out-controller-action-methods-and-classes">Filter out controller action methods and classes</a></li>
+  <li><a href="#conditionally-render-html-in-your-views">Conditionally render HTML in your views</a></li>
+</ul>
+
+<h1 id="set-up-the-sample-application">Set up the sample application</h1>
+
+<p>If you wish to follow along, refer to the previous post for details on <a href="https://daveabrock.com/2020/05/24/introducing-feature-management-copy">how we set up our sample application</a>. In addition, you’ll need to add the <code class="language-plaintext highlighter-rouge">Microsoft.FeatureManagement.AspNetCore</code> library by performing one of the following two steps:</p>
+
+<ul>
+  <li>From the NuGet Package Manager (easiest way is to right-click your solution in Visual Studio, then clicking Manage NuGet Packages), search for and install <code class="language-plaintext highlighter-rouge">Microsoft.FeatureManagement.AspNetCore</code></li>
+  <li>From the <code class="language-plaintext highlighter-rouge">dotnet</code> CLI, you can execute the <code class="language-plaintext highlighter-rouge">dotnet add package Microsoft.FeatureManagement.AspNetCore</code> command</li>
+</ul>
+
+<p>Here is what the project file looks like now:</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;Project</span> <span class="na">Sdk=</span><span class="s">"Microsoft.NET.Sdk.Web"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;PropertyGroup&gt;</span>
+    <span class="nt">&lt;TargetFramework&gt;</span>netcoreapp3.1<span class="nt">&lt;/TargetFramework&gt;</span>
+  <span class="nt">&lt;/PropertyGroup&gt;</span>
+  <span class="nt">&lt;ItemGroup&gt;</span>
+    <span class="nt">&lt;PackageReference</span> <span class="na">Include=</span><span class="s">"Microsoft.FeatureManagement"</span> <span class="na">Version=</span><span class="s">"2.0.0"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;PackageReference</span> <span class="na">Include=</span><span class="s">"Microsoft.FeatureManagement.AspNetCore"</span> <span class="na">Version=</span><span class="s">"2.0.0"</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;/ItemGroup&gt;</span>
+<span class="nt">&lt;/Project&gt;</span>
+</code></pre></div></div>
+
+<h1 id="filter-out-controller-action-methods-and-classes">Filter out controller action methods and classes</h1>
+
+<p>To better manage your feature flags, you can filter from the level of an action method, or even a class, using the <code class="language-plaintext highlighter-rouge">FeatureGate</code> attribute.</p>
+
+<p>Before we get to the fun bits, let’s set up another feature flag in our configuration. As we did in the previous post, add a new feature flag in <code class="language-plaintext highlighter-rouge">appsettings.json</code>. Let’s call it <code class="language-plaintext highlighter-rouge">FlagController</code>. Here’s what our configuration looks like now:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"Logging"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"LogLevel"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"Default"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Information"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"Microsoft"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Warning"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"Microsoft.Hosting.Lifetime"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Information"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"FeatureManagement"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"WelcomeText"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"FlagController"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> 
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"AllowedHosts"</span><span class="p">:</span><span class="w"> </span><span class="s2">"*"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Note that, by default, we will set this one <code class="language-plaintext highlighter-rouge">true</code> for a cleaner demo. Then, let’s go to our <code class="language-plaintext highlighter-rouge">FeatureFlags.cs</code> file and define what we created. A look at the updated file:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">FeatureFlags</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">const</span> <span class="kt">string</span> <span class="n">WelcomeText</span> <span class="p">=</span> <span class="s">"WelcomeText"</span><span class="p">;</span>
+    <span class="k">public</span> <span class="k">const</span> <span class="kt">string</span> <span class="n">FlagController</span> <span class="p">=</span> <span class="s">"FlagController"</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Finally, add a new controller called <code class="language-plaintext highlighter-rouge">FlagController</code> and make sure it implements the <code class="language-plaintext highlighter-rouge">Controller</code> interface. The file should look like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">Microsoft.AspNetCore.Mvc</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">Microsoft.FeatureManagement.Mvc</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">FeatureFlags.Controllers</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">FlagController</span> <span class="p">:</span> <span class="n">Controller</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="n">IActionResult</span> <span class="nf">Index</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="nf">View</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Finally, in your <code class="language-plaintext highlighter-rouge">Views</code> folder, create a <code class="language-plaintext highlighter-rouge">Flag</code> folder, and then a <code class="language-plaintext highlighter-rouge">Flag.cshtml</code> file with the following content. (You could have scaffolded this, but since we aren’t using Entity Framework, this is probably faster.)</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"text-center"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;h1</span> <span class="na">class=</span><span class="s">"display-4"</span><span class="nt">&gt;</span>The controller flag is enabled!<span class="nt">&lt;/h1&gt;</span>
+    <span class="nt">&lt;p&gt;</span>Learn about <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">"https://docs.microsoft.com/aspnet/core"</span><span class="nt">&gt;</span>building Web apps with ASP.NET Core<span class="nt">&lt;/a&gt;</span>.<span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</code></pre></div></div>
+
+<p>To better manage your feature flags, you can filter from the level of an action method, or even a class, using the <code class="language-plaintext highlighter-rouge">FeatureGate</code> attribute. This attribute is super flexible: you can pass in multiple features and decide to gate actions if any or all of the features are enabled. Take a look at the FeatureGateAttribute <a href="https://docs.microsoft.com/dotnet/api/microsoft.featuremanagement.mvc.featuregateattribute?view=azure-dotnet-preview">documentation for details</a>.</p>
+
+<p>For our example, we will annotate <code class="language-plaintext highlighter-rouge">[FeatureGate(FeatureFlags.FlagController)]</code> to our controller class. Any action methods in this class will only be accessible if this flag is set to true. Here’s the latest <code class="language-plaintext highlighter-rouge">FlagController.cs</code>.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">Microsoft.AspNetCore.Mvc</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">Microsoft.FeatureManagement.Mvc</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">FeatureFlags.Controllers</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="nf">FeatureGate</span><span class="p">(</span><span class="n">FeatureFlags</span><span class="p">.</span><span class="n">FlagController</span><span class="p">)]</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">FlagController</span> <span class="p">:</span> <span class="n">Controller</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="n">IActionResult</span> <span class="nf">Index</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="nf">View</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>If you run your app, and navigate to <code class="language-plaintext highlighter-rouge">http://localhost:&lt;port&gt;</code>, you will see the new view rendered appropriately.</p>
+
+<p>Now, if you go to your <code class="language-plaintext highlighter-rouge">appsettings.json</code> and set the flag to <code class="language-plaintext highlighter-rouge">false</code>, then reload the page you’ll get an ugly 404 page. It’s ugly, but it means it works—great!</p>
+
+<p>Of course, if you want to provide a better experience for your users, you can add something like <code class="language-plaintext highlighter-rouge">UseStatusCodePages</code> <a href="https://docs.microsoft.com/aspnet/core/fundamentals/error-handling?view=aspnetcore-3.1#usestatuscodepages">middleware</a> to render something friendlier.</p>
+
+<h1 id="conditionally-render-html-in-your-views">Conditionally render HTML in your views</h1>
+
+<p>Let’s say you want to only render a component on your site if a certain condition applies: for example, that someone is viewing a beta environment. You could definitely mimic what we did in our controllers, right in your razor view, with something like this:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@if (_featureManager.IsEnabled(FeatureFlags.Beta))
+{
+  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"beta"</span><span class="nt">&gt;</span>We are in beta!<span class="nt">&lt;/div&gt;</span>
+}
+</code></pre></div></div>
+
+<p>To make it easier on your life, you can use a <a href="https://docs.microsoft.com/dotnet/api/microsoft.featuremanagement.mvc.taghelpers.featuretaghelper?view=azure-dotnet-preview">specialized tag helper for this</a>, the <code class="language-plaintext highlighter-rouge">FeatureTagHelper</code>.</p>
+
+<p>So, instead, you can try something like this:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;feature</span> <span class="na">name=</span><span class="s">"@FeatureFlags.Beta"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"beta"</span><span class="nt">&gt;</span>We are in beta!<span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/feature&gt;</span>
+</code></pre></div></div>
+
+<p>You can definitely take it further than this as well—the tag helpers allow you to have alternate content displayed in the feature is disabled (using the <code class="language-plaintext highlighter-rouge">Negate</code> property), and you can also require ANY or ALL from a feature set (using the <code class="language-plaintext highlighter-rouge">Requirement</code> property). Take a look <a href="https://docs.microsoft.com/dotnet/api/microsoft.featuremanagement.mvc.taghelpers.featuretaghelper?view=azure-dotnet-preview">at the documentation</a> for details.</p>

@@ -1,0 +1,174 @@
+I"fL<p>In the <a href="https://daveabrock.com/2020/06/29/c-sharp-9-deep-dive-inits">previous post of this series</a>, we discussed the power of records. That was a heavy topic.</p>
+
+<p>For something completely different, we’ll discuss improved pattern matching in C# 9. This is not a completely new feature, but something that has evolved since it was first released way back in C# 7, albeit in basic form. This <a href="https://docs.microsoft.com/dotnet/csharp/pattern-matching">Microsoft article</a> runs down the basics of pattern matching, which improved greatly in C# 8 as well. The pattern matching works with the <code class="language-plaintext highlighter-rouge">is</code> operator and with <code class="language-plaintext highlighter-rouge">switch</code> expressions, much of which I showed off in my article <a href="https://daveabrock.com/2020/03/29/csharp-8-year-late.html"><em>C# 8, A Year Late.</em></a></p>
+
+<p>This is the third post in a six-post series on C# 9 features in-depth:</p>
+
+<ul>
+  <li>Post 1 - <a href="https://daveabrock.com/2020/06/29/c-sharp-9-deep-dive-inits">Init-only features</a></li>
+  <li>Post 2 - <a href="https://daveabrock.com/2020/07/06/c-sharp-9-deep-dive-records">Records</a></li>
+  <li>Post 3 (<em>this post</em>) - Pattern matching</li>
+  <li>Post 4 - <a href="https://daveabrock.com/2020/07/09/c-sharp-9-top-level-programs">Top-level programs</a></li>
+  <li>Post 5 - <a href="https://daveabrock.com/2020/07/14/c-sharp-9-target-typing-covariants">Target typing and covariant returns</a></li>
+  <li>Post 6 - <a href="https://daveabrock.com/2020/07/21/c-sharp-9-scavenger-hunt">Putting it all together with a scavenger hunt</a></li>
+</ul>
+
+<p>This post covers the following topics.</p>
+
+<ul>
+  <li><a href="#first-get-to-know-the-c-8-switch-expression-syntax">First, get to know the C# 8 <code class="language-plaintext highlighter-rouge">switch</code> expression syntax</a></li>
+  <li><a href="#how-pattern-matching-helps-you">How pattern matching helps you</a></li>
+  <li><a href="#our-c-8-baseline-example">Our C# 8 baseline example</a>
+    <ul>
+      <li><a href="#relational-patterns">Relational patterns</a></li>
+      <li><a href="#logical-patterns">Logical patterns</a></li>
+    </ul>
+  </li>
+  <li><a href="#wrapping-up">Wrapping up</a></li>
+</ul>
+
+<h1 id="first-get-to-know-the-c-8-switch-expression-syntax">First, get to know the C# 8 <code class="language-plaintext highlighter-rouge">switch</code> expression syntax</h1>
+
+<p>Before we get started with pattern matching enhancements in C# 9, much of it is based off the improved <code class="language-plaintext highlighter-rouge">switch</code> syntax from C# 8. (If you are already familiar, you can scroll to the next section.)</p>
+
+<p>To be clear, they are now called <code class="language-plaintext highlighter-rouge">switch</code> <em>expressions,</em> and not switch <em>statements.</em> Before C# 8, you would typically have this (stolen from my C# 8 article):</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="nf">FindAProgrammingLanguage</span><span class="p">(</span><span class="kt">string</span> <span class="n">languageInput</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">string</span> <span class="n">languagePhrase</span><span class="p">;</span>
+
+    <span class="k">switch</span> <span class="p">(</span><span class="n">languageInput</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">case</span> <span class="s">"C#"</span><span class="p">:</span>
+            <span class="n">languagePhrase</span> <span class="p">=</span> <span class="s">"C# is fun!"</span><span class="p">;</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="k">case</span> <span class="s">"JavaScript"</span><span class="p">:</span>
+            <span class="n">languagePhrase</span> <span class="p">=</span> <span class="s">"JavaScript is mostly fun!"</span><span class="p">;</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="k">default</span><span class="p">:</span>
+             <span class="k">throw</span> <span class="k">new</span> <span class="nf">Exception</span><span class="p">(</span><span class="s">"You code in something else I don't recognize."</span><span class="p">);</span>
+    <span class="p">};</span>
+    <span class="k">return</span> <span class="n">languagePhrase</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>With switch expressions, we can replace <code class="language-plaintext highlighter-rouge">case</code> and <code class="language-plaintext highlighter-rouge">:</code> with <code class="language-plaintext highlighter-rouge">=&gt;</code> and replace the default statement with <code class="language-plaintext highlighter-rouge">_</code>. That “underscore operator” is <em>technically</em> <a href="https://docs.microsoft.com/dotnet/csharp/discards">called a discard</a>—a temporary, dummy variable that you want intentionally unused. This gives us a much cleaner, expression-like syntax.</p>
+
+<p>Be honest: switch statements enable <code class="language-plaintext highlighter-rouge">goto</code>-like control flow (so we are clear on <a href="https://stackoverflow.com/questions/4756084/use-a-goto-in-a-switch">how I feel about this</a>) and just executes code. I find the expressive style, which forces you to return a value, much better. You know that empty “well, better than a million <code class="language-plaintext highlighter-rouge">if</code>’s, I guess?” feeling you get with <code class="language-plaintext highlighter-rouge">switch</code> statements? This should make you feel better.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="nf">FindAProgrammingLanguage</span><span class="p">(</span><span class="kt">string</span> <span class="n">languageInput</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">string</span> <span class="n">languagePhrase</span> <span class="p">=</span> <span class="n">languageInput</span> <span class="k">switch</span>
+    <span class="p">{</span>
+        <span class="s">"C#"</span> <span class="p">=&gt;</span> <span class="s">"C# is fun!"</span><span class="p">,</span>
+        <span class="s">"JavaScript"</span> <span class="p">=&gt;</span> <span class="s">"JavaScript is mostly fun!"</span><span class="p">,</span>
+         <span class="n">_</span> <span class="p">=&gt;</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">Exception</span><span class="p">(</span><span class="s">"You code in something else I don't recognize."</span><span class="p">),</span>
+    <span class="p">};</span>
+    <span class="k">return</span> <span class="n">languagePhrase</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now that we see how this improved C# 8 <code class="language-plaintext highlighter-rouge">switch</code> behavior helps you, let’s move on to pattern matching.</p>
+
+<h1 id="how-pattern-matching-helps-you">How pattern matching helps you</h1>
+
+<p>Pattern matching allows you to simplify scenarios where you need to cohesively manage data from different sources. An obvious example is when you call an external API where you don’t have any control over the types of data you are getting back. Of course, typically you would create types in your application for all the different types you could get back from this API. Then, you would build an object model off those types. This is <em>a lot</em> of work. What’s that old joke about object-oriented programming about <a href="https://www.johndcook.com/blog/2011/07/19/you-wanted-banana/">the gorilla and the banana</a>?</p>
+
+<p>Imagine if you are working with multiple APIs! What if you provide shipping services, and are working with all the necessary APIs (FedEx, USPS, and more). You think they all got together to form one shared data model?</p>
+
+<p>To make our lives easier, let’s sprinkle some functional, C# 9 magic on top of our OO language and make your life simpler.</p>
+
+<p>(In-depth pattern matching techniques are beyond the scope of this post, but <a href="https://docs.microsoft.com/dotnet/csharp/tutorials/pattern-matching">do check out Bill Wagner’s excellent work</a>.)</p>
+
+<h1 id="our-c-8-baseline-example">Our C# 8 baseline example</h1>
+
+<p>To build off our previous posts, let’s stick with the Iron Man theme. Here’s some C# 8 code we use to calculate a superhero’s fuel cost based on a maximum speed.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Program</span>
+<span class="p">{</span>
+    <span class="k">static</span> <span class="k">void</span> <span class="nf">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">superhero</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Superhero</span>
+        <span class="p">{</span>
+            <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Tony"</span><span class="p">,</span>
+            <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Stark"</span><span class="p">,</span>
+            <span class="n">MaxSpeed</span> <span class="p">=</span> <span class="m">10000</span>
+        <span class="p">};</span>
+        <span class="k">static</span> <span class="kt">decimal</span> <span class="nf">GetFuelCost</span><span class="p">(</span><span class="kt">object</span> <span class="n">hero</span><span class="p">)</span> <span class="p">=&gt;</span> 
+        <span class="n">hero</span> <span class="k">switch</span>
+        <span class="p">{</span>
+            <span class="n">Superhero</span> <span class="n">s</span> <span class="n">when</span> <span class="n">s</span><span class="p">.</span><span class="n">MaxSpeed</span> <span class="p">&lt;</span> <span class="m">1000</span> <span class="p">=&gt;</span> <span class="m">10.00</span><span class="n">m</span><span class="p">,</span>
+            <span class="n">Superhero</span> <span class="n">s</span> <span class="n">when</span> <span class="n">s</span><span class="p">.</span><span class="n">MaxSpeed</span> <span class="p">&lt;=</span> <span class="m">10000</span> <span class="p">=&gt;</span> <span class="m">7.00</span><span class="n">m</span><span class="p">,</span>
+            <span class="n">Superhero</span> <span class="n">_</span> <span class="p">=&gt;</span> <span class="m">12.00</span><span class="n">m</span><span class="p">,</span>
+            <span class="n">_</span> <span class="p">=&gt;</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentException</span><span class="p">(</span><span class="s">"I do not know this one"</span><span class="p">,</span> <span class="k">nameof</span><span class="p">(</span><span class="n">hero</span><span class="p">))</span>
+        <span class="p">};</span>
+        <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="nf">GetFuelCost</span><span class="p">(</span><span class="n">superhero</span><span class="p">));</span> <span class="c1">// 7.00</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">Person</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Address</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">City</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FavoriteColor</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">Superhero</span> <span class="p">:</span> <span class="n">Person</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">int</span> <span class="n">MaxSpeed</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="relational-patterns">Relational patterns</h2>
+
+<p>With C# 9, we can simplify our switch expression using relational patterns. This allows us to use the relational operators such as <code class="language-plaintext highlighter-rouge">&lt;</code>, <code class="language-plaintext highlighter-rouge">&lt;=</code>, <code class="language-plaintext highlighter-rouge">&gt;</code>, and <code class="language-plaintext highlighter-rouge">&gt;=</code>. We can simplify our program—take a look at our new <code class="language-plaintext highlighter-rouge">GetFuelCost</code> method:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="kt">decimal</span> <span class="nf">GetFuelCost</span><span class="p">(</span><span class="n">Superhero</span> <span class="n">hero</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="n">hero</span><span class="p">.</span><span class="n">MaxSpeed</span> <span class="k">switch</span>
+<span class="p">{</span>
+    <span class="p">&lt;</span> <span class="m">1000</span> <span class="p">=&gt;</span> <span class="m">10.00</span><span class="n">m</span><span class="p">,</span>
+    <span class="p">&lt;=</span> <span class="m">10000</span> <span class="p">=&gt;</span> <span class="m">7.00</span><span class="n">m</span><span class="p">,</span>
+    <span class="n">_</span> <span class="p">=&gt;</span> <span class="m">12.00</span><span class="n">m</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<h2 id="logical-patterns">Logical patterns</h2>
+
+<p>Similarly, you can use logical operators, like <code class="language-plaintext highlighter-rouge">and</code>, <code class="language-plaintext highlighter-rouge">or</code>, and <code class="language-plaintext highlighter-rouge">not</code>, as a complement to using relational patterns. This might be a more readable option for you if relational operators are not your jam.</p>
+
+<p>Let’s try a slightly modified example with words instead of symbols:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="kt">decimal</span> <span class="nf">GetFuelCost</span> <span class="p">(</span><span class="n">Superhero</span> <span class="n">hero</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="n">hero</span><span class="p">.</span><span class="n">MaxSpeed</span> <span class="k">switch</span>
+<span class="p">{</span>
+    <span class="m">1</span> <span class="n">or</span> <span class="m">2</span> <span class="p">=&gt;</span> <span class="m">1.00</span><span class="n">m</span><span class="p">,</span>
+    <span class="p">&lt;</span> <span class="m">1000</span> <span class="n">and</span> <span class="p">&lt;</span> <span class="m">5000</span> <span class="p">=&gt;</span> <span class="m">10.00</span><span class="n">m</span><span class="p">,</span>
+    <span class="p">&lt;=</span> <span class="m">10000</span> <span class="p">=&gt;</span> <span class="m">7.00</span><span class="n">m</span><span class="p">,</span>
+    <span class="n">_</span> <span class="p">=&gt;</span> <span class="m">12.00</span><span class="n">m</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>You can also use the <code class="language-plaintext highlighter-rouge">not</code> operator, as I’ve highlighted in previous posts on C# 9 improvements.</p>
+
+<p>As described in the <a href="https://devblogs.microsoft.com/dotnet/welcome-to-c-9-0/"><em>Welcome to C# 9</em></a> post by Microsoft, it’s convenient if you use the <code class="language-plaintext highlighter-rouge">null</code> constant pattern:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">not</span> <span class="k">null</span> <span class="p">=&gt;</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentException</span><span class="p">(</span><span class="s">$"Not a known person: </span><span class="p">{</span><span class="n">hero</span><span class="p">}</span><span class="s">"</span><span class="p">,</span> <span class="k">nameof</span><span class="p">(</span><span class="n">hero</span><span class="p">)),</span>
+<span class="k">null</span> <span class="p">=&gt;</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">(</span><span class="k">nameof</span><span class="p">(</span><span class="n">hero</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>It also helps you think more clearly about negation logic. If you are used to something like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="p">(!(</span><span class="n">hero</span> <span class="k">is</span> <span class="n">Person</span><span class="p">))</span> <span class="p">{</span> <span class="p">...}</span>
+</code></pre></div></div>
+
+<p>Your co-workers will help you, if you change it to this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="p">(</span><span class="n">hero</span> <span class="k">is</span> <span class="n">not</span> <span class="n">Person</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="wrapping-up">Wrapping up</h1>
+
+<p>In this post, we discussed the advantages of pattern matching, especially with coupled with powerful switch expressions, which were introduced in C# 8. We then discussed how C# 9 can help clean up your syntax with its relational and logical patterns.</p>
+
+<p>Stay tuned for the next post, which discusses target typing and covariant returns in C# 9.</p>
+:ET

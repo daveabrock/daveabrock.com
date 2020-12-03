@@ -1,0 +1,82 @@
+<p>C# 9 is finally here, everybody.</p>
+
+<p>This summer, we took a look at most of its core features. We looked at <a href="https://daveabrock.com/2020/06/29/c-sharp-9-deep-dive-inits">init-only features</a>, <a href="https://daveabrock.com/2020/07/06/c-sharp-9-deep-dive-records">records</a>, <a href="https://daveabrock.com/2020/07/06/c-sharp-9-pattern-matching">pattern matching</a>, <a href="https://daveabrock.com/2020/07/09/c-sharp-9-top-level-programs">top-level programs</a>, and <a href="https://daveabrock.com/2020/07/14/c-sharp-9-target-typing-covariants">target typing and covariant returns</a>.</p>
+
+<p>Now, we can look forward to C# 10 (what is also referred to as <em>C# Next</em>). You probably think I’m crazy to be writing about C# 10 so early—and I am!—but there’s a feature slated for C# 10 that looks all set to go, <a href="https://github.com/dotnet/csharplang/issues/2951">constant string interpolation</a>—a request that’s been <a href="https://github.com/dotnet/roslyn/issues/4678">hanging out on GitHub since 2015</a>. Fred Silberberg from the Roslyn team says that <a href="https://github.com/dotnet/csharplang/issues/2951#issuecomment-696784012">it’s implemented in a feature branch and will likely be part of C# 10</a>. As a matter of fact, if you <a href="https://sharplab.io/">head over to SharpLab</a>, there’s a <strong>C# Next: Constant Interpolated Strings</strong> branch you can play with that’s been out there since … October 18, 2020.</p>
+
+<p>While it’s madness to write about a new language feature so early, I don’t think it’s too crazy to talk about <em>this specific feature</em>. It’s super easy to implement so I don’t see that part changing too much—only when it gets shipped.</p>
+
+<p>We’ll discuss the following content in this post.</p>
+
+<ul>
+  <li><a href="#an-absurdly-quick-example">An absurdly quick example</a></li>
+  <li><a href="#why-cant-i-do-that-now">Why can’t I do that now?</a></li>
+  <li><a href="#what-about-culture-impacts">What about culture impacts?</a></li>
+  <li><a href="#wrap-up">Wrap up</a></li>
+</ul>
+
+<p class="notice--warning"><strong>Heads up!</strong> This should go without saying, but things may change between now and the C# 10 release date. In other words: 🤷‍♂️.</p>
+
+<h1 id="an-absurdly-quick-example">An absurdly quick example</h1>
+
+<p>These days—in C# 9 or earlier, that is—if you want to merge constant strings together, you will have to use concatenation, and not interpolation (or remove them as <code class="language-plaintext highlighter-rouge">const</code> variables altogether).</p>
+
+<p>A common use is with paths. In current times, you <em>have</em> to do this if you are working with constant strings:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">const</span> <span class="kt">string</span> <span class="n">myRootPath</span> <span class="p">=</span> <span class="s">"/src/to/my/root"</span><span class="p">;</span>
+<span class="k">const</span> <span class="kt">string</span> <span class="n">myFilePath</span> <span class="p">=</span> <span class="n">myRootPath</span> <span class="p">+</span> <span class="s">"README.md"</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>With constant string interpolation, you can do this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">const</span> <span class="kt">string</span> <span class="n">myRootPath</span> <span class="p">=</span> <span class="s">"/src/to/my/root"</span><span class="p">;</span>
+<span class="k">const</span> <span class="kt">string</span> <span class="n">myWholeFilePath</span> <span class="p">=</span> <span class="s">$"</span><span class="p">{</span><span class="n">myRootPath</span><span class="p">}</span><span class="s">/README.md"</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Constant interpolated strings would be super convenient when working with attribute arguments. Let’s say you want to flag a method with the <a href="https://docs.microsoft.com/dotnet/api/system.obsoleteattribute?view=netcore-3.1">ObsoleteAttribute</a>. Try this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="nf">Obsolete</span><span class="p">(</span><span class="s">$"Ooh, don't use me. Instead, use </span><span class="p">{</span><span class="k">nameof</span><span class="p">(</span><span class="n">MyBetterType</span><span class="p">)}</span><span class="s">."</span><span class="p">)]</span>
+</code></pre></div></div>
+
+<h1 id="why-cant-i-do-that-now">Why can’t I do that now?</h1>
+
+<p>When I learned about string interpolation back in C# 6, I was excited to think I’d never have to do concatenation again—so this is a bummer. Why can’t I do it, anyway?</p>
+
+<p>If you try to use constant string interpolation in C# 9, you’ll get this error back:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>error CS0133: The expression being assigned to <span class="s1">'myFilePath'</span> must be constant
+</code></pre></div></div>
+
+<p>When you use string interpolation, the interpolated strings end up getting converted to <code class="language-plaintext highlighter-rouge">string.Format</code> calls. Once you understand that point, you’ll see it as:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">const</span> <span class="kt">string</span> <span class="n">myFilePath</span> <span class="p">=</span> <span class="kt">string</span><span class="p">.</span><span class="nf">Format</span><span class="p">(</span><span class="s">"{0}/README.md"</span><span class="p">,</span> <span class="n">myRootPath</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>While it may look like a constant at compile time, it isn’t because of the <code class="language-plaintext highlighter-rouge">string.Format</code> invocation. Of course, concatenation works fine since as there’s hardly any magic gluing two string literals together.</p>
+
+<h1 id="what-about-culture-impacts">What about culture impacts?</h1>
+
+<p>While you may think that your string in question is just constants, you might be wrong and it might not be completely obvious. Even something as simple as outputting a float has impacts across cultures.</p>
+
+<p>For example, here in the US I can do this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">$"</span><span class="p">{</span><span class="m">1200.12</span><span class="p">}</span><span class="s">"</span><span class="p">)</span> <span class="c1">// output: 1200.12;</span>
+</code></pre></div></div>
+
+<p>Try a different culture, and the results are different (and, to our point, not constant):</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">CultureInfo</span><span class="p">.</span><span class="n">CurrentCulture</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">CultureInfo</span><span class="p">(</span><span class="s">"es-ES"</span><span class="p">,</span> <span class="k">false</span><span class="p">);</span>
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">$"</span><span class="p">{</span><span class="m">1212.12</span><span class="p">}</span><span class="s">"</span><span class="p">);</span> <span class="c1">// output: 1200,12</span>
+</code></pre></div></div>
+
+<p>When it comes to constant string interpolation, will there be unintentional side effects when working with culture dependencies? The team insists <a href="https://github.com/dotnet/csharplang/issues/2951#issuecomment-559196393">that won’t be an issue</a>:</p>
+
+<blockquote>
+  <p>This feature won’t work in this scenarios. It’ll only work for interpolating other constant strings, so locale is not a concern. It’s really just a slightly different syntax for string concatenation.</p>
+</blockquote>
+
+<h1 id="wrap-up">Wrap up</h1>
+
+<p>In this post, we looked at constant string interpolation—a promising addition to C# 10. We discussed how to use it, the reasons why you can’t use it now, and addressed culture impacts.</p>
+
+<p>If you’re interested in what is currently slated for the next release of C#, head over to the <a href="https://github.com/dotnet/roslyn/blob/master/docs/Language%20Feature%20Status.md">Language Feature Status page</a> in the Roslyn GitHub repo.</p>

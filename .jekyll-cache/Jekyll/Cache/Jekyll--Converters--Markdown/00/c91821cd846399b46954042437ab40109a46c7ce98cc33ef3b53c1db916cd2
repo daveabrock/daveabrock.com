@@ -1,0 +1,38 @@
+I"U<p>We had a lot of fun <a href="https://daveabrock.com/2020/06/29/c-sharp-9-deep-dive-inits">playing with</a> the <a href="https://devblogs.microsoft.com/dotnet/welcome-to-c-9-0/">new C# 9 features</a> over the last few months. As with learning anything brand new, we had to decipher the info the best we could: we went off the <a href="https://devblogs.microsoft.com/dotnet/welcome-to-c-9-0/">announcement in May during Build</a>, meeting minutes and GitHub issues from the team, and good old trial and error.</p>
+
+<p>With .NET 5 <a href="https://devblogs.microsoft.com/dotnet/announcing-net-5-0-preview-7/">fast approaching</a> this fall, things have taken shape and Microsoft has released the set of <a href="https://docs.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-9.0/records">C# 9 specification proposals</a>. These proposals offer clarity on the new features and help to reinforce things I’ve heard or saw, and also allowed me to learn a thing or two.</p>
+
+<p>I wanted to quickly share with you some new things I came across while scanning the records proposal.</p>
+
+<h1 id="what-are-records">What are records?</h1>
+
+<p>What are records?</p>
+
+<p>Short-ish answer: a record is a construct that allows you to encapsulate property state by providing immutable behavior without the need for extensive boilerplate (like for readonly structs). Record types are reference types, like class declarations, but allow you to implement value-like behaviors.</p>
+
+<p>Long answer: <a href="https://daveabrock.com/2020/07/06/c-sharp-9-deep-dive-records">check out last month’s post for a deep dive on the topic</a>.</p>
+
+<h1 id="random-facts-that-i-assumed-but-am-glad-are-in-writing">Random facts that I assumed but am glad are in writing</h1>
+
+<ul>
+  <li>Record parameters can’t use <code class="language-plaintext highlighter-rouge">ref</code>, <code class="language-plaintext highlighter-rouge">out</code>, or <code class="language-plaintext highlighter-rouge">this</code>, but can use <code class="language-plaintext highlighter-rouge">in</code> and <code class="language-plaintext highlighter-rouge">params</code></li>
+  <li>Records can inherit from other records, but <em>cannot</em> inherit from classes (unless it’s <code class="language-plaintext highlighter-rouge">object</code>) and classes can’t inherit from records</li>
+</ul>
+
+<h1 id="print-a-records-members">Print a record’s members</h1>
+
+<p>It looks like, as long as the record derives from <code class="language-plaintext highlighter-rouge">object</code>, records do include a synthesized method that allows you to inspect all the members for that record:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">bool</span> <span class="nf">PrintMembers</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="n">StringBuilder</span> <span class="n">builder</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>From the spec, they note that it’ll iterate through a records <code class="language-plaintext highlighter-rouge">public</code> field and property members and take the format of <code class="language-plaintext highlighter-rouge">this.firstName = "Dave", this.lastName = "Brock"</code> and so on. You can declare this method explicitly.</p>
+
+<p>I think using <code class="language-plaintext highlighter-rouge">PrintMembers</code> will definitely come in handy when you are working with complex records/inheritance and don’t want to override <code class="language-plaintext highlighter-rouge">ToString</code>. Quick and easy—I like it.</p>
+
+<p>(It looks like the synthesized <code class="language-plaintext highlighter-rouge">ToString</code> method that ships with records invokes the <code class="language-plaintext highlighter-rouge">PrintMembers</code> method.)</p>
+
+<h1 id="wrap-up">Wrap up</h1>
+
+<p>This was a quick post to show a few things I came across while reading the specification. Take <a href="https://docs.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-9.0/records">a look yourself</a> to check out details on how it works.</p>
+:ET

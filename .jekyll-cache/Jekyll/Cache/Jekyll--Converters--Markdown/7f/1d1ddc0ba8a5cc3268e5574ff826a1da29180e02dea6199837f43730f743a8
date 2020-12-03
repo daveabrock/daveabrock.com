@@ -1,0 +1,61 @@
+I"f<p><strong>UPDATE! A lot has changed in the two years since this post was first written. I’ve updated this post to make it current and correct.</strong></p>
+
+<p>As developers, we often take advantage of the benefits of sharing common code in a specific project. That way, it can be shared and maintained in a centralized way—accessed easily whether it is your team’s source control repository or, in the .NET world, a NuGet package.</p>
+
+<p>This is no different with Blazor. When we use Razor component class libraries, we can easily share components across projects. When we share components, all our target project needs to do is reference the shared project and add the component—no style imports necessary!</p>
+
+<p>In this article, we’ll demonstrate the power of Razor component class libraries using a simple example with the default scaffolded Blazor application.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<p>Before getting started, make sure you have a <a href="https://dotnet.microsoft.com/download">recent .NET SDK installed</a> (preferably 3.<em>x</em> or later).</p>
+
+<h2 id="create-a-blazor-application">Create a Blazor application</h2>
+
+<p>Let’s create a Blazor application.</p>
+
+<ol>
+  <li>From Visual Studio, click <strong>File</strong> &gt; <strong>New</strong> &gt; <strong>Project</strong> and select the <strong>Blazor App</strong> project template and click <strong>Next</strong>.</li>
+  <li>Give it a name, like <strong>MySharedLibDemo</strong>, and click <strong>Create</strong>.</li>
+  <li>Select the <strong>Blazor</strong> template (<strong>Blazor Server App</strong> or <strong>Blazor WebAssembly App</strong>) and click <strong>OK</strong>. Either type should work here.</li>
+  <li>To add a Razor component class library, we’ll use the .NET Core command-line interface (CLI).</li>
+  <li>Right-click the solution and select <strong>Open Command Line</strong>. From your preferred command line utility, enter <code class="language-plaintext highlighter-rouge">dotnet new</code> to see all the .NET Core templates available to you. We will be adding the <strong>Razor Class Library</strong> template to our project.</li>
+  <li>From your prompt, enter <code class="language-plaintext highlighter-rouge">dotnet new razorclasslib -o MySharedBlazorLibrary</code>. This will add the <code class="language-plaintext highlighter-rouge">MySharedBlazorLibrary</code> project in your directory.</li>
+  <li>Right-click your solution and click <strong>Add</strong> &gt; <strong>Existing Project</strong>. Browse to your library, select the <em>MySharedBlazorLibrary.csproj</em> file, and click <strong>Open</strong>. Your project structure will now resemble the following.</li>
+  <li>Finally, reference the shared project. From your main project, right-click <strong>Dependencies</strong> &gt; <strong>Add Project Reference…</strong> Then, select your newly created project and click <strong>OK</strong>.</li>
+</ol>
+
+<h2 id="add-shared-component-to-your-main-project">Add shared component to your main project</h2>
+
+<p>Now, all you need to do is add the component to your project. If you remember, the shared project includes a <code class="language-plaintext highlighter-rouge">Component1.cshtml</code> file that includes a styled component. We’ll now add this to our main project.</p>
+
+<p>From your <code class="language-plaintext highlighter-rouge">Pages/Index.razor</code> file, add a using statement at the top of the file.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@using MySharedBlazorLibrary
+</code></pre></div></div>
+
+<p>Now, below the <code class="language-plaintext highlighter-rouge">SurveyPrompt</code> component, add the <code class="language-plaintext highlighter-rouge">Component1</code> component. As you begin typing, you can use IntelliSense.</p>
+
+<p><img src="http://localhost:4001/images/Autocomplete.png" alt="Autocomplete" /></p>
+
+<p>Your <code class="language-plaintext highlighter-rouge">Index.razor</code> component should now look like this:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@page "/"
+
+<span class="nt">&lt;h1&gt;</span>Hello, world!<span class="nt">&lt;/h1&gt;</span>
+
+Welcome to your new app.
+
+<span class="nt">&lt;SurveyPrompt</span> <span class="na">Title=</span><span class="s">"How is Blazor working for you?"</span> <span class="nt">/&gt;</span>
+
+<span class="nt">&lt;Component1</span> <span class="nt">/&gt;</span>
+</code></pre></div></div>
+
+<h2 id="view-your-changes">View your changes</h2>
+
+<p>After you save your changes, reload the page to see your new component in action.</p>
+
+<p><img src="http://localhost:4001/images/PageWithComponent-1.png" alt="PageWithComponent-1" /></p>
+
+<p>You have just referenced a component from a shared library with minimal effort. By merely importing the library, you were able to add a component and its styles quite easily.</p>
+:ET

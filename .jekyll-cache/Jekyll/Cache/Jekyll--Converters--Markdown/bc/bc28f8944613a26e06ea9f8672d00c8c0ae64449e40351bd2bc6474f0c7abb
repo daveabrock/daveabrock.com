@@ -1,0 +1,175 @@
+I"�S<p><img src="https://raw.githubusercontent.com/daveabrock/daveabrock.github.io/master/THE%20.NET%20STACKS.png" alt="Newsletter image" /></p>
+
+<p>RIP, <a href="https://www.nytimes.com/2020/10/31/movies/sean-connery-dead.html">James Bond</a>. While watching <em>Goldfinger</em> last night, I forgot about the best feature of Connery Bond films: if you’re confused about the plot, the villain will explain it all to you right before the movie ends. Ah, the original “let’s have retro before the sprint ends.”</p>
+
+<p>This week:</p>
+
+<ul>
+  <li>Is Blazor ready for the enterprise?</li>
+  <li>Dev Discussions: James Hickey</li>
+  <li>Last week in the .NET world</li>
+</ul>
+
+<h2 id="is-blazor-ready-for-the-enterprise">Is Blazor ready for the enterprise?</h2>
+
+<p>If you’re writing .NET web apps, you’ve likely aware of all the Blazor hype. (If you haven’t, it allows you to write web UIs in C#, where you’ve traditionally had to use JavaScript.) In the last two years, I’ve seen it morph from a cute Microsoft project to something they’ve deemed production-ready.</p>
+
+<p>And with .NET 5—becoming generally available next week!—we’re seeing a lot of great improvements with Blazor: <a href="https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-preview-8/#css-isolation-for-blazor-components">CSS isolation</a>, <a href="https://docs.microsoft.com/aspnet/core/blazor/call-javascript-from-dotnet?view=aspnetcore-5.0#blazor-javascript-isolation-and-object-references">JavaScript isolation</a>, <a href="https://docs.microsoft.com/aspnet/core/blazor/components/virtualization">component virtualization</a>, <a href="https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-release-candidate-1/#blazor-support-for-ontoggle-event">toggle event support</a>, <a href="https://docs.microsoft.com/aspnet/core/blazor/webassembly-lazy-load-assemblies">lazy loading</a>, <a href="https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-release-candidate-1/#blazor-webassembly-prerendering">server-side prerendering</a>, and so on. These improvements help Blazor catch up to base features of leading SPA frameworks, like Vue, React, and Angular.</p>
+
+<p>If you’re slinging code for a decent-sized company, you <a href="https://www.telerik.com/blogs/is-blazor-safe-enterprise-bet">might be wondering if Blazor is ready for the enterprise</a>. Can you convince your pointy-haired bosses to use it for new, and maybe existing, apps? I think it’s ready. However, this isn’t an “easy yes”—it involves a nuanced answer. We’ll answer this question by answering some common questions.</p>
+
+<p><strong>Is it another Silverlight?</strong> If you’ve worked in Blazor for a little while, it’s a tired argument but one you’ll have to answer from those not in the day-to-day .NET world. While a similar concept—using C# instead of JavaScript to build web apps—Blazor is built on web standards and is not built with proprietary tech that can be suddenly thrown away. It isn’t a browser plugin like Silverlight.</p>
+
+<p><strong>How will it help teams deliver faster?</strong> Blazor lowers the front-end learning curve normally associated with JavaScript, and allows devs to use their language and their tools to get things done. Blazor doesn’t <em>replace</em> JavaScript. However, if you’re in a shop with mostly C# devs, it’s an obvious productivity improvement. This isn’t a quick on/off switch, as teams still need to get familiar with core SPA concepts, but the use case for .NET shops is clear.</p>
+
+<p><strong>Is it supported with a good ecosystem?</strong> Because Blazor lives in the .NET ecosystem, it comes with official Microsoft support just like any other product (and, last week, <a href="https://daveabrock.com/2020/10/31/dotnet-stacks-23">we discussed .NET 5 support</a>). Additionally, Microsoft continues to devote significant investment in it and has a long history of backwards compatibility. The ecosystem is not as evolved as it is with Angular and React—they’ve had a head start—but is growing tremendously. As <a href="https://www.telerik.com/blogs/is-blazor-safe-enterprise-bet">Peter Vogel mentioned</a>, Blazor already has 25% of the interest that Vue has (<a href="https://trends.google.com/trends/explore?cat=31&amp;geo=US&amp;q=Blazor,Vue">from Google Trends</a>).</p>
+
+<p><strong>Does it perform well?</strong> Compared to other SPA frameworks, Blazor’s performance is … fine? It’ll pass the eye test with Vue and whatnot in most cases but there will be <em>some</em> waiting—Blazor Web Assembly has a large-ish download size (as its loading .NET in the browser), and Blazor Server has a network hop for each user interaction. The team has <a href="https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-release-candidate-1/#blazor-webassembly-performance-improvements">made a lot of progress in addressing performance</a>, and AOT compilation is the most popular request for ASP.NET in .NET 6 (and will impact non-Blazor apps in ASP.NET as well). If you’re dealing with huge amounts of data, you might want to wait for these improvements—but should be suitable in most business cases.</p>
+
+<h2 id="dev-discussions-james-hickey">Dev Discussions: James Hickey</h2>
+
+<p>When designing a real production system—especially over the web—there’s a lot to think about past coding features for stakeholders. For example, how do you manage events? What about scheduling tasks? What about your caching mechanism? A lot of these considerations make you wonder if they should be supplied out-of-the-box with ASP.NET Core.</p>
+
+<p>James Hickey’s <a href="https://github.com/jamesmh/coravel">Coravel project is here to assist</a>. Billed as a “near-zero config .NET Core library that makes task scheduling, caching, queuing, mailing, event broadcasting, and more a breeze,” it ships with an impressive set of free features—and you can look at Coravel Pro for a professional admin panel, UI management, health metrics, and more.</p>
+
+<p>I caught up with James to talk about his project, software design, and more.</p>
+
+<p><img src="http://localhost:4001/images/james-hickey.jpg" alt="James Hickey" /></p>
+
+<h3 id="as-the-author-of-refactoring-typescript-what-are-your-biggest-tips-on-keeping-a-codebase-healthy">As the author of Refactoring TypeScript, what are your biggest tips on keeping a codebase healthy?</h3>
+
+<ul>
+  <li>Simplicity rules the day. If you “feel” like your solution is getting complicated, then step back or take a 15-minute walk!</li>
+  <li>Reuse is over-hyped. It leads to coupling. Coupling more often-than-not causes trouble down the road.</li>
+  <li>Abstract I/O from other kinds of logic. Don’t do direct database or file system access from the core logic in your system. Put that behind an interface.</li>
+  <li>If you want to get good at designing code, then get good at knowing how to build unit tests that have minimal (or no) mocking/stubbing.</li>
+  <li>Use automated quality analyzers to fail builds when code standards are violated.</li>
+  <li><a href="https://blog.codinghorror.com/the-broken-window-theory/">Fix broken windows</a>.</li>
+</ul>
+
+<h3 id="lets-talk-about-your-coravel-project-i-love-your-bold-selling-point-near-zero-config-net-core-micro-framework-that-makes-advanced-application-features-like-task-scheduling-caching-queuing-event-broadcasting-and-more-a-breeze-can-you-walk-through-what-caused-you-to-pursue-this-project-how-coravel-can-help-me-and-how-it-works-with-existing-net-projects">Let’s talk about your Coravel project. I love your bold selling point: “Near-zero config .NET Core micro-framework that makes advanced application features like Task Scheduling, Caching, Queuing, Event Broadcasting, and more a breeze!” Can you walk through what caused you to pursue this project, how Coravel can help me, and how it works with existing .NET projects?</h3>
+
+<p>Back in the day when I was building <em>.aspx</em> WebForms, I discovered the PHP framework Laravel and loved how it included all these additional features like queuing, task scheduling, and so on out of the box. When .NET Core was gaining traction, I found myself wanting some of the conveniences of Laravel but in .NET Core.</p>
+
+<p>Coravel can help you get a new project up-and-running faster by including things like automated task scheduling, background task queuing, and so on out of the box without having to install extra infrastructure. It works with any .NET Core projects and is (supposed to be) super easy to install, configure and use.</p>
+
+<h3 id="for-scheduling-and-event-management-i-know-a-lot-of-folks-like-utilizing-things-like-triggered-azure-functions-and-service-bus-and-the-likeis-there-an-advantage-to-using-coravel-over-that">For scheduling and event management, I know a lot of folks like utilizing things like triggered Azure Functions and Service Bus and the like—is there an advantage to using Coravel over that?</h3>
+
+<p>One disadvantage is that Coravel doesn’t (yet!) support distributed scheduling, queuing, and caching features. One advantage though, again, is you don’t have to install any additional infrastructure. You can install a NuGet package, add a couple lines of code and you’re good-to-go!</p>
+
+<p>You can use Coravel and these other products together, too. For example, we often use a distributed service bus to integrate separate systems via async messaging. Coravel can support the internal integration within a system—like how you might emit domain events between aggregates. Doing this in-memory has certain advantages. Jimmy Bogard, for example, <a href="https://lostechies.com/jimmybogard/2014/05/13/a-better-domain-events-pattern/">has written about using in-memory domain event processing</a>.</p>
+
+<h3 id="i-know-by-default-coravel-caching-is-in-memory-but-has-options-to-persist-to-a-database-how-does-this-compare-to-something-like-redis">I know by default, Coravel caching is in-memory (but has options to persist to a database). How does this compare to something like Redis?</h3>
+
+<p>Again, using Coravel you won’t have to muck around with installing, configuring, and so on with that additional infrastructure. Redis is a fantastic product and I’m hoping to eventually offer providers for Coravel to hook into Redis—which could make using Redis caching, messaging, and so on even easier. I just need to find some time 😉.</p>
+
+<h3 id="do-you-view-coravel-as-an-enhancement-over-the-bcl-or-filling-in-for-some-of-its-shortcomings-this-is-part-of-a-broader-thought-about-osss-role-within-net-core">Do you view Coravel as an enhancement over the BCL, or filling in for some of its shortcomings? This is part of a broader thought about OSS’s role within .NET Core.</h3>
+
+<p>I view Coravel as enhancements over the BCL. I wouldn’t expect to see these features included in a barebones console application, for example. But when it comes to web applications, these are all features that you’ll need pretty much out-of-the-gate if it’s anything more than a demo application.</p>
+
+<h3 id="im-a-fan-of-your-loosely-coupled-show-that-you-run-with-derek-comartin-sure-beats-the-tightly-coupled-showa-great-spot-to-discuss-software-architecture-and-design-in-such-a-fluid-industry-are-there-any-firm-principles-you-are-stubborn-about">I’m a fan of your “Loosely Coupled Show” that you run with Derek Comartin (sure beats the “Tightly Coupled Show”)—a great spot to discuss software architecture and design. In such a fluid industry, are there any firm principles you are stubborn about?</h3>
+
+<p>Generally, I stick with using a feature folder approach to structuring any projects I work on. I’ve <a href="https://builtwithdot.net/blog/changing-how-your-code-is-organized-could-speed-development-from-weeks-to-days">written about this before</a> and Derek <a href="https://codeopinion.com/organizing-code-by-feature-using-vertical-slices/">just wrote about it</a>. I’m a huge fan of CQRS and think it fits perfectly with the feature folders approach.</p>
+
+<p>I’ve given a talk on these topics <a href="https://www.youtube.com/watch?v=36G6-vwwpe8&amp;feature=youtu.be">at the Florida .NET meetup</a> if anyone’s interested in hearing more about it.</p>
+
+<p><em>Check out the <a href="https://daveabrock.com/2020/11/01/dev-discussions-james-hickey">full interview at my website</a>.</em></p>
+
+<h2 id="what-is-your-one-piece-of-programming-advice">What is your one piece of programming advice?</h2>
+
+<p>Make sure you get lots of sleep and step outside once in a while. 😅</p>
+
+<h2 id="-last-week-in-the-net-world">🌎 Last week in the .NET world</h2>
+
+<h3 id="-the-top-5">🔥 The Top 5</h3>
+
+<ul>
+  <li>Jimmy Bogard <a href="https://jimmybogard.com/mind-your-strings-with-net-5-0">finds a .NET 5 breaking change with IndexOf</a>.</li>
+  <li>Jeremy Likness <a href="https://devblogs.microsoft.com/dotnet/help-us-plan-ef-core-6-0">asks for help planning EF Core 6.0</a>, and also <a href="https://devblogs.microsoft.com/dotnet/announcing-version-1-0-of-net-for-apache-spark">announces version 1.0 of .NET for Apache Spark</a>.</li>
+  <li>James Newton-King <a href="https://devblogs.microsoft.com/aspnet/grpc-performance-improvements-in-net-5">walks through gRPC performance improvements in .NET 5</a>.</li>
+  <li>Damien Bowden <a href="https://damienbod.com/2020/10/29/using-azure-cognitive-search-suggesters-in-asp-net-core-and-autocomplete/">uses Azure Cognitive Search suggesters in ASP.NET Core and autocomplete</a>.</li>
+  <li>Rachel Appel <a href="https://blog.jetbrains.com/dotnet/2020/10/29/build-serverless-apps-with-azure-functions/">builds serverless apps from Azure Functions</a>.</li>
+</ul>
+
+<h3 id="-announcements">📢 Announcements</h3>
+
+<ul>
+  <li>Tara Overfield <a href="https://devblogs.microsoft.com/dotnet/net-framework-october-2020-cumulative-update-preview-update-for-windows-10-2004-and-windows-server-version-2004">offers the .NET Framework October update for Windows and Windows Server</a>.</li>
+  <li>Lily Ma <a href="https://devblogs.microsoft.com/azure-sdk/github-issue-support-process">outlines the Azure SDK GitHub issue support process</a>.</li>
+  <li>Leslie Richardson <a href="https://devblogs.microsoft.com/visualstudio/the-future-of-visual-studio-extensions">talks about the future of Visual Studio extensions</a>.</li>
+</ul>
+
+<h3 id="-community-and-events">📅 Community and events</h3>
+
+<ul>
+  <li>For community .NET standups, we’ve got a <a href="https://www.youtube.com/watch?v=jvg57VW1V5c">brand new game dev standup</a>, Entity Framework <a href="https://www.youtube.com/watch?v=YF1MbSYfiRY">talks about EF Core 5 collations</a>, and ASP.NET talks about <a href="https://www.youtube.com/watch?v=Up4Wd_wHzDg">updating Scott Hanselman’s blog to .NET Core</a>.</li>
+  <li>The .NET Docs Show talks <a href="https://www.youtube.com/watch?v=lzVZSKcC-oY">with Sam Basu about Blazor and Comet for Native Mobile Apps</a>.</li>
+  <li>You can check out a stream of this weekend’s <a href="https://www.youtube.com/watch?v=69cccDJ_Vec">.NET Dev Summit 2020 - Asia Pacific</a>.</li>
+</ul>
+
+<h3 id="-aspnet-core--blazor">😎 ASP.NET Core / Blazor</h3>
+
+<ul>
+  <li>Dave Brock (ahem) <a href="https://daveabrock.com/2020/10/26/blast-off-blazor-intro">introduces his Blazor project</a>, and also <a href="https://daveabrock.com/2020/10/28/blast-off-blazor-404-page">writes and tests a 404 Blazor component</a>.</li>
+  <li>Jon Hilton asks: <a href="https://www.telerik.com/blogs/should-enterprise-pick-angular-react-blazor">should your enterprise pick Angular, React, or Blazor</a>?</li>
+  <li>Marinko Spasojevic <a href="https://code-maze.com/how-to-call-javascript-code-from-net-blazor-webassembly/">calls JavaScript functions with C# in Blazor WebAssembly</a>.</li>
+  <li>Scott Hanselman <a href="https://www.hanselman.com/blog/using-the-aspnet-core-environment-feature-to-manage-development-vs-production-for-any-config-file-type">uses the ASP.NET Core environment feature to manage development vs. production for any config file type</a>.</li>
+  <li>Jeetendra Gund <a href="https://www.telerik.com/blogs/how-to-pass-multiple-parameters-get-method-aspnet-core-mvc">passes multiple parameters to a GET method in ASP.NET Core MVC</a>.</li>
+  <li>Thomas Ardal <a href="https://blog.elmah.io/how-we-do-bundling-and-minification-in-asp-net-core/">talks about how he does bundling and minification in ASP.NET Core</a>.</li>
+  <li>Filip Woj <a href="https://www.strathweb.com/2020/10/beautiful-and-compact-web-apis-with-c-9-net-5-0-and-asp-net-core/">shows off compact APIs with C# 9, .NET 5, and ASP.NET Core</a>.</li>
+</ul>
+
+<h3 id="-the-cloud">⛅ The cloud</h3>
+
+<ul>
+  <li>Paul F. Wood <a href="https://www.advancedinstaller.com/using-azure-key-vault.html">discusses when, why, and how to use Azure Key Vault</a>.</li>
+  <li>Matteo Prosperi <a href="https://www.codeproject.com/Articles/5283689/Tinkering-with-client-side-Blazor-and-the-AWS-SDK">tinkers with client-side Blazor and the AWS SDK for .NET</a>.</li>
+  <li>Nwose Lotanna Victor <a href="https://www.telerik.com/blogs/deploy-angular-application-with-azure-static-web-apps">deploys an Angular app with Azure Static Web Apps</a>.</li>
+  <li>Ben De St Paer-Gotch <a href="https://www.docker.com/blog/setting-up-cloud-deployments-using-docker-azure-and-github-actions/">sets up cloud deployments using Docker, Azure and Github Actions</a>.</li>
+</ul>
+
+<h3 id="-c">📔 C#</h3>
+
+<ul>
+  <li>Matthew Jones <a href="https://exceptionnotfound.net/csharp-in-simple-terms-10-interfaces-and-abstract-classes">writes about interfaces and abstract classes in C#</a>.</li>
+  <li>Munib Butt <a href="https://www.c-sharpcorner.com/article/producer-consumer-pattern-in-c-sharp/">shows off the Producer Consumer pattern in C#</a>.</li>
+  <li>Tomasz Pęczek <a href="https://www.tpeczek.com/2020/10/consuming-json-objects-stream-ndjson.html">consumes JSON Objects Stream with HttpClient</a>.</li>
+  <li>Khalid Abuhakmeh <a href="https://khalidabuhakmeh.com/generate-qr-codes-csharp">generates QR codes with C#</a>.</li>
+  <li>Nick Gamb <a href="https://developer.okta.com/blog/2020/10/23/how-to-authenticate-with-saml-in-aspnet-core-and-csharp">authenticates with SAML in ASP.NET Core and C#</a>.</li>
+  <li>Eric Potter <a href="http://humbletoolsmith.com/2020/10/23/upgrading-a-_net-framework-library-to-_net-5/">upgrades a .NET Framework library to .NET 5</a>.</li>
+  <li>Jason Farrell <a href="https://jfarrell.net/2020/10/25/test-series-part-2-unit-testing/">continues his series on unit testing</a>.</li>
+</ul>
+
+<h3 id="-tools">🔧 Tools</h3>
+
+<ul>
+  <li>The Uno Platform Team <a href="https://platform.uno/blog/webassembly-tools-frameworks-and-libraries-for-net-developers/">discusses WebAssembly tools, frameworks, and libraries for .NET devs</a>.</li>
+  <li>ErikEJ <a href="https://erikej.github.io/sqlclient/2020/10/26/sqlclient-commandtimeout-preview.html">sets the command timeout with the latest .NET SqlClient</a>.</li>
+  <li>For Visual Studio: Mads Kristensen <a href="https://devblogs.microsoft.com/visualstudio/get-more-done-with-search-in-visual-studio">offers tips on searching in Visual Studio</a>, and Steve Smith <a href="https://ardalis.com/configure-visual-studio-to-name-private-fields-with-underscore/">configures Visual Studio to name private fields with underscores</a>.</li>
+  <li>Andrew Lock <a href="https://andrewlock.net/deploying-asp-net-core-applications-to-kubernetes-part-9-monitoring-helm-releases-that-use-jobs-and-init-containers/">monitors Helm releases that use jobs and init containers</a>.</li>
+  <li>Over at Code Maze, <a href="https://code-maze.com/elasticsearch-aspnet-core/">they work with Elasticsearch in ASP.NET Core</a>.</li>
+  <li>Rajeev Bera <a href="https://opensource.com/article/20/10/advanced-git-tips">talks about Git tips and tricks</a>.</li>
+  <li>Sanjay Modi <a href="https://procodeguide.com/programming/asp-net-core-code-profiling-using-miniprofiler/">uses MiniProfiler in ASP.NET Core 3.1</a>.</li>
+  <li>Mark Seemann <a href="https://blog.ploeh.dk/2020/10/26/fit-urls/">talks about how to keep REST API URLs evolvable</a>.</li>
+</ul>
+
+<h3 id="-xamarin">📱 Xamarin</h3>
+
+<ul>
+  <li>Charlin Agramonte says: <a href="https://xamgirl.com/stop-doing-isvisibletrue-false-to-show-hide-views-in-runtime-in-xamarin-forms/">stop doing IsVisible=”true/false” to show hide views</a>.</li>
+  <li>Jean-Marie Alfonsi <a href="https://www.sharpnado.com/sharpnado-tabs-2-0/">discusses Sharpnado.Tabs 2.0</a>.</li>
+  <li>Leomaris Reyes <a href="https://askxammy.com/replicating-event-app-ui-in-xamarin-forms/">replicates an event app UI</a>.</li>
+</ul>
+
+<h3 id="-podcasts">🎤 Podcasts</h3>
+
+<p>The 6-Figure Developer podcast <a href="https://6figuredev.com/podcast/episode-167-manage-cloud-cost-with-omry-hay/">talks about managing cloud cost with Omry Hay</a>.</p>
+
+<h3 id="-videos">🎥 Videos</h3>
+
+<ul>
+  <li>Kathleen Dollard <a href="https://www.youtube.com/watch?v=CL1kFrw4qEY">talks about the difference between .NET Core, .NET 5, and .NET Framework</a>.</li>
+  <li>Data Exposed <a href="https://channel9.msdn.com/Shows/Data-Exposed/Creating-Your-First-Azure-SQL-Database">talks about creating your first Azure SQL database</a>.</li>
+  <li>Jeff Fritz <a href="https://www.youtube.com/watch?v=2RKF8XTf0Fc">talks about SOLID and dependency injection in C#</a></li>
+</ul>
+:ET

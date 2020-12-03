@@ -1,0 +1,96 @@
+I"�"<p>The Application Cache (AppCache) API allows offline access to your application by providing the following benefits:</p>
+
+<ul>
+  <li><strong>Performance</strong> - Specified site resources come right from disk, avoiding any network trips</li>
+  <li><strong>Availability</strong> - Users can navigate to your site when they are offline</li>
+  <li><strong>Resilience</strong> - If a server breaks or something bombs and your site is inaccessible online, users can still use your offline site.</li>
+</ul>
+
+<p>In this post, we’ll explore how to implement AppCache and investigate its benefits and many drawbacks.</p>
+
+<h3 id="creating-a-manifest-file">Creating a manifest file</h3>
+
+<p>First, you’ll need to create a manifest file, a static text file that tells the browser which assets to cache for offline availability. A manifest can have three different sections (the order and frequency of these sections do not matter):</p>
+
+<ul>
+  <li><strong>Cache</strong> - This default section lists the site assets that will be cached after an initial download.</li>
+  <li><strong>Network</strong> - Files listed here can come from the network if they aren’t cached. Otherwise, the network isn’t used even if the user is online.</li>
+  <li><strong>Fallback</strong> - A section, which is optional, that specifies pages to use if a resource is not available. The first URI is the resource, and the second is what is used if the network request fails or errors.</li>
+</ul>
+
+<p>Keep in mind the following “gotchas” with the manifest: if the manifest file cannot be found, the cache is deleted. Also, if the manifest or a resource specified in the manifest cannot be found and downloaded, the entire offline caching process fails and the browser will keep using the old application cache.</p>
+
+<p>So, when will the browser use a new cache? This occurs when a user clears their cache, a manifest file is modified, or programmatically (we’ll get to that later).</p>
+
+<p>Pay special attention to the second item. A common misconception is that when any resources listed within the manifest change, they will be re-cached. That is wrong. The manifest file itself needs to change. To facilitate this, it is a common practice to leave a timestamp comment at the top of the file that you can update whenever the manifest changes, such as in my example below.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CACHE MANIFEST
+# v5 2016-08-15
+index.html
+css/main.css
+scripts/script.js
+images/hanna.jpg
+images/emma.jpg
+
+NETWORK:
+*
+
+FALLBACK:
+offline.html
+</code></pre></div></div>
+
+<h3 id="referencing-the-manifest-file">Referencing the manifest file</h3>
+
+<p>Now that you’ve created the manifest file, you then need to reference it in your web page(s). To do this, you’ll need to append the manifest attribute to the opening <code class="language-plaintext highlighter-rouge">&lt;html&gt;</code> tag of any page you want cached:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;html</span> <span class="na">manifest=</span><span class="s">"manifest.appcache"</span><span class="nt">&gt;</span>
+...
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+
+<p>This bears repeating: the attribute must be included on every page that you want cached. The browser will not cache a page if the manifest attribute is not included on the specific page.</p>
+
+<h3 id="using-the-appcache-apis">Using the AppCache APIs</h3>
+
+<p>Now that you have created the manifest file and decided which pages you want to be cached, you can now talk to the AppCache programmatically from the global JavaScript <code class="language-plaintext highlighter-rouge">window.applicationCache</code> object. From this object, you can call the following methods:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">abort</code> - kills the cache download process</li>
+  <li><code class="language-plaintext highlighter-rouge">addEventListener</code> - registers an event handler for a specific event type</li>
+  <li><code class="language-plaintext highlighter-rouge">dispatchEvent</code> - sends an event to a current element</li>
+  <li><code class="language-plaintext highlighter-rouge">removeEventListener</code> - removes a handler previously registered by addEventListener</li>
+  <li><code class="language-plaintext highlighter-rouge">swapCache</code> - swaps an old cache for a new cache</li>
+  <li><code class="language-plaintext highlighter-rouge">update</code> - triggers an update of the existing cache only if updates are available</li>
+</ul>
+
+<p>From the <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Using_the_application_cache">MDN documentation on AppCache</a>, here’s how you would see if your application has an updated manifest file.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">onUpdateReady</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">I found a new version!</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nb">window</span><span class="p">.</span><span class="nx">applicationCache</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">updateready</span><span class="dl">'</span><span class="p">,</span> <span class="nx">onUpdateReady</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">applicationCache</span><span class="p">.</span><span class="nx">status</span> <span class="o">===</span> <span class="nb">window</span><span class="p">.</span><span class="nx">applicationCache</span><span class="p">.</span><span class="nx">UPDATEREADY</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">onUpdateReady</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Note, as specified in the MDN documentation, that <em>“…since a cache manifest file may have been updated before a script attaches event listeners to test for updates, scripts should always test <code class="language-plaintext highlighter-rouge">applicationCache.status</code>.”</em></p>
+
+<h3 id="the-fine-print">The fine print</h3>
+
+<p>In <a href="http://alistapart.com/article/application-cache-is-a-douchebag">Application Cache is a Douchebag</a>, Jake Archibald brilliantly lays out the many limitations of the AppCache API. You should read that piece for the full details, but here are a few gotchas that I haven’t mentioned yet:</p>
+
+<ul>
+  <li><strong>Files come from the cache if you’re online</strong> – you’ll first get a version of the site from your cache. After rendering, the browser then finds updates to the manifest. As noted in the article, it means the browser doesn’t have to wait for timing out connections, but it’s somewhat annoying.</li>
+  <li><strong>Non-cached resources don’t load on a cached page</strong> – if you cache, for example, a web page but not an image on it, the image will not display on the page even when you are online. Really. You would get around this by adding the * to the Network section in your manifest. (However, these connections will fail anyway if you are offline.)</li>
+  <li><strong>You can’t access a cached file by its parameters</strong> – accessing <code class="language-plaintext highlighter-rouge">index.html</code> by parameters such as <code class="language-plaintext highlighter-rouge">index.html?parameter=value</code> will not retrieve the cached page. It will fetch the page over the network.</li>
+</ul>
+
+<p>As you can imagine, AppCache’s limitations have spurned a “let’s not use AppCache” movement across the Web. It has been removed from the Web standards in favor of service workers. When describing service workers, the MDN documentation summed up AppCache’s rise and fall nicely:</p>
+
+<p>The previous attempt — AppCache — seemed to be a good idea because it allowed you to specify assets to cache really easily. However, it made many assumptions about what you were trying to do and then broke horribly when your app didn’t follow those assumptions exactly.</p>
+
+<p>So to answer my initial question, it is not worth it; don’t use AppCache. Unless you are completely aware of the limitations and able to live with them, AppCache’s drawbacks outweigh its benefits. The community has spoken, and using local storage or service workers is the preferred approach.</p>
+:ET

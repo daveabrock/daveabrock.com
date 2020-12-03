@@ -1,0 +1,262 @@
+<p>A couple of weeks ago, I wrote about <a href="https://daveabrock.com/2020/10/13/azure-functions-static-apps-blazor">deploying an Azure Static Web App with Blazor and Azure Functions</a>. In that post, I talked about using the app I built as a base for an upcoming Blazor series. This is it!</p>
+
+<p>We’ll be building our site from the ground up with <em>no Blazor experience required</em>. All you’ll need is a passing knowledge of C# and .NET. If you don’t have that, no problem: brush up on some C# (I enjoy <a href="https://docs.microsoft.com/en-us/learn/paths/csharp-first-steps/">this Learn module</a>) and come back when you’re ready.</p>
+
+<p>This post includes the following content.</p>
+
+<ul>
+  <li><a href="#what-is-blazor">What is Blazor?</a>
+    <ul>
+      <li><a href="#hosting-models">Hosting models</a>
+        <ul>
+          <li><a href="#blazor-web-assembly">Blazor Web Assembly</a>
+            <ul>
+              <li><a href="#the-good">The good</a></li>
+              <li><a href="#the-not-so-good">The not so good</a></li>
+            </ul>
+          </li>
+          <li><a href="#blazor-server">Blazor Server</a>
+            <ul>
+              <li><a href="#the-good-1">The good</a></li>
+              <li><a href="#the-not-so-good-1">The not so good</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#blasting-off-with-our-project">Blasting off with our project</a></li>
+  <li><a href="#our-first-code-review">Our first code review</a>
+    <ul>
+      <li><a href="#the-api-project">The API project</a></li>
+      <li><a href="#the-blazor-project">The Blazor project</a>
+        <ul>
+          <li><a href="#the-route-template">The route template</a></li>
+          <li><a href="#the-code-block">The @code block</a></li>
+          <li><a href="#the-markup">The markup</a></li>
+        </ul>
+      </li>
+      <li><a href="#what-about-css">What about CSS?</a></li>
+    </ul>
+  </li>
+  <li><a href="#run-the-project-locally">Run the project locally</a></li>
+  <li><a href="#wrap-up">Wrap up</a></li>
+</ul>
+
+<h1 id="what-is-blazor">What is Blazor?</h1>
+
+<p>If you’ve worked in the .NET ecosystem, it’s been hard to ignore the buzz around <a href="https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor">Blazor</a>. If you’re new to Blazor or even .NET, a refresher is in order.</p>
+
+<p>Blazor is a front-end (UI) framework using a single-page application model. These days, think of JavaScript libraries like React or Vue. With Blazor, you can build interactive UIs using C#. You do this by building reusable components using C#, CSS, and HTML. For when you can’t use C#, like working with a browser’s local storage, JavaScript interopability is built in. (And if you truly are allergic to  JavaScript, there’s several community projects that can help you–<a href="https://github.com/Blazored">like Blazored</a>.)</p>
+
+<h2 id="hosting-models">Hosting models</h2>
+
+<p>If you select a Blazor project template in Visual Studio, you’ll need to pick a hosting model. Blazor offers two hosting models: Blazor Web Assembly and Blazor Server.</p>
+
+<h3 id="blazor-web-assembly">Blazor Web Assembly</h3>
+
+<p>With Blazor Web Assembly—which we’ll be using in this project!—Blazor and its dependencies (including the .NET runtime!) are downloaded to the browser. The entire app executes on the browser UI thread. All app aseets, typically in <code class="language-plaintext highlighter-rouge">wwwroot</code>, are deployed as static files.</p>
+
+<p>If you look at the footer of your generated HTML, you’ll see it uses <code class="language-plaintext highlighter-rouge">blazor.webassembly.js</code>. This file initializes the app’s runtime after downloading the app and its dependencies.</p>
+
+<p>I’ve <del>stolen</del> borrowed this diagram <a href="https://docs.microsoft.com/aspnet/core/blazor/hosting-models?view=aspnetcore-3.1">from the Microsoft doc on the subject</a>:</p>
+
+<p><img src="http://localhost:4001/images/blazor-webassembly.png" alt="Blazor web assembly diagram" /></p>
+
+<h4 id="the-good">The good</h4>
+
+<ul>
+  <li>No required ASP.NET Core server or dependency on .NET server-side, meaning a serverless deployment scenario (like for this app!) is possible</li>
+  <li>Work is completely offloaded to the client</li>
+  <li>Docker support</li>
+</ul>
+
+<h4 id="the-not-so-good">The not so good</h4>
+
+<ul>
+  <li>The browser is your runtime, so I hope you like your browser</li>
+  <li>Download size is larger, so apps take much longer to load</li>
+  <li>Tooling support is not as great (but improving)</li>
+</ul>
+
+<h3 id="blazor-server">Blazor Server</h3>
+
+<p>With Blazor Server, your app executes on the server from an ASP.NET Core app. Any UI updates, JavaScript calls, and event handling, is handled over a persistent SignalR connection.</p>
+
+<p>I’ve once again <del>stolen</del> borrowed this diagram <a href="https://docs.microsoft.com/aspnet/core/blazor/hosting-models?view=aspnetcore-3.1">from the Microsoft doc on the subject</a>:</p>
+
+<p><img src="http://localhost:4001/images/blazor-server.png" alt="Blazor Server diagram" /></p>
+
+<h4 id="the-good-1">The good</h4>
+
+<ul>
+  <li>Small download size and fast loading time</li>
+  <li>You get to leverage .NET Core APIs and tooling, and share models between the client and server</li>
+  <li>Docker support</li>
+  <li>You don’t have to worry about WebAssembly support (although this will be less a concern), or devices that don’t have a lot of resources to work with</li>
+</ul>
+
+<h4 id="the-not-so-good-1">The not so good</h4>
+
+<ul>
+  <li>High latency, since a network call is required for each interaction</li>
+  <li>An ASP.NET Core server is required</li>
+  <li>No offline support like Blazor Web Assembly</li>
+</ul>
+
+<p>We’ll learn much more about Blazor in great detail as we improve our application. So, what is this application? Keep reading for details.</p>
+
+<h1 id="blasting-off-with-our-project">Blasting off with our project</h1>
+
+<p>As <a href="https://daveabrock.com/2020/10/13/azure-functions-static-apps-blazor">written about previously</a>, I’ve built an app called <em>Blast Off With Blazor</em>. You can see a live version at <em><a href="https://www.blastoffwithblazor.com/">blastoffwithblazor.com</a></em> and also <a href="https://github.com/daveabrock/NASAImageOfDay">clone the GitHub repository</a>.</p>
+
+<p>When the application loads, it calls an Azure Function. The Function, in turn, calls NASA’s Astronomy Picture of the Day (APOD) API to get a picture that is out of this world—literally. The APOD site has been <a href="https://apod.nasa.gov/apod/">serving up amazing images daily</a> since June 16, 1995. Every time you reload the app, I’ll fetch a random image anytime between that start date and today.</p>
+
+<p><img src="https://daveabrock.com/images/blast-off-demo.png" alt="blast off with blazor site" /></p>
+
+<p>Right now, it’s super simple and super slow. We’ll fix that in upcoming posts as we learn Blazor together. As we build on it, we’ll be using additional awesome NASA APIs as we learn all about …</p>
+
+<ul>
+  <li>CSS and JavaScript isolation</li>
+  <li>Data binding</li>
+  <li>Event handling</li>
+  <li>State management</li>
+  <li>Routing</li>
+  <li>Configuration</li>
+  <li>Testing</li>
+  <li>PWAs</li>
+</ul>
+
+<p>… and so on.</p>
+
+<p>For now, let’s look at the code.</p>
+
+<h1 id="our-first-code-review">Our first code review</h1>
+
+<p>I wanted to start with some basic functionality. Let’s look through what I set up for you.</p>
+
+<h2 id="the-api-project">The API project</h2>
+
+<p>Let’s first look at the <code class="language-plaintext highlighter-rouge">Api</code> project as, for now, it’s pretty simple. As I said earlier, we’re going to call the NASA APOD API. If you don’t pass a date to the API it’ll return the latest photo. I preferred to fetch a random one.</p>
+
+<p>So, in <code class="language-plaintext highlighter-rouge">ImageGet.cs</code>, I wrote a helper <code class="language-plaintext highlighter-rouge">GetRandomDate()</code> function. This returns a date between June 16, 1995 (when the API started) and today.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">private</span> <span class="k">static</span> <span class="kt">string</span> <span class="nf">GetRandomDate</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="kt">var</span> <span class="n">random</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Random</span><span class="p">();</span>
+    <span class="kt">var</span> <span class="n">startDate</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">DateTime</span><span class="p">(</span><span class="m">1995</span><span class="p">,</span> <span class="m">06</span><span class="p">,</span> <span class="m">16</span><span class="p">);</span>
+    <span class="kt">var</span> <span class="n">range</span> <span class="p">=</span> <span class="p">(</span><span class="n">DateTime</span><span class="p">.</span><span class="n">Today</span> <span class="p">-</span> <span class="n">startDate</span><span class="p">).</span><span class="n">Days</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">startDate</span><span class="p">.</span><span class="nf">AddDays</span><span class="p">(</span><span class="n">random</span><span class="p">.</span><span class="nf">Next</span><span class="p">(</span><span class="n">range</span><span class="p">)).</span><span class="nf">ToString</span><span class="p">(</span><span class="s">"yyyy-MM-dd"</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now that we have our date, we can work on our Azure Function.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="nf">FunctionName</span><span class="p">(</span><span class="s">"ImageGet"</span><span class="p">)]</span>
+<span class="k">public</span> <span class="k">static</span> <span class="k">async</span> <span class="n">Task</span><span class="p">&lt;</span><span class="n">IActionResult</span><span class="p">&gt;</span> <span class="nf">Run</span><span class="p">(</span>
+    <span class="p">[</span><span class="nf">HttpTrigger</span><span class="p">(</span><span class="n">AuthorizationLevel</span><span class="p">.</span><span class="n">Anonymous</span><span class="p">,</span> <span class="s">"get"</span><span class="p">,</span> <span class="n">Route</span> <span class="p">=</span> <span class="s">"image"</span><span class="p">)]</span> <span class="n">HttpRequest</span> <span class="n">req</span><span class="p">,</span>
+    <span class="n">ILogger</span> <span class="n">log</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">log</span><span class="p">.</span><span class="nf">LogInformation</span><span class="p">(</span><span class="s">"Executing ImageOfDayGet."</span><span class="p">);</span>
+
+    <span class="kt">var</span> <span class="n">apiKey</span> <span class="p">=</span> <span class="n">Environment</span><span class="p">.</span><span class="nf">GetEnvironmentVariable</span><span class="p">(</span><span class="s">"ApiKey"</span><span class="p">);</span>
+    <span class="kt">var</span> <span class="n">response</span> <span class="p">=</span> <span class="k">await</span> <span class="n">httpClient</span><span class="p">.</span><span class="nf">GetAsync</span><span class="p">(</span><span class="s">$"https://api.nasa.gov/planetary/apod?api_key=</span><span class="p">{</span><span class="n">apiKey</span><span class="p">}</span><span class="s">&amp;hd=true&amp;date=</span><span class="p">{</span><span class="nf">GetRandomDate</span><span class="p">()}</span><span class="s">"</span><span class="p">);</span>
+    <span class="kt">var</span> <span class="n">result</span> <span class="p">=</span> <span class="k">await</span> <span class="n">response</span><span class="p">.</span><span class="n">Content</span><span class="p">.</span><span class="nf">ReadAsStringAsync</span><span class="p">();</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">OkObjectResult</span><span class="p">(</span><span class="n">JsonConvert</span><span class="p">.</span><span class="nf">DeserializeObject</span><span class="p">(</span><span class="n">result</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>There’s actually quite a bit going on in the method signature. We start with defining an <code class="language-plaintext highlighter-rouge">HttpTrigger</code>, which means it’ll execute when our app calls it. We pass in an <code class="language-plaintext highlighter-rouge">AuthLevel</code> of <code class="language-plaintext highlighter-rouge">Anonymous</code>, which means the consuming app doesn’t have to pass in a function-specific API key. The <code class="language-plaintext highlighter-rouge">Route</code> signifies we’ll only be using GET calls, and the <code class="language-plaintext highlighter-rouge">Route</code> of <code class="language-plaintext highlighter-rouge">image</code> defines the route template (it’ll respond to <code class="language-plaintext highlighter-rouge">api/image</code> calls).</p>
+
+<p>In the body of our method, we get our API key from our configuration and call the API—passing in our key and the date. We’ll also elect to receive HD images. Once we get a result back, we’ll deserialize it so we can pass it back to the caller.</p>
+
+<p>We’ll be focusing on Blazor, obviously, and not Azure Functions. This is probably the most we’ll get into Azure Functions in these posts. If you want to learn more about Azure Functions, <a href="https://docs.microsoft.com/en-us/azure/azure-functions/">have at it</a>.</p>
+
+<h2 id="the-blazor-project">The Blazor project</h2>
+
+<p>If you navigate to the <code class="language-plaintext highlighter-rouge">Client</code> project, you’ll see <a href="https://github.com/daveabrock/NASAImageOfDay/blob/main/Client/Pages/Index.razor">just one page currently in the project</a>, under the <code class="language-plaintext highlighter-rouge">Pages</code> directory: <code class="language-plaintext highlighter-rouge">Index.razor</code>.</p>
+
+<p>This <code class="language-plaintext highlighter-rouge">.razor</code> file is a component. In Blazor, a component is a “chunk” or “part” of the UI (like a form, page, or even something as simple as a button). In our case, the page is our component. Eventually, we’ll want to change this to make it more reusable. We’ll get there.</p>
+
+<p>These component files use Razor, a combination of C# and HTML. This is very similar to what’s implemented in ASP.NET MVC or Razor Pages.</p>
+
+<h3 id="the-route-template">The route template</h3>
+
+<p>The first thing you’ll see at the top of the page is this:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@page "/"
+</code></pre></div></div>
+
+<p>This <code class="language-plaintext highlighter-rouge">@page</code> attribute signifies a route template. In our case, the root of the app. That’s all we need to know for now, but it can <a href="https://docs.microsoft.com/aspnet/core/blazor/fundamentals/routing?view=aspnetcore-3.1">get a lot more complicated</a>: you can even apply multiple route templates for a component.</p>
+
+<h3 id="the-code-block">The @code block</h3>
+
+<p>Skipping down to the bottom of the file, you’ll see a <code class="language-plaintext highlighter-rouge">@code</code> block—this is where we’ll define our C# code to associate with our component. As we make more complex components, we can even move this code to separate C# classes.</p>
+
+<p>For now, let’s examine the <code class="language-plaintext highlighter-rouge">@code</code> block.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">private</span> <span class="n">Data</span><span class="p">.</span><span class="n">Image</span> <span class="n">image</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>In our <code class="language-plaintext highlighter-rouge">Data</code> project, we have the API model:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">Image</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Title</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Copyright</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="n">DateTime</span> <span class="n">Date</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Explanation</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Url</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">HdUrl</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>More interestingly, we call <code class="language-plaintext highlighter-rouge">OnInitializedAsync</code> to fetch our image from the Azure Function:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">protected</span> <span class="k">override</span> <span class="k">async</span> <span class="n">Task</span> <span class="nf">OnInitializedAsync</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">image</span> <span class="p">=</span> <span class="k">await</span> <span class="n">http</span><span class="p">.</span><span class="n">GetFromJsonAsync</span><span class="p">&lt;</span><span class="n">Data</span><span class="p">.</span><span class="n">Image</span><span class="p">&gt;(</span><span class="s">"api/image"</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Wait, what is that <code class="language-plaintext highlighter-rouge">http</code> reference? That’s us injecting <code class="language-plaintext highlighter-rouge">HttpClient</code>, from the top of the file:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@inject HttpClient http
+</code></pre></div></div>
+
+<p>Much like a normal .NET Core app, you can <a href="https://docs.microsoft.com/en-us/aspnet/core/mvc/views/dependency-injection?view=aspnetcore-3.1">use dependency injection to inject a service into a Razor component</a>.</p>
+
+<h3 id="the-markup">The markup</h3>
+
+<p>Next, you’ll see us use Razor syntax to render <code class="language-plaintext highlighter-rouge">image</code> properties onto the page. You’ll notice I check first if the <code class="language-plaintext highlighter-rouge">image</code> is null before rendering. The page will certainly load before the API call completes. In those cases, the page can error out if you don’t check for it. (I also saw that sometimes the API didn’t return a <code class="language-plaintext highlighter-rouge">Copyright</code>, so I handled that, too.)</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@if (image != null)
+{
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"p-4"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;h1</span> <span class="na">class=</span><span class="s">"text-6xl"</span><span class="nt">&gt;</span>@image.Title<span class="nt">&lt;/h1&gt;</span>
+        <span class="nt">&lt;p</span> <span class="na">class=</span><span class="s">"text-2xl"</span><span class="nt">&gt;</span>@FormatDate(image.Date)<span class="nt">&lt;/p&gt;</span>
+        @if (image.Copyright != null)
+        {
+            <span class="nt">&lt;p&gt;</span>Copyright: @image.Copyright<span class="nt">&lt;/p&gt;</span>
+        }
+    <span class="nt">&lt;/div&gt;</span>
+
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"flex justify-center p-4"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">"@image.Url"</span> <span class="na">class=</span><span class="s">"rounded-lg h-500 w-500 flex items-center justify-center"</span><span class="nt">&gt;&lt;br</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+}
+</code></pre></div></div>
+
+<h2 id="what-about-css">What about CSS?</h2>
+
+<p>In the markup, you might be wondering about the HTML classes. With CSS for this project, <a href="https://chrissainty.com/integrating-tailwind-css-with-blazor-using-gulp-part-1/">Chris Sainty</a> and <a href="https://jonhilton.net/re-usable-components-with-blazor-and-tailwind-css/">Jon Hilton</a> <a href="https://jonhilton.net/re-usable-components-with-blazor-and-tailwind-css/">sold me on Tailwind CSS</a>. Tailwind is what we call utility-first, allowing you to use a variety of classes that allows you to iterate easily. It takes a little bit to get used to, but it sure beats dropping in pre-built components that find their way everywhere (<a href="https://getbootstrap.com/">hi, Bootstrap</a>).</p>
+
+<p>I won’t be going too much in-depth on CSS, knowing my limitations, but that’s what the markup classes are for.</p>
+
+<h1 id="run-the-project-locally">Run the project locally</h1>
+
+<p>I’d love for you to join me as we learn Blazor together. Once you <a href="https://github.com/daveabrock/NASAImageOfDay">clone the GitHub repo</a>, please look at the project README.md to understand how you can get this application up and running.</p>
+
+<h1 id="wrap-up">Wrap up</h1>
+
+<p>I know this was a long “introduction” but I wanted a nice first post to explain everything. In this post, we introduced Blazor, talked about Blazor hosting options, and reviewed our code. Stay tuned and thanks for reading!</p>

@@ -1,0 +1,190 @@
+<p class="notice--success"><strong>Note</strong>: Originally published five months before the official release of C# 9, I’ve updated this post after the release to capture the latest updates.</p>
+
+<p>A few weeks ago, we took a quick tour of some upcoming C# 9 features that will <a href="https://daveabrock.com/2020/06/18/reduce-mental-energy-with-c-sharp">make your development life easier</a>. We dipped our toes in the water. But now it’s time to dig a little deeper.</p>
+
+<p>I’m starting a new series over the next several weeks, that will showcase <a href="https://devblogs.microsoft.com/dotnet/c-9-0-on-the-record/">all of the announced features</a> incrementally. Then, we will tie it all together with an all-in-one app. As for the features we are showing off, we could always dig deeper by what we see in the <a href="https://github.com/dotnet/roslyn/blob/master/docs/Language%20Feature%20Status.md">Language Feature Status in GitHub</a>, but the publicly-announced-at-Build features will most likely make it when .NET 5.0 launches in November 2020.</p>
+
+<p>Here’s what we’ll be walking through:</p>
+
+<ul>
+  <li>Post 1 (<em>this post</em>) - Init-only features</li>
+  <li>Post 2 - <a href="https://daveabrock.com/2020/07/06/c-sharp-9-deep-dive-records">Records</a></li>
+  <li>Post 3 - <a href="https://daveabrock.com/2020/07/06/c-sharp-9-pattern-matching">Pattern matching</a></li>
+  <li>Post 4 - <a href="https://daveabrock.com/2020/07/09/c-sharp-9-top-level-programs">Top-level programs</a></li>
+  <li>Post 5 - <a href="https://daveabrock.com/2020/07/14/c-sharp-9-target-typing-covariants">Target typing and covariant returns</a></li>
+  <li>Post 6 - <a href="https://daveabrock.com/2020/07/21/c-sharp-9-scavenger-hunt">Putting it all together with a scavenger hunt</a></li>
+</ul>
+
+<h1 id="a-focus-on-immutability">A focus on immutability</h1>
+
+<p>A big focus on C# 9 is enabling features that empower you to make immutability easy. The rise of functional programming has showed us how error-prone mutating objects can often be. While we can have immutability in previous versions of C#, it was a little hacky.</p>
+
+<p>With C# 9, the team is shipping a bunch of features that help with immutability.</p>
+
+<h1 id="doing-immutability-before-c-9">Doing immutability before C# 9</h1>
+
+<p>So how would I do immutability before C# 9? For virtually all of your C# life, you’ve done something like the following:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">Person</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Address</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">City</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FavoriteColor</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="c1">// and so on...</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This gets and sets properties of my <code class="language-plaintext highlighter-rouge">Person</code> with no restrictions. To achieve immutability I’d modify my class to only include a <code class="language-plaintext highlighter-rouge">get</code> accessor:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">Person</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Address</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">City</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FavoriteColor</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span>
+    <span class="c1">// and so on...</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>With that in place, I would use constructors to enforce this behavior:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">Person</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nf">Person</span><span class="p">(</span><span class="kt">string</span> <span class="n">firstName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">lastName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">address</span><span class="p">,</span> <span class="kt">string</span> <span class="n">city</span><span class="p">,</span> <span class="kt">string</span> <span class="n">favoriteColor</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">FirstName</span> <span class="p">=</span> <span class="n">firstName</span><span class="p">;</span>
+        <span class="n">LastName</span> <span class="p">=</span> <span class="n">lastName</span><span class="p">;</span>
+        <span class="n">Address</span> <span class="p">=</span> <span class="n">address</span><span class="p">;</span>
+        <span class="n">City</span> <span class="p">=</span> <span class="n">city</span><span class="p">;</span>
+        <span class="n">FavoriteColor</span> <span class="p">=</span> <span class="n">favoriteColor</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Address</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">City</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FavoriteColor</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>That’s great, but I can’t do this with object initializers. If I wanted to initialize an object like this…</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">person</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Person</span>
+<span class="p">{</span>
+    <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Tony"</span><span class="p">,</span>
+    <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Stark"</span><span class="p">,</span>
+    <span class="n">Address</span> <span class="p">=</span> <span class="s">"10880 Malibu Point"</span><span class="p">,</span>
+    <span class="n">City</span> <span class="p">=</span> <span class="s">"Malibu"</span><span class="p">,</span>
+    <span class="n">FavoriteColor</span> <span class="p">=</span> <span class="s">"Red"</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>…there’s nothing that prevents me from mutating after the fact:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">person</span><span class="p">.</span><span class="n">FirstName</span><span class="p">);</span> <span class="c1">// Tony</span>
+<span class="n">person</span><span class="p">.</span><span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Howard"</span><span class="p">;</span>
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">person</span><span class="p">.</span><span class="n">FirstName</span><span class="p">);</span> <span class="c1">// Howard</span>
+</code></pre></div></div>
+
+<p>Previously, for object initialization to work, the properties must be mutable. To set values in a new <code class="language-plaintext highlighter-rouge">Person</code> in an immutable way, you’ll need to call the object’s constructor (in this case, as in most cases, a parameterless constructor) and then perform assignment from the setters.</p>
+
+<h2 id="introducing-the-init-accessor">Introducing the <code class="language-plaintext highlighter-rouge">init</code> accessor</h2>
+
+<p>With C# 9, we can change this with an <code class="language-plaintext highlighter-rouge">init</code> accessor. This means you can only create and set a property when you initialize the object. If we modify our <code class="language-plaintext highlighter-rouge">Person</code> model like this, we can prevent the <code class="language-plaintext highlighter-rouge">FirstName</code> from being changed:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">Person</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Address</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">City</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FavoriteColor</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="c1">// and so on...</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>With this, that means this code will work:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">person</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Person</span>
+<span class="p">{</span>
+    <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Tony"</span><span class="p">,</span>
+    <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Stark"</span><span class="p">,</span>
+    <span class="n">Address</span> <span class="p">=</span> <span class="s">"10880 Malibu Point"</span><span class="p">,</span>
+    <span class="n">City</span> <span class="p">=</span> <span class="s">"Malibu"</span><span class="p">,</span>
+    <span class="n">FavoriteColor</span> <span class="p">=</span> <span class="s">"Red"</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>However, when you try to execute this code:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">person</span><span class="p">.</span><span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Howard"</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>The compiler will not be happy.</p>
+
+<h2 id="warning-init-only-properties-arent-mandatory">Warning: init-only properties aren’t mandatory</h2>
+
+<p>The beauty of object initializers is the ability to set whatever you want, wherever you want, like so:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">person</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Person</span>
+<span class="p">{</span>
+    <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Tony"</span><span class="p">,</span>
+    <span class="n">City</span> <span class="p">=</span> <span class="s">"Malibu"</span><span class="p">,</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>If you want to come in and set an <code class="language-plaintext highlighter-rouge">Address</code> that has an <code class="language-plaintext highlighter-rouge">init</code> property on it, thinking you can do so because you haven’t set its value yet, you’re wrong. For example, I can’t come in and do this…</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">person</span><span class="p">.</span><span class="n">FavoriteColor</span> <span class="p">=</span> <span class="s">"Red"</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>…because the object has already been initialized.</p>
+
+<h2 id="init-accessors-and-read-only-fields">Init accessors and read-only fields</h2>
+
+<p>As we just saw, <code class="language-plaintext highlighter-rouge">init</code> accessors can only be called when you initialize. If you wish to work with <code class="language-plaintext highlighter-rouge">readonly</code> fields, the mutability only applies during initialization, just as with non-read-only ones.</p>
+
+<p>With this in mind, using private fields will set a value during initialization - otherwise, we will have an <code class="language-plaintext highlighter-rouge">ArgumentNullException</code> thrown:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">Person</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="kt">string</span> <span class="n">_firstName</span><span class="p">;</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="kt">string</span> <span class="n">_lastName</span><span class="p">;</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="kt">string</span> <span class="n">_address</span><span class="p">;</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="kt">string</span> <span class="n">_city</span><span class="p">;</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="kt">string</span> <span class="n">_favoriteColor</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span>
+    <span class="p">{</span>
+        <span class="k">get</span> <span class="p">=&gt;</span> <span class="n">_firstName</span><span class="p">;</span>
+        <span class="n">init</span> <span class="p">=&gt;</span> <span class="n">_firstName</span> <span class="p">=</span> <span class="p">(</span><span class="k">value</span> <span class="p">??</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">(</span><span class="k">nameof</span><span class="p">(</span><span class="n">FirstName</span><span class="p">)));</span>
+    <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span>
+    <span class="p">{</span>
+        <span class="k">get</span> <span class="p">=&gt;</span> <span class="n">_lastName</span><span class="p">;</span>
+        <span class="n">init</span> <span class="p">=&gt;</span> <span class="n">_lastName</span> <span class="p">=</span> <span class="p">(</span><span class="k">value</span> <span class="p">??</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">(</span><span class="k">nameof</span><span class="p">(</span><span class="n">LastName</span><span class="p">)));</span>
+    <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Address</span>
+    <span class="p">{</span>
+        <span class="k">get</span> <span class="p">=&gt;</span> <span class="n">_address</span><span class="p">;</span>
+        <span class="n">init</span> <span class="p">=&gt;</span> <span class="n">_address</span> <span class="p">=</span> <span class="p">(</span><span class="k">value</span> <span class="p">??</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">(</span><span class="k">nameof</span><span class="p">(</span><span class="n">Address</span><span class="p">)));</span>
+    <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">City</span>
+    <span class="p">{</span>
+        <span class="k">get</span> <span class="p">=&gt;</span> <span class="n">_city</span><span class="p">;</span>
+        <span class="n">init</span> <span class="p">=&gt;</span> <span class="n">_city</span> <span class="p">=</span> <span class="p">(</span><span class="k">value</span> <span class="p">??</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">(</span><span class="k">nameof</span><span class="p">(</span><span class="n">City</span><span class="p">)));</span>
+    <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FavoriteColor</span>
+    <span class="p">{</span>
+        <span class="k">get</span> <span class="p">=&gt;</span> <span class="n">_favoriteColor</span><span class="p">;</span>
+        <span class="n">init</span> <span class="p">=&gt;</span> <span class="n">_favoriteColor</span> <span class="p">=</span> <span class="p">(</span><span class="k">value</span> <span class="p">??</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">(</span><span class="k">nameof</span><span class="p">(</span><span class="n">FavoriteColor</span><span class="p">)));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="whats-next">What’s next</h1>
+
+<p>In this post, we learned how to make individual properties become immutable. If you want this behavior for your entire object, you’ll want to work with records - one of the best new features in C# 9, in my opinion. Stay tuned for my next post to discuss this.</p>

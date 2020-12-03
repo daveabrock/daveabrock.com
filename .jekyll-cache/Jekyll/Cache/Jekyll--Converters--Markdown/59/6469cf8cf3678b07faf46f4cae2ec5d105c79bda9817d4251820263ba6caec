@@ -1,0 +1,166 @@
+I"�J<p><img src="https://raw.githubusercontent.com/daveabrock/daveabrock.github.io/master/THE%20.NET%20STACKS.png" alt="Newsletter image" /></p>
+
+<p>I messaged a developer friend to see if he liked my puns, and he said “false.” I told him I didn’t appreciate the cyber boolean.</p>
+
+<p>On tap this week:</p>
+
+<ul>
+  <li>.NET 5 RC 2 ships</li>
+  <li>.NET Foundation updates</li>
+  <li>Last week in the .NET world</li>
+</ul>
+
+<h2 id="-net-5-rc-2-ships">🚢 .NET 5 RC 2 ships</h2>
+
+<p>On Tuesday, Microsoft announced the release of <a href="https://devblogs.microsoft.com/dotnet/announcing-net-5-0-rc-2/">.NET 5.0 RC 2</a>. With the general release of .NET 5 on November 10, it’s the last release candidate (“near-final,” as Richard Lander puts it). You can <a href="https://dotnet.microsoft.com/download/dotnet/5.0">download it here</a> (and will also need the latest Visual Studio preview on <a href="https://visualstudio.microsoft.com/vs/preview/">Windows</a> or <a href="https://visualstudio.microsoft.com/vs/mac/">Mac</a>).</p>
+
+<p>The biggest news out of the general announcement post? MSI installers are now available for ARM64 (yes!)—however, note the .NET 5 SDK <a href="https://devblogs.microsoft.com/dotnet/announcing-net-5-0-preview-8/#windows-arm64">does not contain the Windows Desktop components on ARM64</a>. As a bonus, I learned that <a href="https://docs.microsoft.com/visualstudio/deployment/walkthrough-manually-deploying-a-clickonce-application?view=vs-2019">ClickOnce</a> is still a thing and available for .NET Core 3.1 and .NET 5 Windows apps.</p>
+
+<h3 id="aspnet-core-updates-for-blazor">ASP.NET Core updates for Blazor</h3>
+
+<p>For being so late in the release cycle, ASP.NET Core <a href="https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-release-candidate-2/">was able to ship quite a few Blazor updates for RC 2</a>.</p>
+
+<p>As I’ve <a href="https://daveabrock.com/2020/09/10/blazor-css-isolation">written about extensively</a>, Blazor now ships with CSS isolation—the ability to scope styles to only a single component. Previously, <a href="https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-preview-8/">when the feature was released in .NET 5 Preview 8</a>, all scoped files were bundled into a big <code class="language-plaintext highlighter-rouge">scoped.styles.css</code> file. If you were styling a lot of components, the bundle could get quite heavy. Now, Blazor produces one bundle for each referenced project or package with the format <code class="language-plaintext highlighter-rouge">MyProject.styles.css</code>. (The official Microsoft doc on CSS isolation, <a href="https://github.com/dotnet/AspNetCore.Docs/pull/19956">which I’m writing</a>, should be live in the next week or two.)</p>
+
+<p>In addition, RC 2 comes with a bunch of Blazor tooling updates. The <a href="https://github.com/dotnet/aspnetcore/issues/25887">pesky static port issue</a> was resolved, you can step out and over async methods, and can debug lazy loaded assemblies. Also, your tools can now throw warnings when using unsupported Blazor Web Assembly APIs from a browser. (This is part of a larger .NET 5 effort that annotates which APIs are supported <a href="https://docs.microsoft.com/dotnet/standard/analyzers/api-analyzer#discover-cross-platform-issues">with a platform compatability analyzer</a>.)</p>
+
+<h3 id="entity-framework-core-5-updates">Entity Framework Core 5 updates</h3>
+
+<p>Because EF Core 5 RC1 <a href="https://docs.microsoft.com/ef/core/what-is-new/ef-core-5.0/whatsnew">was so feature-rich</a>—with many-to-many, mapping entity types to queries, event counters, <code class="language-plaintext highlighter-rouge">SaveChanges</code> interception and much more, RC2 was spent on bug fixes. (Also, if Jeremy Likness’s callouts in every update haven’t gotten your attention, know that EF Core 5 requires .NET Standard 2.1, meaning it won’t run on .NET Standard 2.0 platforms like .NET Framework.)</p>
+
+<p>Next week, I’ll talk about the .NET 5 release cycles and how Microsoft is supporting them.</p>
+
+<h2 id="-net-foundation-all-hands-meeting-recap">🧭 .NET Foundation “all hands” meeting recap</h2>
+
+<p>The .NET Foundation provided a <a href="https://dotnetfoundation.org/blog/2020/10/14/blog/posts/net-foundation-september-october-2020-update">September/October update this week</a>, and also <a href="https://www.youtube.com/watch?v=CX8wT0mO5qg">hosted an “all hands meeting”</a> with the Board of Directors (which was live-streamed and open to all).</p>
+
+<p>In the past, the Foundation has heard loud and clear that they need to work on better communication and openness. They’ve responded with regular updates, releasing budget info, a State of the Union update, and more. There’s a proposal to change the mission statement (<a href="https://github.com/dotnet-foundation/website/pull/388">and you can chime in on the open GitHub issue until October 26</a>):</p>
+
+<blockquote>
+  <p>Our mission is to build and educate producers and consumers, both new and old of the .NET platform. We will grow a trusted OSS ecosystem adopted by education, commercial entities, and all users. We will lead by example creating a world-wide, healthy, vibrant, and diverse OSS community.</p>
+</blockquote>
+
+<p>There was some mention of the <a href="https://github.com/dotnet-foundation/project-maturity-model">.NET Foundation maturity model</a>, which is currently sitting on the back burner. This model helps to improve the quality and quantity of .NET open source projects (and .NET in general). A big driver of this model is to get corporate sponsors to pay for .NET Foundation projects and there’s some open work on seeing that through—how do you make the projects sustainable without lazily asking maintainers to keep working hard on them?</p>
+
+<p>Rodney Littles II made a great point in saying: “There are people in the community that are asking a lot of the .NET Foundation … We are the .NET community, what are we going to do for ourselves? We have to get past this concept of a Microsoft-driven construct.”</p>
+
+<p>It’s easy to get skeptical about the “Microsoft-driven construct” comment—Microsoft owns .NET and has a huge financial stake in seeing it do well, so hoping for complete independence isn’t realistic. As a result, when it comes to the .NET Foundation Microsoft is both an asset and a liability. But it’s important for the community to not view the Foundation as something that needs to be driven by Microsoft. Yes, there will always be questions on Microsoft’s independence, but at a certain point the growth of the Foundation depends on the community.</p>
+
+<h2 id="-last-week-in-the-net-world">🌎 Last week in the .NET world</h2>
+
+<h3 id="-the-top-3">🔥 The Top 3</h3>
+
+<ul>
+  <li>.NET 5 RC 2 is out—<a href="https://devblogs.microsoft.com/dotnet/announcing-net-5-0-rc-2">Richard Lander has the details</a>, Daniel Roth <a href="https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-release-candidate-2">updates us on ASP.NET Core</a>, and Jeremy Likness <a href="https://devblogs.microsoft.com/dotnet/announcing-entity-framework-core-ef-core-5-rc2">runs through EF Core</a>.</li>
+  <li>Andrew Lock <a href="https://andrewlock.net/deploying-asp-net-core-applications-to-kubernetes-part-7-running-database-migrations/">runs database migrations when deploying to Kubernetes</a>.</li>
+  <li>Manuel Grundner <a href="https://blog.delegate.at/2020/10/11/comment-system-on-static-sites-with-dotnet-core-and-github-actions.html">writes a static site comment system with .NET Core and GitHub Actions</a>.</li>
+</ul>
+
+<h3 id="-announcements">📢 Announcements</h3>
+
+<ul>
+  <li>The Azure SDK team <a href="https://devblogs.microsoft.com/azure-sdk/october-2020-release">offers an October update</a>.</li>
+  <li>Jimmy Bogard <a href="https://jimmybogard.com/mediatr-9-0-released">releases MediatR 9.0</a>.</li>
+  <li>Rahul Bhandari <a href="https://devblogs.microsoft.com/dotnet/net-core-october-2020">releases the .NET Core October 2020 update for reliability and other non-security fixes</a>, and Tara Overfield <a href="https://devblogs.microsoft.com/dotnet/net-framework-republishing-of-july-2020-security-only-updates">republishes the July 2020 Security Only Updates for .NET Framework to resolve a known issue that affected the original release</a> as well as <a href="https://devblogs.microsoft.com/dotnet/net-framework-october-2020-security-and-quality-rollup-updates">the .NET Framework October 2020 security and quality rollup updates</a>.</li>
+</ul>
+
+<h3 id="-community-and-events">📅 Community and events</h3>
+
+<ul>
+  <li>The .NET Foundation <a href="https://dotnetfoundation.org/blog/2020/10/14/blog/posts/net-foundation-september-october-2020-update">provides a September/October 2020 update</a>, and also <a href="https://www.youtube.com/watch?v=CX8wT0mO5qg">holds an “All Hands” meeting</a>.</li>
+  <li>Speaking of, <a href="https://www.youtube.com/watch?v=RBb-iuElZxI">.NET Foundation executive director Claire Novotny talks to the .NET Docs Show</a>.</li>
+  <li>For .NET standups, Entity Framework <a href="https://www.youtube.com/watch?v=KenrBgNg8jk">talks to David Pine about his new SDK</a> and <a href="https://www.youtube.com/watch?v=euM0GtPpbyc">ASP.NET discusses .NET 6 planning</a>.</li>
+  <li>Microsoft rolls out <a href="https://devblogs.microsoft.com/dotnet/dotnet-live-tv">.NET Live TV</a>.</li>
+  <li>GitHub shows off <a href="https://github.blog/2020-10-14-even-better-code-review-in-github-for-mobile/">its new mobile PR capabilities</a>.</li>
+  <li>Hadi Hariri <a href="https://hadihariri.com/2020/10/14/a-few-words-on-git/">talks more about his issues with Git</a>.</li>
+  <li>Octopus Deploy <a href="https://octopus.com/blog/dotnet-foundation">is now a corporate sponsor of the .NET Foundation</a>.</li>
+</ul>
+
+<h3 id="-aspnet-core--blazor">😎 ASP.NET Core / Blazor</h3>
+
+<ul>
+  <li>Richard Reedy <a href="https://www.telerik.com/blogs/how-to-add-grpc-to-your-blazor-app">adds gRPC to his Blazor app</a>.</li>
+  <li>Marinko Spasojevic <a href="https://code-maze.com/using-access-token-with-blazor-webassembly-httpclient/">uses an access token with Blazor WASM HttpClient</a> and also <a href="https://code-maze.com/how-to-secure-blazor-webassembly-with-identityserver4/">secures Blazor WebAssembly with IdentityServer4</a>.</li>
+  <li>Claudio Bernasconi <a href="https://www.claudiobernasconi.ch/2020/10/14/introduction-to-blazor-server/">introduces Blazor Server</a>.</li>
+  <li>Niels Swimberghe <a href="https://swimburger.net/blog/dotnet/pushing-ui-changes-from-blazor-server-to-browser-on-server-raised-events">pushes UI changes from Blazor Server to browser on server raised events</a>.</li>
+  <li>Jon Hilton <a href="https://jonhilton.net/blazor-wasm-in-razor-pages/">renders a Blazor WASM components in your existing MVC/Razor Pages application</a>, and also <a href="https://jonhilton.net/blazor-wasm-prerendering-missing-http-client/">continues prerendering Blazor WASM with .NET 5</a>.</li>
+  <li>Steve Fenton <a href="https://www.stevefenton.co.uk/2020/10/simple-conditional-updates-to-entities-in-asp-net-core-mvc/">writes about simple conditional updates to entities in ASP.NET Core MVC</a>.</li>
+</ul>
+
+<h3 id="-the-cloud">⛅ The cloud</h3>
+
+<ul>
+  <li>Dave Brock (ahem) <a href="https://daveabrock.com/2020/10/13/azure-functions-static-apps-blazor">deploys an Azure Static Web App using Blazor and Azure Functions</a>.</li>
+  <li>Abel Wang <a href="https://devblogs.microsoft.com/devops/static-web-app-pr-workflow-for-azure-app-service-using-azure-devops">creates the Static Web App PR Workflow for Azure App Service using Azure DevOps</a>.</li>
+  <li>Mickaël Derriey <a href="https://devblogs.microsoft.com/azure-sdk/azure-identity-with-sql-graph-ef">uses Azure Identity with Azure SQL, Graph, and Entity Framework</a>.</li>
+  <li>Scott Hanselman <a href="https://www.hanselman.com/blog/migrating-this-blog-to-azure-its-done-now-the-work-begins">migrated his blog to Azure, and the work is just beginning</a>.</li>
+</ul>
+
+<h3 id="-c">📔 C#</h3>
+
+<ul>
+  <li>Matthew Jones <a href="https://exceptionnotfound.net/csharp-in-simple-terms-7-class-basics-properties-methods-access">discusses classes and members in C#</a>, and also <a href="https://exceptionnotfound.net/csharp-in-simple-terms-6-methods-parameters-and-arguments">talks about methods, parameters, and arguments in C#</a>.</li>
+  <li>Steve Gordon <a href="https://www.stevejgordon.co.uk/dotnet-internals-system-threading-channels-unboundedchannelt-part-3">continues his series on System.Threading.Channels</a>.</li>
+  <li>Carmel Eve <a href="https://endjin.com/blog/2020/10/design-patterns-in-csharp-the-decorator-pattern.html">runs through the Decorator pattern in C#</a>.</li>
+  <li>Michael Shpilt <a href="https://michaelscodingspot.com/dynamic-queries/">works with dynamic Queries with expressions Trees in C#</a>.</li>
+  <li>Khalid Abuhakmeh <a href="https://khalidabuhakmeh.com/switch-expressions-in-csharp-8">works through switch expressions in C# 8</a>.</li>
+  <li>Marco Siccardi <a href="https://msicc.net/some-helpful-extensions-when-dealing-with-types-in-net/">writes about helpful extensions with dealing with types</a>.</li>
+  <li>Jerome Laban <a href="https://jaylee.org/archive/2020/10/10/profiling-csharp-9-source-generators.html">profiles C# 9 source generators</a>.</li>
+  <li>Cezary Piatek <a href="https://cezarypiatek.github.io/post/async-analyzers-p1/">tracks down async code smells with analyzers</a>.</li>
+  <li>Anthony Giretti <a href="https://anthonygiretti.com/2020/10/12/introducing-c-9-covariant-returns/">introduces covariant returns in C# 9</a>.</li>
+  <li>Patrick Smacchia <a href="https://blog.ndepend.com/c9-records-immutable-classes/">discusses immutable classes with C# 9 records</a>.</li>
+</ul>
+
+<h3 id="-f">📗 F#</h3>
+
+<ul>
+  <li>Isaac Abraham says <a href="https://www.compositional-it.com/news-blog/sceptical-about-f-tooling-these-days-you-shouldnt-be/">you shouldn’t be skeptical about F# tooling</a>, and also <a href="https://www.compositional-it.com/news-blog/creating-azure-functions-with-farmer/">creates Azure Functions with Farmer</a>.</li>
+  <li>Istvan walks through <a href="https://dev.to/l1x/why-i-chose-f-for-our-aws-lambda-project-4978">why he chose F# for his AWS Lambda project</a>.</li>
+  <li>Christian Findlay <a href="https://christianfindlay.com/2020/10/17/how-to-use-fsharp-and-csharp/">discusses how to use F# from C#</a>.</li>
+  <li>Nabeel Valley <a href="https://nabeelvalley.netlify.app/stdout/2020/13-10/launch-fsi-from-terminal/">walks through scripting with F#</a>.</li>
+  <li>Mariusz <a href="https://dev.to/klimcio/file-order-in-f-the-most-annoying-thing-for-a-beginner-38dc">discusses file order in F#</a>.</li>
+  <li>Christina Ljungberg <a href="https://christinaljungberg-independent.com/2020/10/15/unit-testing-with-f/">unit tests with F#</a>.</li>
+</ul>
+
+<h3 id="-tools">🔧 Tools</h3>
+
+<ul>
+  <li>Mark Downie <a href="https://www.poppastring.com/blog/debugger-tip-step-into-a-specific-method">steps into a specific method in Visual Studio</a>.</li>
+  <li>Kayla Cinnamon <a href="https://devblogs.microsoft.com/commandline/windows-terminal-tips-and-tricks">offers Windows Terminal tips and tricks</a>.</li>
+  <li>Georg Dangl <a href="https://blog.dangl.me/archive/running-sql-server-integration-tests-in-net-core-projects-via-docker/">runs SQL Server integration tests in .NET Core with Docker</a>.</li>
+  <li>ErikEJ discusses <a href="https://erikej.github.io/efcore/2020/10/12/ef-core-sqlserver-scaffolding-gotchas.html">EF Core Database First gotchas and workarounds</a>.</li>
+  <li>Kevin Griffin <a href="https://consultwithgriff.com/how-to-upgrade-dotnet-cli-templates">has a quick post about upgrading .NET CLI templates</a>.</li>
+  <li>Michael Shpilt <a href="https://oz-code.com/blog/production-debugging/4-awesome-tools-for-net-debugging-in-production">writes about four awesome tools for debugging .NET in production</a>.</li>
+  <li>Steve Fenton <a href="https://www.stevefenton.co.uk/2020/10/execute-raw-sql-scripts-in-entity-framework-core/">executes raw SQL scripts in EF Core</a>.</li>
+  <li>Shahed Chowdhuri <a href="https://wakeupandcode.com/debugging-multiple-net-core-projects-in-vs-code/">debugs multiple .NET Core projects in VS Code</a>.</li>
+  <li>David Grace <a href="https://www.roundthecode.com/dotnet/setup-your-blazor-wasm-and-asp-net-core-web-api-in-azure-devops">sets up a Blazor WASM and ASP.NET Core Web API in Azure DevOps</a>.</li>
+  <li>Paul Michaels <a href="https://www.pmichaels.net/2020/10/10/executing-dynamically-generated-sql-in-ef-core">executes dynamically generated SQL in EF Core</a>.</li>
+  <li>Nicholas Blumhardt <a href="https://nblumhardt.com/2020/10/bootstrap-logger/">bootstraps logging with Serilog + ASP.NET Core</a>.</li>
+  <li>Scott Hanselman <a href="https://www.hanselman.com/blog/keeping-your-wsl-linux-instances-up-to-date-automatically-within-windows-10">keeps his WSL Linux instances up to date automatically within Windows 10</a>.</li>
+</ul>
+
+<h3 id="-xamarin">📱 Xamarin</h3>
+
+<ul>
+  <li>Mitchel Sellers <a href="https://www.mitchelsellers.com/blog/article/adding-dark-theme-support-for-xamarin-forms-shell">adds dark theme support for Xamarin Forms Shell</a>.</li>
+  <li>Leomaris Reyes <a href="https://www.syncfusion.com/blogs/post/5-tips-to-easily-use-the-grid-for-layouts-in-xamarin-forms.aspx">offers 5 tips to use the grid for layouts</a>.</li>
+  <li>Yana Kerpecheva <a href="https://www.telerik.com/blogs/choose-time-duration-telerik-timespan-picker-xamarin">chooses a time duration with Telerik TimeSpan Picker for Xamarin</a>.</li>
+  <li>Delpin Susai Raj <a href="https://xamarinmonkeys.blogspot.com/2020/10/xamarinforms-support-dark-mode.html">supports dark mode</a>.</li>
+</ul>
+
+<h3 id="-podcasts">🎤 Podcasts</h3>
+
+<ul>
+  <li>The .NET Rocks podcast <a href="https://www.dotnetrocks.com/default.aspx?ShowNum=1709">talks about migrating .NET Applications to Azure with Mike Richter</a>.</li>
+  <li>The Changelog <a href="https://changelog.com/podcast/415">talks to Spotify about shipping at scale</a>.</li>
+  <li>The Azure DevOps Podcast <a href="http://azuredevopspodcast.clear-measure.com/stefan-schackow-on-whats-new-in-azure-app-service-episode-110">talks about what’s new in Azure App Service</a>.</li>
+  <li>The Coding Blocks podcast <a href="https://www.codingblocks.net/podcast/the-devops-handbook-enable-daily-learning/">continues talking about the DevOps Handbook</a>.</li>
+</ul>
+
+<h3 id="-videos">🎥 Videos</h3>
+
+<ul>
+  <li>The ON.NET Show talks about <a href="https://channel9.msdn.com/Shows/On-NET/ASPNET-Core-Series-PWAs-with-Blazor">PWAs with Blazor</a>, the <a href="https://www.youtube.com/watch?v=1IqQkNcsqWE">YARP reverse proxy</a>, and <a href="https://www.youtube.com/watch?v=bVSq1rKcW-o">Azure Static Web Apps</a>.</li>
+  <li>Immo Landwerth discusses <a href="https://www.youtube.com/watch?v=-kAr21i11f4">the journey to .NET 5</a> and also <a href="https://www.youtube.com/watch?v=A_y1gIzzRT8">.NET 5 cross-plat development</a>.</li>
+</ul>
+:ET

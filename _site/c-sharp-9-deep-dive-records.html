@@ -1,0 +1,293 @@
+<p class="notice--success"><strong>Note</strong>: Originally published five months before the official release of C# 9, I’ve updated this post after the release to capture the latest updates.</p>
+
+<p>In the <a href="https://daveabrock.com/2020/06/29/c-sharp-9-deep-dive-inits">previous post of this series</a>, we discussed the init-only features of C# 9, which allowed you to make individual properties immutable. That works great on a case-by-case basis, but the real power in leveraging C# immutability is when you can do this for custom types. This is where records shine, and will be the focus of this post.</p>
+
+<p>This is the second post in a six-post series on C# 9 features in-depth:</p>
+
+<ul>
+  <li>Post 1 - <a href="https://daveabrock.com/2020/06/29/c-sharp-9-deep-dive-inits">Init-only features</a></li>
+  <li>Post 2 (<em>this post</em>) - Records</li>
+  <li>Post 3 - <a href="https://daveabrock.com/2020/07/06/c-sharp-9-pattern-matching">Pattern matching</a></li>
+  <li>Post 4 - <a href="https://daveabrock.com/2020/07/09/c-sharp-9-top-level-programs">Top-level programs</a></li>
+  <li>Post 5 - <a href="https://daveabrock.com/2020/07/14/c-sharp-9-target-typing-covariants">Target typing and covariant returns</a></li>
+  <li>Post 6 - <a href="https://daveabrock.com/2020/07/21/c-sharp-9-scavenger-hunt">Putting it all together with a scavenger hunt</a></li>
+</ul>
+
+<p>This post covers the following topics.</p>
+
+<ul>
+  <li><a href="#a-quick-primer-on-immutable-types">A quick primer on immutable types</a></li>
+  <li><a href="#ok-so-what-is-a-record">OK, so what is a record?</a></li>
+  <li><a href="#whats-the-difference-between-structs-and-records">What’s the difference between structs and records?</a></li>
+  <li><a href="#create-your-first-record">Create your first record</a></li>
+  <li><a href="#use-with-expressions-with-records">Use <code class="language-plaintext highlighter-rouge">with</code> expressions with records</a>
+    <ul>
+      <li><a href="#use-inheritance-with-the-with-expression">Use inheritance with the <code class="language-plaintext highlighter-rouge">with</code> expression</a></li>
+    </ul>
+  </li>
+  <li><a href="#implementing-positional-records">Implementing positional records</a></li>
+  <li><a href="#evaluating-record-equality">Evaluating record equality</a></li>
+  <li><a href="#wrapping-up">Wrapping up</a></li>
+</ul>
+
+<h1 id="a-quick-primer-on-immutable-types">A quick primer on immutable types</h1>
+
+<p>Before we get started, let’s briefly talk about the concept of immutable types. For sure, immutability is a stuffy word to some but the premise here is simple: once instantiated or initialized, immutable types never change.</p>
+
+<p>What do you get with immutable types? First, you get simplicity. An immutable object only has one state, the state you specified when you created the object. You’ll also see that they are secure and thread-safe with no required synchronization. Because you don’t have threads fighting to change an object, they can be shared freely in your applications.</p>
+
+<p>Put another way: <strong>immutable types reduce risk, are safer, and help to prevent a lot of nasty bugs that occur when you update your objects.</strong></p>
+
+<p>Even if you aren’t familiar with this concept yet, or haven’t been forced to think this way, you’re already using it in the .NET world. For example, <code class="language-plaintext highlighter-rouge">System.DateTime</code> is immutable, as are strings. And now with records in C# 9, you can create your own immutable types.</p>
+
+<h1 id="ok-so-what-is-a-record">OK, so what is a record?</h1>
+
+<p>What is a record, exactly? A record is a construct that allows you to encapsulate property state. (I am avoiding the use of the word object, for clarity.) Or, put in less geeky terms, records allow you to perform value-like behaviors on properties. This is why I’m avoiding saying “objects” when I speak of records. We need to start thinking in terms of data, and not objects. Records aren’t meant for mutable state—if you want to represent change, create a new record. That way, you define them by working with the data, and not passing around a single object that gets changed by multiple functions.</p>
+
+<p>Records are incredibly flexible. Anthony Giretti <a href="https://anthonygiretti.com/2020/06/19/introducing-c-9-questions-answers-about-records/">found that classes can have records as properties, and also that records can contain structs and objects</a>.</p>
+
+<h1 id="whats-the-difference-between-structs-and-records">What’s the difference between structs and records?</h1>
+
+<p>Allow me to read your mind—you might be asking: how is this different than structs? If you haven’t used it before, we can define a value type, called a <code class="language-plaintext highlighter-rouge">struct</code>, in C# today. So, why don’t we just build on the <code class="language-plaintext highlighter-rouge">struct</code> functionality instead of introducing a new member (ha!) to C#? After all, you can declare an immutable value type by saying <code class="language-plaintext highlighter-rouge">readonly struct</code>.</p>
+
+<p>Records are offering the following advantages, from what I can see:</p>
+
+<ul>
+  <li>An easy, simplified construct whose intent is to use as an immutable data structure with easy syntax, like <code class="language-plaintext highlighter-rouge">with</code> expressions to copy objects (keep reading for details!)</li>
+  <li>Robust equality support with <code class="language-plaintext highlighter-rouge">Equals(object)</code>, <code class="language-plaintext highlighter-rouge">IEquatable&lt;T&gt;</code>, and <code class="language-plaintext highlighter-rouge">GetHashCode()</code></li>
+  <li>Constructor/deconstructor support with simplified positional (constructor-based) records</li>
+</ul>
+
+<p>Of course you can do this with structs, and even classes, but this requires tedious boilerplate. The idea here is to have a construct that is simple and straightforward to implement.</p>
+
+<p><del><strong>UPDATE</strong>: One of the biggest draws of records over structs is the reduced memory allocation that is required. Since C# records are compiled to reference types behind the scenes, they are accessed by a reference and not as a copy. As a result, no additional memory allocation is required other than the original record allocation. <strong>Thanks to commenter Tecfield for mentioning this!</strong></del></p>
+
+<p>Thanks to Isaac Abraham for the correction concerning memory allocation (and <a href="https://twitter.com/MadsTorgersen/status/1327033065168748545">confirmed by C# lead designer Mads Torgersen</a>):</p>
+
+<blockquote class="twitter-tweet" data-conversation="none" data-theme="dark"><p lang="en" dir="ltr">Hmm. Not sure about the memory stuff - as with all reference vs struct, the former creates GC pressure whereas the latter is passed by value. There are good reasons for wanting both types.</p>&mdash; Isaac Abraham (@isaac_abraham) <a href="https://twitter.com/isaac_abraham/status/1327021232001323008?ref_src=twsrc%5Etfw">November 12, 2020</a></blockquote>
+<script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>Hopefully by now, if I did my job, you know what records are and the rationale for them. Let’s see some code.</p>
+
+<h1 id="create-your-first-record">Create your first record</h1>
+
+<p>To declare a record, you use the new <code class="language-plaintext highlighter-rouge">record</code> keyword. Brilliant, right?</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="n">record</span> <span class="n">Person</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Address</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">City</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FavoriteColor</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="c1">// and so on...</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>When you mark a type as <code class="language-plaintext highlighter-rouge">record</code> like this, it won’t give you immutability on its own—you’ll need to use <code class="language-plaintext highlighter-rouge">init</code> properties, like in the following example:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="n">record</span> <span class="n">Person</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Address</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">City</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FavoriteColor</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+    <span class="c1">// and so on...</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>To achieve default immutability, you can create objects by using positional arguments (constructor-like syntax). When you do this, you can declare records with one line:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="n">record</span> <span class="nf">Person</span><span class="p">(</span><span class="kt">string</span> <span class="n">FirstName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">LastName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">Address</span><span class="p">,</span> <span class="kt">string</span> <span class="n">City</span><span class="p">,</span> <span class="kt">string</span> <span class="n">FavoriteColor</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>For more details, check out my post: <em><a href="https://daveabrock.com/2020/11/02/csharp-9-records-immutable-default">Are C# 9 records immutable by default</a></em>?</p>
+
+<h1 id="use-with-expressions-with-records">Use <code class="language-plaintext highlighter-rouge">with</code> expressions with records</h1>
+
+<p>Before C# 9, you would likely represent new state by creating new values from existing ones.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">person</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Person</span><span class="p">(</span><span class="s">"Tony"</span><span class="p">,</span> <span class="s">"Stark"</span><span class="p">,</span> <span class="s">"10880 Malibu Point"</span><span class="p">,</span> <span class="s">"Malibu"</span><span class="p">,</span> <span class="s">"red"</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Tony"</span><span class="p">,</span>
+    <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Stark"</span><span class="p">,</span>
+    <span class="n">Address</span> <span class="p">=</span> <span class="s">"10880 Malibu Point"</span><span class="p">,</span>
+    <span class="n">City</span> <span class="p">=</span> <span class="s">"Malibu"</span><span class="p">,</span>
+    <span class="n">FavoriteColor</span> <span class="p">=</span> <span class="s">"red"</span>
+<span class="p">};</span>
+
+<span class="kt">var</span> <span class="n">newPerson</span> <span class="p">=</span> <span class="n">person</span><span class="p">;</span>
+<span class="n">newPerson</span><span class="p">.</span><span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Howard"</span><span class="p">;</span>
+<span class="n">newPerson</span><span class="p">.</span><span class="n">City</span> <span class="p">=</span> <span class="s">"Pasadena"</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>This pattern is referred to as non-destructive mutation (now <em>that</em> will make you seem smart at your next dinner party!). C# 9 has a new type of expression, a <code class="language-plaintext highlighter-rouge">with</code> expression, to assist you.</p>
+
+<p class="notice--info">This functionality is only available in records, and not structs or classes.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">person</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Person</span>
+<span class="p">{</span>
+    <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Tony"</span><span class="p">,</span>
+    <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Stark"</span><span class="p">,</span>
+    <span class="n">Address</span> <span class="p">=</span> <span class="s">"10880 Malibu Point"</span><span class="p">,</span>
+    <span class="n">City</span> <span class="p">=</span> <span class="s">"Malibu"</span><span class="p">,</span>
+    <span class="n">FavoriteColor</span> <span class="p">=</span> <span class="s">"red"</span>
+<span class="p">};</span>
+
+<span class="kt">var</span> <span class="n">newPerson</span> <span class="p">=</span> <span class="n">person</span> <span class="n">with</span> <span class="p">{</span> <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Howard"</span><span class="p">,</span> <span class="n">City</span> <span class="p">=</span> <span class="s">"Pasadena"</span> <span class="p">};</span>
+</code></pre></div></div>
+
+<p>You can easily use your familiar object initializer syntax to differentiate what has changed between objects, including multiple properties. Under the covers, the record has a <code class="language-plaintext highlighter-rouge">protected</code> copy constructor. If you wish, you can change the default behavior of the copy constructor but the default behavior should be suitable in most of your cases (to create a copy, change properties to what you passed in, and copy the properties that you don’t).</p>
+
+<h2 id="use-inheritance-with-the-with-expression">Use inheritance with the <code class="language-plaintext highlighter-rouge">with</code> expression</h2>
+
+<p>Remember when I said records support inheritance, while structs do not? I wasn’t lying. We can use inheritance with our <code class="language-plaintext highlighter-rouge">with</code> expression. Let’s say we have a <code class="language-plaintext highlighter-rouge">Superhero</code> class that inherits from <code class="language-plaintext highlighter-rouge">Person</code> and has a new <code class="language-plaintext highlighter-rouge">MaxSpeed</code> property.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Program</span>
+<span class="p">{</span>
+    <span class="k">static</span> <span class="k">void</span> <span class="nf">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">person</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Superhero</span>
+        <span class="p">{</span>
+            <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Tony"</span><span class="p">,</span>
+            <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Stark"</span><span class="p">,</span>
+            <span class="n">Address</span> <span class="p">=</span> <span class="s">"10880 Malibu Point"</span><span class="p">,</span>
+            <span class="n">City</span> <span class="p">=</span> <span class="s">"Malibu"</span><span class="p">,</span>
+            <span class="n">FavoriteColor</span> <span class="p">=</span> <span class="s">"red"</span><span class="p">,</span>
+            <span class="n">MaxSpeed</span> <span class="p">=</span> <span class="m">1000</span>
+        <span class="p">};</span>
+
+        <span class="kt">var</span> <span class="n">newPerson</span> <span class="p">=</span> <span class="n">person</span> <span class="n">with</span> <span class="p">{</span> <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Howard"</span><span class="p">,</span> <span class="n">City</span> <span class="p">=</span> <span class="s">"Pasadena"</span> <span class="p">};</span>
+
+        <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">newPerson</span><span class="p">.</span><span class="n">FirstName</span><span class="p">);</span> <span class="c1">// Howard</span>
+        <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">newPerson</span><span class="p">.</span><span class="n">MaxSpeed</span><span class="p">);</span> <span class="c1">// 1000</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="n">record</span> <span class="n">Person</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Address</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">City</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FavoriteColor</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="n">record</span> <span class="n">Superhero</span> <span class="p">:</span> <span class="n">Person</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">int</span> <span class="n">MaxSpeed</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Hey, this works! How? Records actually have a hidden virtual method that clones the <em>entire</em> object. An inherited record overrides this method to call the copy constructor of that type, chaining to the copy constructor of the base record.</p>
+
+<h1 id="implementing-positional-records">Implementing positional records</h1>
+
+<p>Sometimes, you’ll need to take a positional approach—meaning data is supplied from constructor arguments. You can definitely do this with records.</p>
+
+<p>Here’s what you can do to enable your own constructor and deconstructor.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Program</span>
+<span class="p">{</span>
+    <span class="k">static</span> <span class="k">void</span> <span class="nf">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">person</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Person</span><span class="p">(</span><span class="s">"Tony"</span><span class="p">,</span> <span class="s">"Stark"</span><span class="p">,</span> <span class="s">"10880 Malibu Point"</span><span class="p">,</span> <span class="s">"Malibu"</span><span class="p">,</span> <span class="s">"red"</span><span class="p">);</span>
+        <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">person</span><span class="p">.</span><span class="n">FirstName</span><span class="p">);</span> <span class="c1">// Tony</span>
+        <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">person</span><span class="p">.</span><span class="n">LastName</span><span class="p">);</span> <span class="c1">// Stark</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+
+<span class="k">public</span> <span class="n">record</span> <span class="n">Person</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span><span class="p">;</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span><span class="p">;</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Address</span><span class="p">;</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">City</span><span class="p">;</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FavoriteColor</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">Person</span><span class="p">(</span><span class="kt">string</span> <span class="n">firstName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">lastName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">address</span><span class="p">,</span> <span class="kt">string</span> <span class="n">city</span><span class="p">,</span> <span class="kt">string</span> <span class="n">favoriteColor</span><span class="p">)</span>
+      <span class="p">=&gt;</span> <span class="p">(</span><span class="n">FirstName</span><span class="p">,</span> <span class="n">LastName</span><span class="p">,</span> <span class="n">Address</span><span class="p">,</span> <span class="n">City</span><span class="p">,</span> <span class="n">FavoriteColor</span><span class="p">)</span> <span class="p">=</span> <span class="p">(</span><span class="n">firstName</span><span class="p">,</span> <span class="n">lastName</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">city</span><span class="p">,</span> <span class="n">favoriteColor</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">Deconstruct</span><span class="p">(</span><span class="k">out</span> <span class="kt">string</span> <span class="n">firstName</span><span class="p">,</span> <span class="k">out</span> <span class="kt">string</span> <span class="n">lastName</span><span class="p">,</span> <span class="k">out</span> <span class="kt">string</span> <span class="n">address</span><span class="p">,</span> 
+                            <span class="k">out</span> <span class="kt">string</span> <span class="n">city</span><span class="p">,</span> <span class="k">out</span> <span class="kt">string</span> <span class="n">favoriteColor</span><span class="p">)</span> 
+      <span class="p">=&gt;</span> <span class="p">(</span><span class="n">firstName</span><span class="p">,</span> <span class="n">lastName</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">city</span><span class="p">,</span> <span class="n">favoriteColor</span><span class="p">)</span> <span class="p">=</span> <span class="p">(</span><span class="n">FirstName</span><span class="p">,</span> <span class="n">LastName</span><span class="p">,</span> <span class="n">Address</span><span class="p">,</span> <span class="n">City</span><span class="p">,</span> <span class="n">FavoriteColor</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>You can clean this up with new simplified syntax, as that one-liner will give you construction and deconstruction out-of-the-box.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Program</span>
+<span class="p">{</span>
+    <span class="k">static</span> <span class="k">void</span> <span class="nf">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">person</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Person</span><span class="p">(</span><span class="s">"Tony"</span><span class="p">,</span> <span class="s">"Stark"</span><span class="p">,</span> <span class="s">"10880 Malibu Point"</span><span class="p">,</span> <span class="s">"Malibu"</span><span class="p">,</span> <span class="s">"red"</span><span class="p">);</span>
+        <span class="kt">var</span> <span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">last</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">city</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="p">=</span> <span class="n">person</span><span class="p">;</span>
+
+        <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">person</span><span class="p">.</span><span class="n">FirstName</span><span class="p">);</span> <span class="c1">// Tony</span>
+        <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">person</span><span class="p">.</span><span class="n">LastName</span><span class="p">);</span> <span class="c1">// Stark</span>
+        <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">first</span><span class="p">);</span> <span class="c1">// Tony</span>
+        <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">last</span><span class="p">);</span> <span class="c1">// Stark</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="n">record</span> <span class="nf">Person</span><span class="p">(</span><span class="kt">string</span> <span class="n">FirstName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">LastName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">Address</span><span class="p">,</span> <span class="kt">string</span> <span class="n">City</span><span class="p">,</span> <span class="kt">string</span> <span class="n">FavoriteColor</span><span class="p">);</span>
+
+</code></pre></div></div>
+
+<h1 id="evaluating-record-equality">Evaluating record equality</h1>
+
+<p>If we’re being honest, <em>technically</em> records are a kind of class, which also means they are <em>technically</em> reference types. But that’s OK—like structs, records override the <code class="language-plaintext highlighter-rouge">Equals(object)</code> method that every class has, to achieve the value-ness we are after. This means we can work with value-based equality as well.</p>
+
+<p>For example, if we create two new objects we know that they have different references in memory, so a <code class="language-plaintext highlighter-rouge">ReferenceEquals</code> call (or even a <code class="language-plaintext highlighter-rouge">==</code> call) will return <code class="language-plaintext highlighter-rouge">false</code> even if they have the same values. This is different than structs—because structs are value types, this will not occur.</p>
+
+<p>With records, we’ll compare values.</p>
+
+<p>Watch what happens as we:</p>
+
+<ul>
+  <li>Create a new <code class="language-plaintext highlighter-rouge">Person</code> called <code class="language-plaintext highlighter-rouge">person</code>, Tony Stark</li>
+  <li>Create another <code class="language-plaintext highlighter-rouge">Person</code>, called <code class="language-plaintext highlighter-rouge">newPerson</code>, Howard Stark, with two different properties (<code class="language-plaintext highlighter-rouge">FirstName</code> and <code class="language-plaintext highlighter-rouge">City</code>)</li>
+  <li>Create a third <code class="language-plaintext highlighter-rouge">Person</code> called <code class="language-plaintext highlighter-rouge">anotherPerson</code>, and set <code class="language-plaintext highlighter-rouge">anotherPerson</code> to the same values as the original <code class="language-plaintext highlighter-rouge">person</code></li>
+</ul>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Program</span>
+<span class="p">{</span>
+    <span class="k">static</span> <span class="k">void</span> <span class="nf">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">person</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Person</span>
+        <span class="p">{</span>
+            <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Tony"</span><span class="p">,</span>
+            <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Stark"</span><span class="p">,</span>
+            <span class="n">Address</span> <span class="p">=</span> <span class="s">"10880 Malibu Point"</span><span class="p">,</span>
+            <span class="n">City</span> <span class="p">=</span> <span class="s">"Malibu"</span><span class="p">,</span>
+            <span class="n">FavoriteColor</span> <span class="p">=</span> <span class="s">"red"</span>
+        <span class="p">};</span>
+
+        <span class="kt">var</span> <span class="n">newPerson</span> <span class="p">=</span> <span class="n">person</span> <span class="n">with</span> <span class="p">{</span> <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Howard"</span><span class="p">,</span> <span class="n">City</span> <span class="p">=</span> <span class="s">"Pasadena"</span> <span class="p">};</span>
+
+        <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">Object</span><span class="p">.</span><span class="nf">ReferenceEquals</span><span class="p">(</span><span class="n">person</span><span class="p">,</span> <span class="n">newPerson</span><span class="p">));</span> <span class="c1">// false</span>
+        <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">Object</span><span class="p">.</span><span class="nf">Equals</span><span class="p">(</span><span class="n">person</span><span class="p">,</span> <span class="n">newPerson</span><span class="p">));</span> <span class="c1">// false</span>
+
+        <span class="kt">var</span> <span class="n">anotherPerson</span> <span class="p">=</span> <span class="n">newPerson</span> <span class="n">with</span> <span class="p">{</span> <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Tony"</span><span class="p">,</span> <span class="n">City</span> <span class="p">=</span> <span class="s">"Malibu"</span> <span class="p">};</span>
+        <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">Object</span><span class="p">.</span><span class="nf">Equals</span><span class="p">(</span><span class="n">person</span><span class="p">,</span> <span class="n">anotherPerson</span><span class="p">));</span> <span class="c1">// true</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="n">record</span> <span class="n">Person</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Address</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">City</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FavoriteColor</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Nice! Also, along with the <code class="language-plaintext highlighter-rouge">Equals</code> override records ship with a <code class="language-plaintext highlighter-rouge">GetHashCode()</code> override if you’re so inclined.</p>
+
+<h1 id="wrapping-up">Wrapping up</h1>
+
+<p>In this post, we discussed a lot about records in C# 9. We discussed what a record is, how it compares to a struct, <code class="language-plaintext highlighter-rouge">with</code> expressions, inheritance, positional records, and how to evaluate equality.</p>
+
+<p>As I discussed, this is continually changing—let me know how this works for you, and if things have changed since this was published. These are exciting new features and I hope you are able to see their benefit.</p>

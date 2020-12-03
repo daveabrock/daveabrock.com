@@ -1,0 +1,283 @@
+I"�<p>“I hate JavaScript.”</p>
+
+<p>Let’s get real: we’ve all said it. When we say these words in anger, what do we <em>really</em> hate about JavaScript?</p>
+
+<p>It is <em>node_modules</em>? Is it Webpack? Is it the convoluted ecosystem which seems to change every three months? Is it npm or yarn, or package dependencies in general? Is it the lack of a standard build system or a standard library? Is it the fact that it’s dynamically and loosely typed, with almost no restrictions? Is it the inherent design flaws? The insecure nature? The pedantic framework wars?</p>
+
+<p>While these are all valid gripes, let’s think about it another way: <em>is a big reason why we sometimes say we hate JavaScript because we don’t understand its core concepts well enough</em>?</p>
+
+<p>I’ve experienced this journey first-hand. As a back-end C# developer, I was arrogant: with my years of experience as a software engineer, I thought with a lot of the constructs being similar, it wouldn’t take me long to master. JavaScript is so different from any other language, with intricacies all of its own—it took me <em>years</em> to understand this.</p>
+
+<p>I got up to speed, rushed to use other frameworks, embraced TypeScript (as you should!), but still couldn’t stand JavaScript. My problem: I never took the time to learn and understand concepts where, if you don’t know or understand them, you’ll spend hours (sometimes days) on a bug, fix it thanks to some luck, and never truly understand the source of the problem—and, as a result, be subjected to an infinite loop of JavaScript incompetence.</p>
+
+<p>After I began to understand why I despised JavaScript, I took action to learn more. In the last year or two, after filling in some gaps, I find JavaScript to be a somewhat pleasant experience. I’m not saying its perfect—what is?—but I understand why things are the way they are.</p>
+
+<p>So, allow me to share with you a few things that, once I learned them, made me understand JavaScript so much better and made my experience a lot less frustrating. To you, some might be “you didn’t know this?” and some might be difficult to grasp—and that’s OK. Wherever you are in your journey, I hope this helps you.</p>
+
+<p>By the end, if you dig deep into these concepts my hope is that you can appreciate and understand JavaScript a little more, for the good and the bad.</p>
+
+<p>This post covers the following topics.</p>
+
+<ul>
+  <li><a href="#understand-execution-context">Understand execution context</a>
+    <ul>
+      <li><a href="#the-global-context">The global context</a></li>
+      <li><a href="#functional-execution-context">Functional execution context</a></li>
+    </ul>
+  </li>
+  <li><a href="#know-the-event-loop">Know the event loop</a></li>
+  <li><a href="#know-async-and-await">Know <code class="language-plaintext highlighter-rouge">async</code> and <code class="language-plaintext highlighter-rouge">await</code></a></li>
+  <li><a href="#know-the-big-three-array-methods">Know the big three array methods</a>
+    <ul>
+      <li><a href="#map">.map()</a></li>
+      <li><a href="#filter">.filter()</a></li>
+      <li><a href="#reduce">.reduce()</a></li>
+      <li><a href="#when-to-use-map-filter-and-reduce-in-one-sentence">When to use <code class="language-plaintext highlighter-rouge">map</code>, <code class="language-plaintext highlighter-rouge">filter</code>, and <code class="language-plaintext highlighter-rouge">reduce</code>, in one sentence</a></li>
+    </ul>
+  </li>
+  <li><a href="#understand-that-arrow-functions-arent-just-for-conciseness">Understand that arrow functions aren’t just for conciseness</a></li>
+  <li><a href="#wrap-up">Wrap up</a></li>
+</ul>
+
+<h1 id="understand-execution-context">Understand execution context</h1>
+
+<p>To completely understand and work with advanced JavaScript concepts like closures, scopes, and hoisting, you need to understand how JavaScript’s execution contexts work. If you ever have trouble understanding why a variable is <code class="language-plaintext highlighter-rouge">undefined</code> when you do not want it to be, the execution context is a good place to start.</p>
+
+<p>When talking about execution context, we need to understand two things: the global context and the function execution context.</p>
+
+<h2 id="the-global-context">The global context</h2>
+
+<p>The global context is the default context, where code resides that does not sit inside a function. The context contains two items at the beginning before you run any code at all: the global object (which is <code class="language-plaintext highlighter-rouge">window</code> in browser-based JS or <code class="language-plaintext highlighter-rouge">global</code> for Node.js) and the <code class="language-plaintext highlighter-rouge">this</code> variable—which is set to the global object.</p>
+
+<p>The global context also sets up space in memory for our variables and functions, and assigns variables to <code class="language-plaintext highlighter-rouge">undefined</code> while putting function declarations in memory. <em>This takes place before any code is run, and is called the creation phase.</em></p>
+
+<p>If you look at this code:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">firstName</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">Dave</span><span class="dl">'</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">lastName</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">Brock</span><span class="dl">'</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">occupation</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">Software Developer</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">getDetails</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="na">firstName</span><span class="p">:</span> <span class="nx">firstName</span><span class="p">,</span>
+        <span class="na">lastName</span><span class="p">:</span> <span class="nx">lastName</span><span class="p">,</span>
+        <span class="na">occupation</span><span class="p">:</span> <span class="nx">occupation</span>
+    <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p class="notice--info">My return object could use the short-hand object syntax, but I’m doing it this way for clarity.</p>
+
+<p>After the code runs—we are now in the execution phase—the JS engine executes the code line by line and assigns variables to the values you specified. For example, if you log a variable between creation and execution, you should get back <code class="language-plaintext highlighter-rouge">undefined</code>.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">firstName</span><span class="p">);</span> <span class="c1">// undefined</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">lastName</span><span class="p">);</span> <span class="c1">// undefined</span>
+
+<span class="kd">var</span> <span class="nx">firstName</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">Dave</span><span class="dl">'</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">lastName</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">Brock</span><span class="dl">'</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">occupation</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">Software Developer</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">getDetails</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="na">firstName</span><span class="p">:</span> <span class="nx">firstName</span><span class="p">,</span>
+        <span class="na">lastName</span><span class="p">:</span> <span class="nx">lastName</span><span class="p">,</span>
+        <span class="na">occupation</span><span class="p">:</span> <span class="nx">occupation</span>
+    <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>This is <a href="https://scotch.io/tutorials/understanding-hoisting-in-javascript">what hoisting is</a>: assigning variables <code class="language-plaintext highlighter-rouge">undefined</code> while being created. Our industry is full of using fancy words for such simple things. I hope this clears things up.</p>
+
+<h2 id="functional-execution-context">Functional execution context</h2>
+
+<p>The other context you need to know is the functional context (for, of course, functions). This is created whenever functions are called (or invoked, to be fancy). We’ll have one for every function, and since the global object (and execution context) are in place it doesn’t need to create it again. This context creates an <code class="language-plaintext highlighter-rouge">arguments</code> object and then, just like the global context, creates a <code class="language-plaintext highlighter-rouge">this</code> object, sets up space for variables and functions, and sets variables to <code class="language-plaintext highlighter-rouge">undefined</code> and puts any declarations in memory.</p>
+
+<p>When a function is invoked, a new functional execution context is created for it and added to the call stack. After execution completes, it gets removed (popped).</p>
+
+<p>For more details, check out <a href="https://ui.dev/ultimate-guide-to-execution-contexts-hoisting-scopes-and-closures-in-javascript/">Tyler McGinnis’s wonderful article</a>.</p>
+
+<h1 id="know-the-event-loop">Know the event loop</h1>
+
+<p>If I can pick one thing I wish I knew when I started working on JavaScript, it’s the event loop. How I would have <em>loved</em> for someone to find my bug as a junior engineer, pull me aside, and say: “Hey, stop what you’re doing and take the rest of the day to learn the event loop. Thank me later.”</p>
+
+<p>Because the JavaScript engine is single-threaded, it’s vitally important that you understand this. Being single-threaded is actually not the worst thing, as it avoids a lot of concurrency issues—but you still need to understand how not to block the single thread you have at your disposal.</p>
+
+<p>Here’s the job and purpose of the event loop in JavaScript: it looks at the call stack and runs anything that is currently on the stack. If it’s empty, it looks at the message queue, and pushes its contents onto the stack in order.</p>
+
+<p>Because JS is single-threaded, it has one call stack. But what happens if something on the stack is taking forever and blocks things? For that we have browser APIs—we can offload things like <code class="language-plaintext highlighter-rouge">setTimeout</code> and DOM APIs to give the illusion we’re concurrent.</p>
+
+<p>A common example: how is this code processed?</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">setTimeout</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">oh hi!</span><span class="dl">'</span><span class="p">)</span>
+<span class="p">},</span> <span class="mi">5000</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>When this happens, we <a href="https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout">call out to a browser API</a> that is NOT part of the JavaScript runtime. When the five seconds completes, the API lets JavaScript know, and an item is added to the message queue, which is first in, first out. When the call stack is empty, JS takes the message, places it on the stack, and runs it.</p>
+
+<p>This is an important distinction to make: when you invoke <code class="language-plaintext highlighter-rouge">setTimeout</code> you are not saying it’ll return in five seconds—you’re saying that is the minimum amount of time it will return, depending on what else is in the call stack.</p>
+
+<p>Your knowledge of the call stack is vital as your code becomes more complex. These concepts weren’t clear until I watched the Philip Roberts talk, which is on YouTube. In my opinion, it’s well worth your time.</p>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/8aGhZQkoFbQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+
+<h1 id="know-async-and-await">Know <code class="language-plaintext highlighter-rouge">async</code> and <code class="language-plaintext highlighter-rouge">await</code></h1>
+
+<p>If you’re a regular reader here, you’re likely a C# developer—so I don’t need to tell you about <a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Async_await">how awesome the <code class="language-plaintext highlighter-rouge">async</code> and <code class="language-plaintext highlighter-rouge">await</code> paradigm is</a>. The excitement is ever-present in the JavaScript community as well. From callbacks, to promises, and now async await, the JS async capabilities have come a long way.</p>
+
+<p>However, like in C#, don’t let its simple syntax fool you into thinking you don’t have to be aware of how it all works. You can view <code class="language-plaintext highlighter-rouge">async</code> and <code class="language-plaintext highlighter-rouge">await</code> as a wrapper <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">around the Promise infrastructure</a>.</p>
+
+<p>When you do something like this…</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">sayHiToDave</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="dl">"</span><span class="s2">Hi, Dave</span><span class="dl">"</span> <span class="p">};</span>
+</code></pre></div></div>
+
+<p>… if you execute it in your console, you’ll get back <code class="language-plaintext highlighter-rouge">Hi, Dave</code>. As you should.</p>
+
+<p>Now, if you make it async:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="k">async</span> <span class="nx">sayHiToDave</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="dl">"</span><span class="s2">Hi, Dave</span><span class="dl">"</span> <span class="p">};</span>
+</code></pre></div></div>
+
+<p>If you invoke this in your dev tools, you’ll see it returns a <code class="language-plaintext highlighter-rouge">Promise</code>. The return values will always be converted to promises.</p>
+
+<p><img src="http://localhost:4001/images/promise.png" alt="promise" /></p>
+
+<p>So, to consume the return value, you would do something like:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">sayHiToDave</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Of course, what’s the fun of async without the <code class="language-plaintext highlighter-rouge">await</code>? Await avoids all this <code class="language-plaintext highlighter-rouge">.then()</code> work. It’ll pause on the line until the promise is completed or fulfilled, then will return the value you wanted.</p>
+
+<p>So just understand <code class="language-plaintext highlighter-rouge">async</code> and <code class="language-plaintext highlighter-rouge">await</code> is mostly syntactic sugar over Promises, saving you from the <code class="language-plaintext highlighter-rouge">.then()</code> chaining they are famous for.</p>
+
+<p>However, know the downsides: async/await looks synchronous. In fact, <code class="language-plaintext highlighter-rouge">await</code> blocks code execution until fulfillment time. Other <em>tasks</em> can run, but <em>your</em> code is blocked. If you are await’ing a lot of things, you can face a performance hit as each <code class="language-plaintext highlighter-rouge">await</code> is waiting for the previous one.</p>
+
+<p>If this sounds like something you face, the <a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Async_await">wonderful MDN async/await article says</a>: you can offset this by storing <code class="language-plaintext highlighter-rouge">Promise</code> objects in variables, then awaiting them all.</p>
+
+<p>As with anything, know the drawbacks and try not to use async/await without knowing what’s <em>really</em> happening.</p>
+
+<h1 id="know-the-big-three-array-methods">Know the big three array methods</h1>
+
+<p>There are <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">so many array methods in JavaScript</a>. For most of them, you should be able to reference the docs and apply your knowledge. But the three you must truly master and wrap your mind around are <code class="language-plaintext highlighter-rouge">map()</code>, <code class="language-plaintext highlighter-rouge">filter()</code>, and <code class="language-plaintext highlighter-rouge">reduce()</code>. These are used so frequently and are so important. They will take you far.</p>
+
+<h2 id="map">.map()</h2>
+
+<p>A lot of us know this one, but as a recap: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter">the <code class="language-plaintext highlighter-rouge">map()</code> method</a> creates a new array based on a previous array. Here, I would just like to send city names to a new array. The important thing to note with these methods is that a new array is created (and it does not update your existing array).</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">cities</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Chicago</span><span class="dl">'</span><span class="p">,</span> <span class="na">state</span><span class="p">:</span> <span class="dl">'</span><span class="s1">IL</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">2693976</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Houston</span><span class="dl">'</span><span class="p">,</span> <span class="na">state</span><span class="p">:</span> <span class="dl">'</span><span class="s1">TX</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">2320268</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Minneapolis</span><span class="dl">'</span><span class="p">,</span> <span class="na">state</span><span class="p">:</span> <span class="dl">'</span><span class="s1">MN</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">453403</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Madison</span><span class="dl">'</span><span class="p">,</span> <span class="na">state</span><span class="p">:</span> <span class="dl">'</span><span class="s1">WI</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">258054</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">San Antonio</span><span class="dl">'</span><span class="p">,</span> <span class="na">state</span><span class="p">:</span> <span class="dl">'</span><span class="s1">TX</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">1327407</span> <span class="p">}</span>
+<span class="p">]</span>
+
+<span class="c1">// ['Chicago', 'Houston', 'Minneapolis', 'Madison', 'San Antonio']</span>
+<span class="kd">const</span> <span class="nx">justCityNames</span> <span class="o">=</span> <span class="nx">cities</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">cities</span> <span class="o">=&gt;</span> <span class="nx">cities</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h2 id="filter">.filter()</h2>
+
+<p>To take it a step further, we can use <code class="language-plaintext highlighter-rouge">filter()</code> to create a new array based on some criteria. For example, let’s get back all cities with a population more than 1 million people.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">cities</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Chicago</span><span class="dl">'</span><span class="p">,</span> <span class="na">state</span><span class="p">:</span> <span class="dl">'</span><span class="s1">IL</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">2693976</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Houston</span><span class="dl">'</span><span class="p">,</span> <span class="na">state</span><span class="p">:</span> <span class="dl">'</span><span class="s1">TX</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">2320268</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Minneapolis</span><span class="dl">'</span><span class="p">,</span> <span class="na">state</span><span class="p">:</span> <span class="dl">'</span><span class="s1">MN</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">453403</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Madison</span><span class="dl">'</span><span class="p">,</span> <span class="na">state</span><span class="p">:</span> <span class="dl">'</span><span class="s1">WI</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">258054</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">San Antonio</span><span class="dl">'</span><span class="p">,</span> <span class="na">state</span><span class="p">:</span> <span class="dl">'</span><span class="s1">TX</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">1327407</span> <span class="p">}</span>
+<span class="p">]</span>
+
+<span class="c1">// ['Chicago', 'Houston', 'Minneapolis', 'Madison', 'San Antonio']</span>
+<span class="kd">const</span> <span class="nx">bigCities</span> <span class="o">=</span> <span class="nx">cities</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">city</span> <span class="o">=&gt;</span> <span class="nx">city</span><span class="p">.</span><span class="nx">population</span> <span class="o">&gt;</span> <span class="mi">1000000</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h2 id="reduce">.reduce()</h2>
+
+<p>To be honest, <code class="language-plaintext highlighter-rouge">.map</code> and <code class="language-plaintext highlighter-rouge">.filter</code> aren’t too difficult to grasp—it’s <code class="language-plaintext highlighter-rouge">reduce()</code> that will hold the key to your glory (and your frustration, if you don’t understand it). While methods like <code class="language-plaintext highlighter-rouge">map()</code> and <code class="language-plaintext highlighter-rouge">filter()</code> make you another array, <code class="language-plaintext highlighter-rouge">reduce()</code> has greater ambitions. It says: “you give me an array, and I’ll transform it for you to whatever you want.” This can be an object, an array, an int, a calculation. Anything.</p>
+
+<p>Let’s say we want to add up total population for all our cities using an add function:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">add</span><span class="p">(</span><span class="nx">array</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">array</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">total</span><span class="p">,</span> <span class="nx">num</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">total</span> <span class="o">+</span> <span class="nx">num</span>
+    <span class="p">},</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">};</span>
+
+<span class="kd">const</span> <span class="nx">cities</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Chicago</span><span class="dl">'</span><span class="p">,</span> <span class="na">state</span><span class="p">:</span> <span class="dl">'</span><span class="s1">IL</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">2693976</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Houston</span><span class="dl">'</span><span class="p">,</span> <span class="na">state</span><span class="p">:</span> <span class="dl">'</span><span class="s1">TX</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">2320268</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Minneapolis</span><span class="dl">'</span><span class="p">,</span> <span class="na">state</span><span class="p">:</span> <span class="dl">'</span><span class="s1">MN</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">453403</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Madison</span><span class="dl">'</span><span class="p">,</span> <span class="na">state</span><span class="p">:</span> <span class="dl">'</span><span class="s1">WI</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">258054</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">San Antonio</span><span class="dl">'</span><span class="p">,</span> <span class="na">state</span><span class="p">:</span> <span class="dl">'</span><span class="s1">TX</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">1327407</span> <span class="p">}</span>
+<span class="p">]</span>
+
+<span class="kd">const</span> <span class="nx">cityPopulations</span> <span class="o">=</span> <span class="nx">cities</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">cities</span> <span class="o">=&gt;</span> <span class="nx">cities</span><span class="p">.</span><span class="nx">population</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">totalPopulation</span> <span class="o">=</span> <span class="nx">add</span><span class="p">(</span><span class="nx">cityPopulations</span><span class="p">);</span> <span class="c1">// 7053108</span>
+</code></pre></div></div>
+
+<p>Our function takes two arguments: the first is invoked for every element, and the second is the initial value. In our case, the initial value is 0 (make sure to pass this to avoid <code class="language-plaintext highlighter-rouge">NaN</code> frustrations).</p>
+
+<p>For each iteration, <code class="language-plaintext highlighter-rouge">num</code> will be what’s in the array—in our situation, the population of a city. With <code class="language-plaintext highlighter-rouge">total</code>, it will be initially 0, then whatever the previous city returned. Cool?</p>
+
+<p>This is a simple example, and even this is a little trippy. My advice? Do <code class="language-plaintext highlighter-rouge">reduce()</code> calls until you can’t see straight, then do some some more. Pass in an array, transform into anything imaginable. Because once you master reduce, you rule the JavaScript world.</p>
+
+<h2 id="when-to-use-map-filter-and-reduce-in-one-sentence">When to use <code class="language-plaintext highlighter-rouge">map</code>, <code class="language-plaintext highlighter-rouge">filter</code>, and <code class="language-plaintext highlighter-rouge">reduce</code>, in one sentence</h2>
+
+<p>Use <code class="language-plaintext highlighter-rouge">map()</code> when you are turning an array into another array, <code class="language-plaintext highlighter-rouge">.filter()</code> to turn an array into another array by filtering (or removing, most likely) elements, and <code class="language-plaintext highlighter-rouge">reduce()</code> to transform an array into something magical (specifically, not an array).</p>
+
+<h1 id="understand-that-arrow-functions-arent-just-for-conciseness">Understand that arrow functions aren’t just for conciseness</h1>
+
+<p>Starting <a href="http://es6-features.org/">with ES6</a>, you can use arrow functions. Before ES6, here’s how we’d write our previous filter function:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">cities</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Chicago</span><span class="dl">'</span><span class="p">,</span> <span class="na">state</span><span class="p">:</span> <span class="dl">'</span><span class="s1">IL</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">2693976</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Houston</span><span class="dl">'</span><span class="p">,</span> <span class="na">state</span><span class="p">:</span> <span class="dl">'</span><span class="s1">TX</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">2320268</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Minneapolis</span><span class="dl">'</span><span class="p">,</span> <span class="na">state</span><span class="p">:</span> <span class="dl">'</span><span class="s1">MN</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">453403</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Madison</span><span class="dl">'</span><span class="p">,</span> <span class="na">state</span><span class="p">:</span> <span class="dl">'</span><span class="s1">WI</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">258054</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">San Antonio</span><span class="dl">'</span><span class="p">,</span> <span class="na">state</span><span class="p">:</span> <span class="dl">'</span><span class="s1">TX</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">1327407</span> <span class="p">}</span>
+<span class="p">]</span>
+
+<span class="kd">var</span> <span class="nx">bigCitiesOld</span> <span class="o">=</span> <span class="nx">cities</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">city</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">city</span><span class="p">.</span><span class="nx">population</span> <span class="o">&gt;</span> <span class="mi">1000000</span><span class="p">;</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>Instead, we can use an arrow function whose <code class="language-plaintext highlighter-rouge">=&gt;</code> offers an implicit return and make things a lot cleaner and easier. We also don’t need to manually type the <code class="language-plaintext highlighter-rouge">function</code> syntax. Check out this one-liner:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">bigCities</span> <span class="o">=</span> <span class="nx">cities</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">city</span> <span class="o">=&gt;</span> <span class="nx">city</span><span class="p">.</span><span class="nx">population</span> <span class="o">&gt;</span> <span class="mi">1000000</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>This is great and, for a lot of us, this completes our understanding of arrow functions. But when you made that subtle change in deleting the <code class="language-plaintext highlighter-rouge">function</code> syntax, you are also changing the context of <code class="language-plaintext highlighter-rouge">this</code>. And you definitely need to understand … this.</p>
+
+<p>In short, arrow functions don’t have their own <code class="language-plaintext highlighter-rouge">this</code> value. When you use <code class="language-plaintext highlighter-rouge">function()</code> syntax, it receives a <code class="language-plaintext highlighter-rouge">this</code> value automatically, even when you don’t want it! As a result, before arrow functions, you’ve probably written a hack like this:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">addEverything</span><span class="p">(</span><span class="nx">items</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nb">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="nx">items</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">thing</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nb">self</span><span class="p">.</span><span class="nx">addAThing</span><span class="p">(</span><span class="nx">thing</span><span class="p">)</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>You need to do this <code class="language-plaintext highlighter-rouge">var self = this</code> garbage because your inner function doesn’t inherit this from the outer function—meaning <code class="language-plaintext highlighter-rouge">this</code> will be <code class="language-plaintext highlighter-rouge">window</code> or <code class="language-plaintext highlighter-rouge">undefined</code> if you don’t do the hack. You could also do <code class="language-plaintext highlighter-rouge">.bind</code> but the ugliness remains.</p>
+
+<p>With arrow functions, you can just do this:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">addEverything</span><span class="p">(</span><span class="nx">items</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">items</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">thing</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">thing</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>No hacks needed assuming you know that you’ll need to use the <code class="language-plaintext highlighter-rouge">function()</code> syntax for methods called using the dot operator (<code class="language-plaintext highlighter-rouge">object.method</code>). These functions receive <code class="language-plaintext highlighter-rouge">this</code> from whoever called it. For everything else, use arrow functions.</p>
+
+<p>You’ll want to study Jason Orendorff’s <a href="https://hacks.mozilla.org/2015/06/es6-in-depth-arrow-functions/">ES6 In Depth: Arrow Functions</a> piece until the proverbial light bulb goes off in your head.</p>
+
+<h1 id="wrap-up">Wrap up</h1>
+
+<p>In this post, we covered ways to understand JavaScript a little better. We worked through execution contexts, the event loop, async/await, array methods, and the nuances of arrow functions.</p>
+
+<p>I hope you found this article useful. What are some JS pieces that boosted your confidence once you understood how they worked? Let me know in the comments!</p>
+:ET

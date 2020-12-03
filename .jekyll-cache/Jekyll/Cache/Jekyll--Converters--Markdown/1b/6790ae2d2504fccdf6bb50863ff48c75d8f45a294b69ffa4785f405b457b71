@@ -1,0 +1,186 @@
+I"�R<p>There are several reasons why you’ll want to host publicly accessible images yourself. For example, you may want to compress them or apply metadata for querying purposes on your site. For my <em>Blast Off with Blazor</em> project, I had that exact need.</p>
+
+<p>In my case, I want to host images cheaply and also work with the image’s metadata over a NoSQL database. Azure Storage blobs and Azure Cosmos DB were obvious choices, since I’m already deploying the site as an Azure Static Web App.</p>
+
+<p>To accomplish this, I wrote a quick Azure Function that accomplishes both tasks. Let’s take a look at how this works.</p>
+
+<p>(Take a <a href="https://github.com/daveabrock/ImageUploader">look at the repository</a> for the full treatment.)</p>
+
+<h1 id="before-you-begin-create-azure-resources">Before you begin: create Azure resources</h1>
+
+<p>Before you begin, you need to set up the following:</p>
+
+<ul>
+  <li>An <a href="https://portal.azure.com/">Azure storage account</a> (I set up StorageV2, with LRS, and Hot access tier)</li>
+  <li>A <a href="https://docs.microsoft.com/azure/storage/blobs/storage-quickstart-blobs-portal">blob container</a> to store your images (I set it to public access as anonymous read access is not a concern for publicly available photos)</li>
+  <li>A <a href="https://docs.microsoft.com/azure/cosmos-db/create-cosmosdb-resources-portal">Cosmos DB resource</a> (I largely accepted the defaults except using the Serverless option, now in preview, to reduce costs)</li>
+  <li>A <a href="https://docs.microsoft.com/azure/cosmos-db/create-cosmosdb-resources-portal">Cosmos DB collection, database, and container</a></li>
+</ul>
+
+<p>Once I created all these resources, I added the configuration values to my <code class="language-plaintext highlighter-rouge">local.settings.json</code> file. These values are available in the portal when you browse to your various resources. (When you deploy your resources, they’ll need to be added to your configuration.)</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"Values"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"ApiKey"</span><span class="p">:</span><span class="w"> </span><span class="s2">"my-nasa-api-key"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"CosmosEndpoint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"url-to-my-cosmos-endpoint"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"CosmosKey"</span><span class="p">:</span><span class="w"> </span><span class="s2">"my-cosmos-primary-key"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"CosmosDatabase"</span><span class="p">:</span><span class="w"> </span><span class="s2">"name-of-my-cosmos-db"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"CosmosContainer"</span><span class="p">:</span><span class="w"> </span><span class="s2">"name-of-my-cosmos-container"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"StorageAccount"</span><span class="p">:</span><span class="w"> </span><span class="s2">"storage-account-name"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"StorageKey"</span><span class="p">:</span><span class="w"> </span><span class="s2">"storage-key"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"BlobContainerUrl"</span><span class="p">:</span><span class="w"> </span><span class="s2">"url-to-my-container"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h1 id="the-azure-function">The Azure function</h1>
+
+<p>In my Azure function I’m doing three things:</p>
+
+<ul>
+  <li>Call the NASA Image of the Day API to get a response with image details—including URL, title, description, and so on</li>
+  <li>From the URL in the response payload, copy the image to Azure Storage</li>
+  <li>Then, update Cosmos DB with the URL of the new resource, and the other properties in the object</li>
+</ul>
+
+<p>If we look at the <a href="https://apod.nasa.gov/apod/astropix.html">Astronomy Picture of the Day site</a>, it hosts an image and its metadata for the current day. I want to put the image in Storage Blobs and the details in Cosmos DB.</p>
+
+<p><img src="http://localhost:4001/images/apod-site.png" alt="The Astronomy Picture of the Day site" /></p>
+
+<p>Here’s how the function itself looks:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//using System;</span>
+<span class="c1">//using System.Threading.Tasks;</span>
+<span class="c1">//using Microsoft.AspNetCore.Mvc;</span>
+<span class="c1">//using Microsoft.Azure.WebJobs;</span>
+<span class="c1">//using Microsoft.Azure.WebJobs.Extensions.Http;</span>
+<span class="c1">//using Microsoft.AspNetCore.Http;</span>
+<span class="c1">//using Microsoft.Extensions.Logging;</span>
+<span class="c1">//using Newtonsoft.Json;</span>
+<span class="c1">//using System.Net.Http;</span>
+<span class="c1">//using Azure.Storage;</span>
+<span class="c1">//using Azure.Storage.Blobs;</span>
+<span class="c1">//using System.Linq;</span>
+<span class="c1">//using Microsoft.Azure.Cosmos;</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">ImageUploader</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">HttpClient</span> <span class="n">httpClient</span><span class="p">;</span>
+    <span class="k">private</span> <span class="n">CosmosClient</span> <span class="n">cosmosClient</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">ImageUploader</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">httpClient</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">HttpClient</span><span class="p">();</span>
+        <span class="n">cosmosClient</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">CosmosClient</span><span class="p">(</span><span class="n">Environment</span><span class="p">.</span><span class="nf">GetEnvironmentVariable</span><span class="p">(</span><span class="s">"CosmosEndpoint"</span><span class="p">),</span>
+                                        <span class="n">Environment</span><span class="p">.</span><span class="nf">GetEnvironmentVariable</span><span class="p">(</span><span class="s">"CosmosKey"</span><span class="p">));</span>
+    <span class="p">}</span>
+
+    <span class="p">[</span><span class="nf">FunctionName</span><span class="p">(</span><span class="s">"Uploader"</span><span class="p">)]</span>
+    <span class="k">public</span> <span class="k">async</span> <span class="n">Task</span><span class="p">&lt;</span><span class="n">IActionResult</span><span class="p">&gt;</span> <span class="nf">Run</span><span class="p">(</span>
+    <span class="p">[</span><span class="nf">HttpTrigger</span><span class="p">(</span><span class="n">AuthorizationLevel</span><span class="p">.</span><span class="n">Anonymous</span><span class="p">,</span> <span class="s">"get"</span><span class="p">,</span> <span class="s">"post"</span><span class="p">,</span> <span class="n">Route</span> <span class="p">=</span> <span class="s">"upload"</span><span class="p">)]</span> <span class="n">HttpRequest</span> <span class="n">req</span><span class="p">,</span> <span class="n">ILogger</span> <span class="n">log</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">apiKey</span> <span class="p">=</span> <span class="n">Environment</span><span class="p">.</span><span class="nf">GetEnvironmentVariable</span><span class="p">(</span><span class="s">"ApiKey"</span><span class="p">);</span>
+        <span class="kt">var</span> <span class="n">response</span> <span class="p">=</span> <span class="k">await</span> <span class="n">httpClient</span><span class="p">.</span><span class="nf">GetAsync</span><span class="p">(</span><span class="s">$"https://api.nasa.gov/planetary/apod?api_key=</span><span class="p">{</span><span class="n">apiKey</span><span class="p">}</span><span class="s">"</span><span class="p">);</span>
+        <span class="kt">var</span> <span class="n">result</span> <span class="p">=</span> <span class="k">await</span> <span class="n">response</span><span class="p">.</span><span class="n">Content</span><span class="p">.</span><span class="nf">ReadAsStringAsync</span><span class="p">();</span>
+
+        <span class="kt">var</span> <span class="n">imageDetails</span> <span class="p">=</span> <span class="n">JsonConvert</span><span class="p">.</span><span class="n">DeserializeObject</span><span class="p">&lt;</span><span class="n">Image</span><span class="p">&gt;(</span><span class="n">result</span><span class="p">);</span>
+
+        <span class="k">await</span> <span class="nf">UploadImageToAzureStorage</span><span class="p">(</span><span class="n">imageDetails</span><span class="p">.</span><span class="n">Url</span><span class="p">);</span>
+        <span class="k">await</span> <span class="nf">AddImageToContainer</span><span class="p">(</span><span class="n">imageDetails</span><span class="p">);</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">OkObjectResult</span><span class="p">(</span><span class="s">"Processing complete."</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>After I get the response back from the API, I deserialize it to an <code class="language-plaintext highlighter-rouge">Image</code> model and then do the work in Azure (keep reading for those details).</p>
+
+<p>Here is the model:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">Newtonsoft.Json</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">MassImageUploader</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">Image</span>
+    <span class="p">{</span>
+        <span class="p">[</span><span class="nf">JsonProperty</span><span class="p">(</span><span class="s">"id"</span><span class="p">)]</span>
+        <span class="k">public</span> <span class="n">Guid</span> <span class="n">Id</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+
+        <span class="p">[</span><span class="nf">JsonProperty</span><span class="p">(</span><span class="s">"title"</span><span class="p">)]</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">Title</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+
+        <span class="p">[</span><span class="nf">JsonProperty</span><span class="p">(</span><span class="s">"copyright"</span><span class="p">)]</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">Copyright</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+
+        <span class="p">[</span><span class="nf">JsonProperty</span><span class="p">(</span><span class="s">"date"</span><span class="p">)]</span>
+        <span class="k">public</span> <span class="n">DateTime</span> <span class="n">Date</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+
+        <span class="p">[</span><span class="nf">JsonProperty</span><span class="p">(</span><span class="s">"explanation"</span><span class="p">)]</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">Explanation</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+
+        <span class="p">[</span><span class="nf">JsonProperty</span><span class="p">(</span><span class="s">"url"</span><span class="p">)]</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">Url</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="upload-image-to-azure-storage-blob-container">Upload image to Azure Storage blob container</h2>
+
+<p>In my <code class="language-plaintext highlighter-rouge">UploadImageToAzureStorage</code> method, I pass along the URI of the publicly accessible image. From that, I get the <code class="language-plaintext highlighter-rouge">fileName</code> by extracting the last part of the URI (for example, <em>myfile.jpg</em>). With the <code class="language-plaintext highlighter-rouge">fileName</code> I build the path of my new resource in the <code class="language-plaintext highlighter-rouge">blobUri</code>—that path will include the Azure Storage container URL and the <code class="language-plaintext highlighter-rouge">fileName</code>.</p>
+
+<p>After that, I pass my credentials to a new <code class="language-plaintext highlighter-rouge">StorageSharedKeyCredential</code>, and instantiate a new <code class="language-plaintext highlighter-rouge">BlobClient</code>. Then, the copy occurs in the <code class="language-plaintext highlighter-rouge">StartCopyFromUriAsync</code>, which passes in a URI.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">private</span> <span class="k">async</span> <span class="n">Task</span><span class="p">&lt;</span><span class="kt">bool</span><span class="p">&gt;</span> <span class="nf">UploadImageToAzureStorage</span><span class="p">(</span><span class="kt">string</span> <span class="n">imageUri</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">var</span> <span class="n">fileName</span> <span class="p">=</span> <span class="nf">GetFileNameFromUrl</span><span class="p">(</span><span class="n">imageUri</span><span class="p">);</span>
+    <span class="kt">var</span> <span class="n">blobUri</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Uri</span><span class="p">(</span><span class="s">$"</span><span class="p">{</span><span class="n">Environment</span><span class="p">.</span><span class="nf">GetEnvironmentVariable</span><span class="p">(</span><span class="s">"BlobContainerUrl"</span><span class="p">)}</span><span class="s">/</span><span class="p">{</span><span class="n">fileName</span><span class="p">}</span><span class="s">"</span><span class="p">);</span>
+    <span class="kt">var</span> <span class="n">storageCredentials</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">StorageSharedKeyCredential</span><span class="p">(</span>
+        <span class="n">Environment</span><span class="p">.</span><span class="nf">GetEnvironmentVariable</span><span class="p">(</span><span class="s">"StorageAccount"</span><span class="p">),</span>
+        <span class="n">Environment</span><span class="p">.</span><span class="nf">GetEnvironmentVariable</span><span class="p">(</span><span class="s">"StorageKey"</span><span class="p">));</span>
+    <span class="kt">var</span> <span class="n">blobClient</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">BlobClient</span><span class="p">(</span><span class="n">blobUri</span><span class="p">,</span> <span class="n">storageCredentials</span><span class="p">);</span>
+    <span class="k">await</span> <span class="n">blobClient</span><span class="p">.</span><span class="nf">StartCopyFromUriAsync</span><span class="p">(</span><span class="k">new</span> <span class="nf">Uri</span><span class="p">(</span><span class="n">imageUri</span><span class="p">));</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">Task</span><span class="p">.</span><span class="nf">FromResult</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">private</span> <span class="kt">string</span> <span class="nf">GetFileNameFromUrl</span><span class="p">(</span><span class="kt">string</span> <span class="n">urlString</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">var</span> <span class="n">url</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Uri</span><span class="p">(</span><span class="n">urlString</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">url</span><span class="p">.</span><span class="n">Segments</span><span class="p">.</span><span class="nf">Last</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>If I browse to my Azure Storage container, I’ll see my new image.</p>
+
+<p><img src="http://localhost:4001/images/blob-result.png" alt="The result" /></p>
+
+<h1 id="push-metadata-to-cosmos-db">Push metadata to Cosmos DB</h1>
+
+<p>With my image successfully stored, I can push the metadata to an Azure Cosmos DB container. In my <code class="language-plaintext highlighter-rouge">AddImageToContainer</code> method, I pass in my populated <code class="language-plaintext highlighter-rouge">Image</code> model. Then I’ll get the Azure Cosmos DB container, get the path, then call <code class="language-plaintext highlighter-rouge">CreateItemAsync</code> while passing in the <code class="language-plaintext highlighter-rouge">image</code>. Easy.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">private</span> <span class="k">async</span> <span class="n">Task</span><span class="p">&lt;</span><span class="kt">bool</span><span class="p">&gt;</span> <span class="nf">AddImageToContainer</span><span class="p">(</span><span class="n">Image</span> <span class="n">image</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="n">cosmosClient</span><span class="p">.</span><span class="nf">GetContainer</span><span class="p">(</span>
+        <span class="n">Environment</span><span class="p">.</span><span class="nf">GetEnvironmentVariable</span><span class="p">(</span><span class="s">"CosmosDatabase"</span><span class="p">),</span>
+        <span class="n">Environment</span><span class="p">.</span><span class="nf">GetEnvironmentVariable</span><span class="p">(</span><span class="s">"CosmosContainer"</span><span class="p">));</span>
+
+    <span class="kt">var</span> <span class="n">fileName</span> <span class="p">=</span> <span class="nf">GetFileNameFromUrl</span><span class="p">(</span><span class="n">image</span><span class="p">.</span><span class="n">Url</span><span class="p">);</span>
+
+    <span class="n">image</span><span class="p">.</span><span class="n">Id</span> <span class="p">=</span> <span class="n">Guid</span><span class="p">.</span><span class="nf">NewGuid</span><span class="p">();</span>
+    <span class="n">image</span><span class="p">.</span><span class="n">Url</span> <span class="p">=</span> <span class="s">$"</span><span class="p">{</span><span class="n">Environment</span><span class="p">.</span><span class="nf">GetEnvironmentVariable</span><span class="p">(</span><span class="s">"BlobContainerUrl"</span><span class="p">)}</span><span class="s">/</span><span class="p">{</span><span class="n">fileName</span><span class="p">}</span><span class="s">"</span><span class="p">;</span>
+
+    <span class="k">await</span> <span class="n">container</span><span class="p">.</span><span class="nf">CreateItemAsync</span><span class="p">(</span><span class="n">image</span><span class="p">);</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">Task</span><span class="p">.</span><span class="nf">FromResult</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>In the Data Explorer for my Cosmos DB resource in the Azure portal, I can see my new record.</p>
+
+<p><img src="http://localhost:4001/images/cosmos-result.png" alt="The result" /></p>
+
+<h1 id="wrap-up">Wrap up</h1>
+
+<p>In this post, we learned how to store a publicly accessible image in Azure Storage, then post that URL and other metadata in Azure Cosmos DB.</p>
+
+<p>As always, feel free to post any feedback or experiences in the comments.</p>
+
+:ET

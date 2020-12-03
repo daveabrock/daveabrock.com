@@ -1,0 +1,209 @@
+I"JV<p>For the last few years, I hosted my blog on the <a href="https://ghost.org/">Ghost platform</a>. It was a fast, Node-powered CMS, which allowed for stupid-simple publishing: I could get in, write, and get out. However, I was looking at another annual bill for $220 and I wanted to find a better (and cheaper) way. I knew of the myriad of static site generators out there today. I eventually landed on <a href="https://pages.github.com/">Jekyll + GitHub Pages</a>. A month in, I’m happy that GitHub Pages gives me the flexibility to customize as I wanted, but also the simplicity. I can push a markdown file to GitHub, and then deploy to daveabrock.com automatically. All for just the cost of my domain name ($9 a year)!</p>
+
+<p>After I publish my posts, I typically post them to Twitter. Ghost had a setting to do this. Could I do this from GitHub Pages? Not easily, it seemed, without leveraging external services. I could maybe toy with an RSS feed trigger from IFTTT or build something with Azure Logic Apps. Of course, it’s a silly thing to obsess over but why should I manually do something repeatedly?</p>
+
+<p>A thought occurred to me: if I’m using GitHub, shouldn’t I be able to use their pipeline? I knew that I could leverage <a href="https://github.com/features/actions">GitHub Actions</a> in my repo, which the docs say allow me to “discover, create, and share actions to perform any job you’d like, including CI/CD, and combine actions in a completely customized workflow.” I would love to make this a deployment step.</p>
+
+<p>Alas, being forced to manually tweet about a new post a few times a month wasn’t one of my life’s biggest regrets—but if I could spend a few hours learning about GitHub Actions while saving a few minutes every month, why not?</p>
+
+<p><strong>This post is about learning</strong>. Sure, you could look at my 16-line YAML file say, “looks pretty simple” and maybe it is, in retrospect. But when you try something new, you stumble and you learn—and that’s what this post is about.</p>
+
+<p>This post contains the following content.</p>
+
+<ul>
+  <li><a href="#the-perfect-world-and-what-i-can-do-now">The perfect world, and what I can do now</a></li>
+  <li><a href="#what-you-need-before-you-get-started">What you need before you get started</a></li>
+  <li><a href="#add-twitter-api-secrets-to-github">Add Twitter API secrets to GitHub</a></li>
+  <li><a href="#create-your-first-github-action">Create your first GitHub Action</a></li>
+  <li><a href="#how-to-get-just-the-commit-message-from-git">How to get just the commit message from Git</a></li>
+  <li><a href="#passing-commit-message-to-my-github-action">Passing commit message to my GitHub action</a></li>
+  <li><a href="#wrapping-up">Wrapping up</a></li>
+</ul>
+
+<h1 id="the-perfect-world-and-what-i-can-do-now">The perfect world, and what I can do now</h1>
+
+<p>Without knowing much about GitHub Actions, here’s the workflow I envisioned:</p>
+
+<ol>
+  <li>Every time I write a post, push my markdown file (and associated files, like images) to my repository.</li>
+  <li>Run a GitHub Actions workflow step from that push</li>
+  <li>In that step, get the post title and path to the post</li>
+  <li>Send a tweet with this information</li>
+</ol>
+
+<p>As you can imagine, it was the third step that took some thought. In a perfect world, here’s how I would grab the post and URL information:</p>
+
+<ol>
+  <li>Somehow, grab the Git commit data and parse the committed files</li>
+  <li>Assuming I’ll only be pushing one markdown file, get the title metadata which is sitting inside the file</li>
+  <li>Get path, which more or less is the filename (would just have the replace the <code class="language-plaintext highlighter-rouge">.markdown</code> extension with <code class="language-plaintext highlighter-rouge">.html</code>)</li>
+  <li>Pass that string to the <a href="https://github.com/marketplace/actions/send-tweet-action">Send Tweet Action</a></li>
+</ol>
+
+<p>Did I mention I didn’t want to write any additional code or scripts, or spend more than a few hours on this? It was time to reset my expectations and think a little smaller. Thanks to some input from <a href="https://twitter.com/isaacrlevin">my friend Isaac Levin from Microsoft</a>—<a href="https://twitter.com/isaacrlevin/status/1251176465237868544">on Twitter, naturally</a>—I decided to just add the title and URL to my Git commit message. Then, I could just pass down the commit message to the Twitter action. This was manageable.</p>
+
+<p>Let’s get started.</p>
+
+<h1 id="what-you-need-before-you-get-started">What you need before you get started</h1>
+
+<p>If you’re playing along at home, you need to do the following before proceeding with this post:</p>
+
+<ul>
+  <li>Register for a <a href="https://developer.twitter.com">Twitter developer account</a>. It wouldn’t be a terrible idea to set up a test account first to avoid spamming your followers</li>
+  <li>Once the registration is approved, head over to <a href="https://developer.twitter.com/apps">developer.twitter.com/apps</a> and create a Twitter application. You’ll need to do this so the Send Tweet Action can call the Twitter API on your behalf</li>
+  <li>A GitHub repository (this demo works for any push, but the obvious use case is a GitHub Pages site)</li>
+</ul>
+
+<h1 id="add-twitter-api-secrets-to-github">Add Twitter API secrets to GitHub</h1>
+
+<p>We will be using the <a href="https://github.com/marketplace/actions/send-tweet-action">Send Tweet Action</a>, developed by GitHub’s <a href="https://twitter.com/ethomson">Edward Thomson</a>. This action handles connecting to Twitter API to send the tweet. We need to provide it the Twitter consumer API key, Twitter consumer API secret, Twitter access token, and Twitter access token secret.</p>
+
+<p>To retrieve those, go to <a href="https://developer.twitter.com/apps">developer.twitter.com/apps</a>, click <code class="language-plaintext highlighter-rouge">Details</code> next to the application you created, then the <code class="language-plaintext highlighter-rouge">Keys and tokens</code> link.</p>
+
+<p>You need to add those to GitHub as encrypted secrets. From GitHub, go to <strong>Settings</strong> &gt; <strong>Secrets</strong>. I recommend calling them <code class="language-plaintext highlighter-rouge">TWITTER_CONSUMER_API_KEY</code>, <code class="language-plaintext highlighter-rouge">TWITTER_CONSUMER_API_SECRET</code>, <code class="language-plaintext highlighter-rouge">TWITTER_ACCESS_TOKEN</code>, and <code class="language-plaintext highlighter-rouge">TWITTER_ACCESS_TOKEN_SECRET</code>, so you can easily follow the code in this post. For details on storing encrypted secrets in GitHub, read <a href="https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets">this GitHub article</a>.</p>
+
+<h1 id="create-your-first-github-action">Create your first GitHub Action</h1>
+
+<p>To get started, you’ll need to set up a GitHub Action. To do that, click the <code class="language-plaintext highlighter-rouge">Actions</code> link at the top of your repository, right next to <code class="language-plaintext highlighter-rouge">Pull Requests</code>. From there, you’ll see the power of GitHub Actions—there are so many CI workflows and automation processes to choose!</p>
+
+<p><img src="http://localhost:4001/images/actions-options.png" alt="Actions options" /></p>
+
+<p>For us, though, we’ll use <code class="language-plaintext highlighter-rouge">Simple Workflow.</code> In that pane, click <code class="language-plaintext highlighter-rouge">Set up this workflow.</code> Once you do that, you will see that you are now editing a <code class="language-plaintext highlighter-rouge">blank.yml</code> file (which you can rename), sitting in a <code class="language-plaintext highlighter-rouge">.github/workflows</code> directory. We’ll be updating this file.</p>
+
+<p>Let’s send a tweet! Replace the contents in <code class="language-plaintext highlighter-rouge">blank.yml</code> with this, right in GitHub, and commit the file. (We will explain particulars in a second.)</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">name</span><span class="pi">:</span> <span class="s">Send a Tweet</span>
+<span class="na">on</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">push</span><span class="pi">]</span>
+<span class="na">jobs</span><span class="pi">:</span>
+  <span class="na">tweet</span><span class="pi">:</span>
+    <span class="na">runs-on</span><span class="pi">:</span> <span class="s">ubuntu-latest</span>
+    <span class="na">steps</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">uses</span><span class="pi">:</span> <span class="s">ethomson/send-tweet-action@v1</span>
+        <span class="na">with</span><span class="pi">:</span>
+          <span class="na">status</span><span class="pi">:</span> <span class="s2">"</span><span class="s">NEW</span><span class="nv"> </span><span class="s">POST!"</span>
+          <span class="na">consumer-key</span><span class="pi">:</span> <span class="s">${{ secrets.TWITTER_CONSUMER_API_KEY }}</span>
+          <span class="na">consumer-secret</span><span class="pi">:</span> <span class="s">${{ secrets.TWITTER_CONSUMER_API_SECRET }}</span>
+          <span class="na">access-token</span><span class="pi">:</span> <span class="s">${{ secrets.TWITTER_ACCESS_TOKEN }}</span>
+          <span class="na">access-token-secret</span><span class="pi">:</span> <span class="s">${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}</span>
+</code></pre></div></div>
+
+<p>After you commit the file, you can head over to the <code class="language-plaintext highlighter-rouge">Actions</code> page in GitHub to monitor the status.</p>
+
+<p><img src="http://localhost:4001/images/job-results.png" alt="Job results" /></p>
+
+<p>With any luck, you should see a tweet that says “NEW POST!” Let’s break down what’s happening. (You can also <a href="https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions">review the docs</a> for details on GitHub Actions workflow syntax.)</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">name</code> - the name of your workflow, which is displayed on the actions page</li>
+  <li><code class="language-plaintext highlighter-rouge">on</code> - the event that triggers the workflow. I included <code class="language-plaintext highlighter-rouge">push</code> but you can also do <code class="language-plaintext highlighter-rouge">pull_request</code> or other options</li>
+  <li><code class="language-plaintext highlighter-rouge">jobs</code> - a workflow comprises one or more jobs
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">runs-on</code> - the type of machine to run the job on (required)</li>
+      <li><code class="language-plaintext highlighter-rouge">steps</code> - one of a sequence of tasks in a job
+        <ul>
+          <li><code class="language-plaintext highlighter-rouge">uses</code> - selects an action to run. In our case, we are using the Send Tweet Action from the GitHub Marketplace</li>
+          <li><code class="language-plaintext highlighter-rouge">with</code>- the input that the action requires. For this action, the <code class="language-plaintext highlighter-rouge">status</code> is the tweet text, and the rest of the fields reference the secrets you created earlier.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p>So, this is great! However, your followers aren’t mind readers. Tweeting “NEW POST!” doesn’t do much. We now have to figure out how to tweet the commit message.</p>
+
+<h1 id="how-to-get-just-the-commit-message-from-git">How to get just the commit message from Git</h1>
+
+<p>To get the latest commit from Git, I know I can use <code class="language-plaintext highlighter-rouge">git log 1</code>. Here’s what I get back:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>commit cc789c6bd3032e0d28111b2515f3931cb5b95e4b <span class="o">(</span>HEAD -&gt; master<span class="o">)</span>
+Merge: e5b2597 a07f6b5
+Author: Dave
+Date:   Sun Apr 19 08:05:02 2020 <span class="nt">-0500</span>
+
+Merge branch <span class="s1">'master'</span> of https://github.com/daveabrock/daveabrock.github.io
+</code></pre></div></div>
+
+<p>I already see two problems: (1) this is a merge commit message, and (2) I <em>just</em> want the message.</p>
+
+<p>How about <code class="language-plaintext highlighter-rouge">git log 1 --no-merges</code>?</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>commit cc789c6bd3032e0d28111b2515f3931cb5b95e4b <span class="o">(</span>HEAD -&gt; master<span class="o">)</span>
+Author: Dave
+Date:   Sun Apr 19 08:05:02 2020 <span class="nt">-0500</span>
+
+my commit
+</code></pre></div></div>
+
+<p>Better! But I just want to see <code class="language-plaintext highlighter-rouge">my commit.</code> Luckily, Git has a <a href="https://git-scm.com/docs/pretty-formats"><code class="language-plaintext highlighter-rouge">--pretty</code> flag</a>. I can pass <code class="language-plaintext highlighter-rouge">--pretty=%B</code>, where <code class="language-plaintext highlighter-rouge">%B</code> is the raw body of the commit message. So now, let’s pass <code class="language-plaintext highlighter-rouge">git log --no-merges -1 --pretty=%B</code>. And what do we get?</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>my commit
+</code></pre></div></div>
+
+<p>Victory! (Or you could have googled it, but what fun is that?)</p>
+
+<h1 id="passing-commit-message-to-my-github-action">Passing commit message to my GitHub action</h1>
+
+<p>So now, I know how to do things: how to tweet when I push and how to get my commit message. How do we connect them? From my <code class="language-plaintext highlighter-rouge">blank.yml</code> file, I want a way to run <code class="language-plaintext highlighter-rouge">git log</code> and save the output, then pass the output to the action’s <code class="language-plaintext highlighter-rouge">status</code> field.</p>
+
+<p>From what I could see, the <code class="language-plaintext highlighter-rouge">checkout</code> action allows me to <a href="https://github.com/actions/checkout">fetch commit details</a>. So, I can do something like this:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">name</span><span class="pi">:</span> <span class="s">Send a Tweet</span>
+<span class="na">on</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">push</span><span class="pi">]</span>
+<span class="na">jobs</span><span class="pi">:</span>
+  <span class="na">tweet</span><span class="pi">:</span>
+    <span class="na">runs-on</span><span class="pi">:</span> <span class="s">ubuntu-latest</span>
+    <span class="na">steps</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/checkout@v1</span>
+      <span class="pi">-</span> <span class="na">id</span><span class="pi">:</span> <span class="s">log</span>
+        <span class="na">run</span><span class="pi">:</span> <span class="s">echo "$(git log --no-merges -1 --pretty=%B)"</span>
+    <span class="c1"># rest of file removed for brevity</span>
+</code></pre></div></div>
+
+<p>If I look at the output from the Actions page, everything looks great. Now, how can I store this in a variable? Well, I was initially reading about a <code class="language-plaintext highlighter-rouge">steps.logs.outputs</code> object. If, for example, I changed my run command to <code class="language-plaintext highlighter-rouge">echo "::set-output name=message::$(git log --no-merges -1 --pretty=%B)"</code> I could access the value from using <code class="language-plaintext highlighter-rouge">steps.log.outputs.message</code>. Great, let’s try it! Here’s the full file. What do you think will happen?</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">name</span><span class="pi">:</span> <span class="s">Send a Tweet</span>
+<span class="na">on</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">push</span><span class="pi">]</span>
+<span class="na">jobs</span><span class="pi">:</span>
+  <span class="na">tweet</span><span class="pi">:</span>
+    <span class="na">runs-on</span><span class="pi">:</span> <span class="s">ubuntu-latest</span>
+    <span class="na">steps</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/checkout@v1</span>
+      <span class="pi">-</span> <span class="na">id</span><span class="pi">:</span> <span class="s">log</span>
+        <span class="na">run</span><span class="pi">:</span> <span class="s">echo "::set-output name=message::$(git log --no-merges -1 --pretty=%B)"</span>
+      <span class="pi">-</span> <span class="na">uses</span><span class="pi">:</span> <span class="s">ethomson/send-tweet-action@v1</span>
+        <span class="na">with</span><span class="pi">:</span>
+          <span class="na">status</span><span class="pi">:</span> <span class="s2">"</span><span class="s">NEW</span><span class="nv"> </span><span class="s">POST:</span><span class="nv"> </span><span class="s">${{</span><span class="nv"> </span><span class="s">steps.log.output.message</span><span class="nv"> </span><span class="s">}}"</span>
+          <span class="na">consumer-key</span><span class="pi">:</span> <span class="s">${{ secrets.TWITTER_CONSUMER_API_KEY }}</span>
+          <span class="na">consumer-secret</span><span class="pi">:</span> <span class="s">${{ secrets.TWITTER_CONSUMER_API_SECRET }}</span>
+          <span class="na">access-token</span><span class="pi">:</span> <span class="s">${{ secrets.TWITTER_ACCESS_TOKEN }}</span>
+          <span class="na">access-token-secret</span><span class="pi">:</span> <span class="s">${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}</span>
+</code></pre></div></div>
+
+<p>This results in a <strong>NEW POST:</strong> tweet, sadly, with no commit data. This does not persist across actions or steps (in retrospect, the reason for it being in <code class="language-plaintext highlighter-rouge">steps</code>). Luckily, GitHub Actions has <a href="https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables">environment variables</a>, which come to our rescue.</p>
+
+<p>While I was on the right track with my <code class="language-plaintext highlighter-rouge">run</code> statement, I should have used <code class="language-plaintext highlighter-rouge">set-env</code> instead. This injects the value into an <code class="language-plaintext highlighter-rouge">env</code> object that GitHub Actions uses for environmental variables. So: if I say <code class="language-plaintext highlighter-rouge">set-env name=POST_COMMIT_MESSAGE</code> I could access it later using <code class="language-plaintext highlighter-rouge">${{ env.POST_COMMIT_MESSAGE }}</code>. Here is the updated file.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">name</span><span class="pi">:</span> <span class="s">Send a Tweet</span>
+<span class="na">on</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">push</span><span class="pi">]</span>
+<span class="na">jobs</span><span class="pi">:</span>
+  <span class="na">tweet</span><span class="pi">:</span>
+    <span class="na">runs-on</span><span class="pi">:</span> <span class="s">ubuntu-latest</span>
+    <span class="na">steps</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/checkout@v1</span>
+      <span class="pi">-</span> <span class="na">id</span><span class="pi">:</span> <span class="s">log</span>
+        <span class="na">run</span><span class="pi">:</span> <span class="s">echo "::set-env name=POST_COMMIT_MESSAGE::$(git log --no-merges -1 --pretty=%B)"</span>
+      <span class="pi">-</span> <span class="na">uses</span><span class="pi">:</span> <span class="s">ethomson/send-tweet-action@v1</span>
+        <span class="na">with</span><span class="pi">:</span>
+          <span class="na">status</span><span class="pi">:</span> <span class="s2">"</span><span class="s">NEW</span><span class="nv"> </span><span class="s">POST:</span><span class="nv"> </span><span class="s">${{</span><span class="nv"> </span><span class="s">steps.log.output.message</span><span class="nv"> </span><span class="s">}}"</span>
+          <span class="na">consumer-key</span><span class="pi">:</span> <span class="s">${{ secrets.TWITTER_CONSUMER_API_KEY }}</span>
+          <span class="na">consumer-secret</span><span class="pi">:</span> <span class="s">${{ secrets.TWITTER_CONSUMER_API_SECRET }}</span>
+          <span class="na">access-token</span><span class="pi">:</span> <span class="s">${{ secrets.TWITTER_ACCESS_TOKEN }}</span>
+          <span class="na">access-token-secret</span><span class="pi">:</span> <span class="s">${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}</span>
+</code></pre></div></div>
+
+<p>It works! So now, in the future, if I push a commit message to <code class="language-plaintext highlighter-rouge">master</code> in the format <code class="language-plaintext highlighter-rouge">&lt;Post title&gt; &lt;url&gt;</code> it will push to Twitter right away. (I can now customize based on PR or other policies, as well.)</p>
+
+<h1 id="wrapping-up">Wrapping up</h1>
+
+<p>I hope you enjoyed reading this post as much as I did writing it. This was my first foray into this, so if you know of a better and simpler way to do this, leave a comment below (<a href="https://twitter.com/daveabrock">or on Twitter, obviously</a>).</p>
+:ET

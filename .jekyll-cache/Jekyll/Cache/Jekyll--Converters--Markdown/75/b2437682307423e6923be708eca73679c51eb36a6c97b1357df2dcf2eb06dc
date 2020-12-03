@@ -1,0 +1,67 @@
+I"�<p>The beauty of a cross-platform framework like ASP.NET Core is your ability to choose tooling <strong>you prefer</strong>. With all its advantages, <a href="https://visualstudio.microsoft.com/">Visual Studio</a> can sometimes be too powerful for what you need.</p>
+
+<p>With ASP.NET Core, the days of being locked down to writing .NET in Visual Studio are over. For example, you can write your applications on editors like <a href="https://code.visualstudio.com/">Visual Studio Code,</a> whether you are on Mac, Windows, or a flavor of Linux.</p>
+
+<p>Earlier this year, I spoke and wrote extensively about <a href="https://daveabrock.com/2018/03/05/full-stack-development-in-vs-code-with-asp-net-core">how to write an ASP.NET Core app with Visual Studio Code.</a> As this support is evolving, you may notice experiences here and there that do not compare to using a full-fledged editor like Visual Studio—but if you are using Code for your Core apps you may find the trade-off worth it.</p>
+
+<p>That gap is narrowing with the announcement that Visual Studio Code <a href="https://blogs.msdn.microsoft.com/webdev/2018/11/16/razor-support-in-visual-studio-code-now-in-preview/">now has support for Razor,</a> the .NET markup syntax engine that allows you to write dynamic views using .NET code and HTML markup.</p>
+
+<p>As discussed in the announcement, this is very much in preview and has limitations. Read the article for details on what these limitations are, how to provide feedback, and how to disable it if you come across issues.</p>
+
+<h2 id="take-advantage-of-razor-support-in-code">Take advantage of Razor support in Code</h2>
+
+<p>Before you look at Razor support in Code, create an ASP.NET Core application in Visual Studio Code. We will just create an application based on the ASP.NET Core web application template. For an in-depth tutorial on using ASP.NET Core with Code, you can review <a href="https://daveabrock.com/2018/03/05/full-stack-development-in-vs-code-with-asp-net-core">my blog post</a> or an in-depth tutorial at <a href="https://docs.microsoft.com/en-us/aspnet/core/tutorials/razor-pages-vsc/?view=aspnetcore-2.1">the official Microsoft Docs site.</a></p>
+
+<p>As prerequisites, make sure you have <a href="https://code.visualstudio.com/">Visual Studio Code,</a> the <a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.csharp">C# extension,</a> and the <a href="https://www.microsoft.com/net/learn/dotnet/hello-world-tutorial">.NET Core SDK</a> installed.</p>
+
+<h3 id="create-a-quick-net-core-web-app-in-visual-studio-code">Create a quick .NET Core web app in Visual Studio Code</h3>
+
+<p>From Visual Studio Code, enter the following commands from the integrated terminal (if you don’t see it, click <strong>Terminal</strong> &gt; <strong>New Terminal</strong>):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dotnet new webapp <span class="nt">-o</span> TestRazorSupport
+code <span class="nt">--reuse-window</span> TestRazorSupport
+</code></pre></div></div>
+
+<p>The first command uses the <a href="https://docs.microsoft.com/en-us/dotnet/core/tools/?tabs=netcore2x">.NET Core CLI</a> to create a new application based on the <code class="language-plaintext highlighter-rouge">webapp</code> template. The application now exists within a <code class="language-plaintext highlighter-rouge">TestRazorSupport</code> folder. The second command uses a <a href="https://code.visualstudio.com/docs/editor/command-line">Code command-line switch</a> to open the application in your active Code window.</p>
+
+<p>Now, you can open any view file (<em>.cshtml</em>) to experiment with Razor support.</p>
+
+<h3 id="explore-razor-support-in-visual-studio-code">Explore Razor support in Visual Studio Code</h3>
+
+<p>If you open a view—I will be looking at <em>Pages/Contact.cshtml</em>—you can see Razor support in action.</p>
+
+<p>First, let’s update the <code class="language-plaintext highlighter-rouge">ContactModel</code> with some additional properties. Here’s what my <em>Contact.cshtml.cs</em> now looks like:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">Microsoft.AspNetCore.Mvc.RazorPages</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">TestRazorSupport.Pages</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">ContactModel</span> <span class="p">:</span> <span class="n">PageModel</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">Message</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">Name</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">Email</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+
+        <span class="k">public</span> <span class="k">void</span> <span class="nf">OnGet</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="n">Message</span> <span class="p">=</span> <span class="s">"Your contact page."</span><span class="p">;</span>
+            <span class="n">Name</span> <span class="p">=</span> <span class="s">"Dave Brock"</span><span class="p">;</span>
+            <span class="n">Email</span> <span class="p">=</span> <span class="s">"dave@myemail.com"</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>In <em>Contact.cshtml</em>, let’s access the <code class="language-plaintext highlighter-rouge">Name</code> property to check out the Razor support.</p>
+
+<p><img src="http://localhost:4001/images/Name.png" alt="Name property" /></p>
+
+<p>It works as you would expect—even inside HTML attributes—as we access the <code class="language-plaintext highlighter-rouge">Email</code> property:</p>
+
+<p><img src="http://localhost:4001/images/Email.png" alt="Email" /></p>
+
+<p>And if we access .NET APIs (and <a href="https://blogs.msdn.microsoft.com/webdev/2018/11/16/razor-support-in-visual-studio-code-now-in-preview/">steal from the announcement)</a> it works beautifully!</p>
+
+<p><img src="http://localhost:4001/images/DateTime.png" alt="DateTime" /></p>
+:ET

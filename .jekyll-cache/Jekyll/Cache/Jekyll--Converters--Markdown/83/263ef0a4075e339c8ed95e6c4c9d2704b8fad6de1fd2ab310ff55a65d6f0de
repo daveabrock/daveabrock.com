@@ -1,0 +1,197 @@
+I"�N<p><img src="https://raw.githubusercontent.com/daveabrock/daveabrock.github.io/master/THE%20.NET%20STACKS.png" alt="Newsletter image" /></p>
+
+<p>Happy Monday to you! Here’s what we have for this week:</p>
+
+<ul>
+  <li>How Blazor is drastically improving in preview 8 of .NET 5</li>
+  <li>A discussion with Scott Addie</li>
+  <li>A trip around the community</li>
+</ul>
+
+<h2 id="net-5-preview-8-s-blazor">.NET 5 Preview 8 ♥’s Blazor</h2>
+
+<p>In a few weeks, we’ll see preview 8 of .NET 5, the <em>last</em> preview before the release candidates, and it’ll be filled with a ton of Blazor improvements for performance and tooling. In <a href="https://www.youtube.com/watch?v=KRNd8JDRqRc">this week’s ASP.NET community standup</a>, the team showed off a lot of these new features that folks have been asking for.</p>
+
+<p>The biggest takeaway is that, with preview 8, Blazor is using the .NET 5 runtime and libraries—and with it, its improvements. Previously, Blazor Web Assembly was using Mono libraries—which seemed a little off, when thinking about the “One .NET” mission of .NET 5. Using the .NET 5 runtime now accounts for a ton of performance gains: the team reports that arbitrary CPU code in .NET 5 is around 30% faster (think dictionaries and string comparisons), JSON serialization and deserialization looks to be about twice as fast, and Blazor component rendering is anywhere from 2x to 4x faster.</p>
+
+<p>Microsoft has traditional C# devs sold on Blazor—one toolchain, one language, much awesomeness. We get it. To really make an impact, and welcome other folks to .NET, Blazor will need to have features that folks demand from their other SPA frameworks and libraries like Angular and React (or other tools in that space). For example, if I ask a JS expert (and .NET outsider) to try a new SPA competitor, and there’s no auto-refresh, it’s hard to be taken seriously.</p>
+
+<p>With preview 8, we’re seeing quite a few of these features. Here’s three of them.</p>
+
+<h3 id="css-isolation">CSS isolation</h3>
+
+<p>When working with components, the idea is that they can be portable, organized elements. If I have a <code class="language-plaintext highlighter-rouge">&lt;DatePicker&gt;</code> component, for example, I should be able to drop it and its styles wherever I need. Until preview 8, I would have to style my components in some CSS file somewhere else, and bring in that style sheet, and worry about maintaining that and dealing with cascading impacts throughout my site.</p>
+
+<p>No more. Now, with CSS isolation, you can make life easier on yourself. By using a naming convention like <code class="language-plaintext highlighter-rouge">myComponent.razor.css</code>, Blazor will bind the CSS to your component with no imports needed! And since that’s only bound to your component you can simplify your styles. Instead of declaring something like <code class="language-plaintext highlighter-rouge">&lt;table class="myComponentStyle"&gt;</code> just style a <code class="language-plaintext highlighter-rouge">table</code> in your component’s stylesheet and done!</p>
+
+<p><em>What about JS isolation?</em> It isn’t ready now, but it’s on the way.</p>
+
+<h3 id="lazy-loading">Lazy loading</h3>
+
+<p>Let’s say you have parts of your app that aren’t accessed every time. For example, reporting that’s generally accessed once a month. With lazy loading, you can load any assemblies only when needed. In your routing configuration, you can inject a lazy loading service and specify which assemblies to load and when. No more customized tree shaking.</p>
+
+<h3 id="auto-refresh">Auto-refresh</h3>
+
+<p>The instant feedback loop is a big reason why so many people are drawn to front-end development. I can make a change, click Save (or not even Save!) and my changes are reflected immediately. This is thanks for incremental build tooling running in the background.</p>
+
+<p>.NET has its <a href="https://docs.microsoft.com/aspnet/core/tutorials/dotnet-watch?view=aspnetcore-3.1">own incremental file watcher</a>, <code class="language-plaintext highlighter-rouge">dotnet watch</code>, that not a lot of people know about. Blazor will use <code class="language-plaintext highlighter-rouge">dotnet watch</code> behind the scenes to provide the auth-refresh capability.</p>
+
+<p>There’s much more coming in preview 8, so definitely <a href="https://www.youtube.com/watch?v=KRNd8JDRqRc">check out the video if you’re so inclined</a>—and watch this space for more details when it arrives.</p>
+
+<h2 id="dev-discussions-scott-addie">Dev Discussions: Scott Addie</h2>
+
+<p>Have you worked in ASP.NET Core? If so, you have surely come across Scott Addie, whether you know about it or not. For over three years, Scott has worked as a content developer at Microsoft—publishing documentation on the framework, APIs, ebooks, blog posts, and Learn modules, and more.</p>
+
+<p>He’s also been active in the developer community—both before and after joining Microsoft—and you can find him as a co-host on The .NET Docs Show, a weekly Twitch stream.</p>
+
+<p>I recently caught up with Scott to talk about his work in the community, his career, .NET 5, and what he’s working on.</p>
+
+<p><img src="http://localhost:4001/images/keynote-scott.jpg" alt="Scott Addie" /></p>
+
+<p><strong>Walk us through your role.</strong></p>
+
+<p>For over three years, I’ve been a content developer on the .NET, Web Development, &amp; Languages team of the Developer Relations division. My primary responsibility is to produce technical content focused on teaching ASP.NET Core. I’m provided creative freedom in how to best accomplish that goal. Ultimately, the ability to effectively communicate complex ideas, in both verbal and written forms, is critical to my success in this role.</p>
+
+<p><strong>What kind of projects are you hacking away at now?</strong></p>
+
+<p>Bill Wagner, Maxime Rouiller, and myself have been collaborating on a tool that generates “What’s New” pages for conceptual docsets hosted on <em>docs.microsoft.com.</em> It’s a .NET Core console app written in C# that uses the GitHub GraphQL API to process pull requests. I plan to distribute the tool internally as a .NET Core global tool. The idea is to provide customers with a summary of what changed in a particular product’s documentation during a specific time period. For example, the ASP.NET Core documentation publishes “What’s New” pages on a monthly cadence. At the time of writing, the concept has been adopted for the following products:</p>
+
+<ul>
+  <li><a href="https://docs.microsoft.com/dotnet/whats-new">.NET</a></li>
+  <li><a href="https://docs.microsoft.com/aspnet/core/whats-new">ASP.NET Core</a></li>
+  <li><a href="https://docs.microsoft.com/azure/devops/release-notes/docswhatsnew">Azure DevOps</a></li>
+  <li><a href="https://docs.microsoft.com/azure/cognitive-services/whats-new-docs">Cognitive Services</a></li>
+  <li><a href="https://docs.microsoft.com/xamarin/whats-new">Xamarin</a></li>
+</ul>
+
+<p>I’m actively working with a handful of other teams, including C++, Visual Studio, and SQL, to roll out these pages. There’s a sizeable features backlog for this tool. Some feature ideas include a “What’s New” hub page and an RSS feed.</p>
+
+<p><strong>My approach has always been: hit up the docs for just-in-time knowledge, or quick learning, and Learn modules for in-depth and hands-on content. Is that Microsoft’s approach?</strong></p>
+
+<p>The team offers content for folks at every level in their journey. If you’re a seasoned ASP.NET Core developer, the <a href="https://docs.microsoft.com/aspnet/core/">conceptual content</a> and <a href="https://docs.microsoft.com/dotnet/api/?view=aspnetcore-3.1">API reference content</a> are great resources. If you’re new to .NET, the <a href="https://dotnet.microsoft.com/learn">Learn .NET</a> page is a better starting point. If you want to learn more about using ASP.NET Core with Azure, <a href="https://docs.microsoft.com/learn/browse/?expanded=dotnet&amp;products=aspnet-core">Microsoft Learn</a> is a good place to start. In many Learn modules, an Azure subscription isn’t required to test drive Azure services with .NET. You’re provided an Azure Cloud Shell instance and a set of instructions that can often be completed in under an hour. Gamification is an important aspect of Learn. As you complete modules, you earn achievement badges. Virtual trophies are awarded for the completion of learning paths.</p>
+
+<p><strong>Over at Build, a few folks discussed Learn TV. What is it and what can we expect from it?</strong></p>
+
+<p>Learn TV is a Microsoft-owned video content platform that offers 24 hours of programming, 7 days a week. If you tuned in to the recent <a href="https://focus.dotnetconf.net/agenda">.NET Conf: Focus on Microservices</a> event, you may have noticed that it streamed live on Learn TV. Additionally, Learn TV streams live shows from the Developer Relations organization, such as <strong>The .NET Docs Show</strong> and <strong>92 &amp; Pike</strong>. It’s still early days for Learn TV, hence the “preview” label on its landing page. Golnaz Alibeigi is working with a small team of folks to evolve it in to a world-class product. I’ll defer to Golnaz for specific plans.</p>
+
+<p><strong>I know you work on a lot of Learn modules. What are you working on now?</strong></p>
+
+<p>Nish Anil, Cam Soper, and myself are authoring a .NET microservices learning path in Microsoft Learn. The learning path is based on the eBook <a href="https://docs.microsoft.com/dotnet/architecture/microservices/">.NET Microservices: Architecture for Containerized .NET apps</a> and is expected to consist of seven modules. At the time of writing, the following modules have been published:</p>
+
+<ul>
+  <li><a href="https://docs.microsoft.com/learn/modules/microservices-aspnet-core/">Create and deploy a cloud-native ASP.NET Core microservice</a></li>
+  <li><a href="https://docs.microsoft.com/learn/modules/microservices-resiliency-aspnet-core/">Implement resiliency in a cloud-native ASP.NET Core microservice</a></li>
+</ul>
+
+<p>Next up is a microservices module focused on DevOps with GitHub Actions. The learning path project board is <a href="https://github.com/dotnet/AspNetCore.Docs/projects/68">available for anyone to see</a>.</p>
+
+<p><strong>What is your one piece of programming advice?</strong></p>
+
+<p>My advice is to ask probing questions and challenge the status quo. Regardless of your organizational rank, ask why your team operates the way they do. Ask why certain technology choices were made. The answers might surprise you. Equipped with those answers, you can begin to understand existing processes and formulate improvements. If you have an idea, don’t be afraid to speak up. Everyone brings a unique perspective to the table.</p>
+
+<p><em>This is just a small portion of my interview with Scott! <a href="https://daveabrock.com/2020/08/15/dev-discussions-scott-addie">Head over to my site for more</a>.</em></p>
+
+<h2 id="-last-week-in-the-net-world">🌎 Last week in the .NET world</h2>
+
+<h3 id="-the-top-3">🔥 The Top 3</h3>
+
+<ul>
+  <li>Khalid Abuhakmeh <a href="https://khalidabuhakmeh.com/secrets-of-a-dotnet-professional">discusses the secrets of a .NET professional</a>.</li>
+  <li>Andrew Lock <a href="https://andrewlock.net/understanding-scopes-with-ihttpclientfactory-message-handlers/">talks about DI scopes in IHttpClientFactory message handlers</a>.</li>
+  <li>Damien Bowden <a href="https://damienbod.com/2020/08/11/retry-error-handling-for-activities-and-orchestrations-in-azure-durable-functions/">does retry error handling for activities and orchestrations in Azure Durable Functions</a>.</li>
+</ul>
+
+<h3 id="-announcements">📢 Announcements</h3>
+
+<ul>
+  <li>Tara Overfield <a href="https://devblogs.microsoft.com/dotnet/net-framework-august-2020-security-and-quality-rollup-updates/">runs through .NET Framework August 2020 security and quality updates</a>, and Rahul Bhandari <a href="https://devblogs.microsoft.com/dotnet/net-core-august-2020/">discusses August 2020 security updates for .NET Core</a>.</li>
+  <li>Microsoft and Chris Pietschmann <a href="https://build5nines.com/free-ebook-developers-guide-to-azure-2020-edition/">have released a 2020 developer’s guide to Azure</a>.</li>
+  <li>It looks like nuget.org <a href="https://devblogs.microsoft.com/nuget/advanced-search-on-nuget-org/">now supports advanced search</a>.</li>
+</ul>
+
+<h3 id="-community-and-events">📅 Community and events</h3>
+
+<ul>
+  <li>A very hard day <a href="https://blog.mozilla.org/blog/2020/08/11/changing-world-changing-mozilla/">at Mozilla, and the community at large</a>.</li>
+  <li>The .NET Docs Show has an <em>amazing</em> conversation with <a href="https://www.youtube.com/watch?v=GTIsjQq-GXU">Layla Porter about .NET Core 3.1 and Twilio</a>.</li>
+  <li>Two community standups this week: the languages team <a href="https://www.youtube.com/watch?v=EU3c0yz_cwE">talks IoT, API analyzers, and more</a>, and ASP.NET <a href="https://www.youtube.com/watch?v=KRNd8JDRqRc">talks about Blazor updates in .NET 5</a>.</li>
+</ul>
+
+<h3 id="-blazor">😎 Blazor</h3>
+
+<ul>
+  <li>Marinko Spasojevic <a href="https://code-maze.com/blazor-webassembly-role-based-authorization/">walks through role-based auth with Blazor WebAssembly</a>.</li>
+  <li>Both <a href="https://www.codeproject.com/Articles/5276055/Blazor-WebAssembly-vs-Angular-Client-Side-Clash">Lee Richardson</a> and <a href="https://www.telerik.com/blogs/blazor-vs-angular-web-developers">Jon Hilton</a> compare Angular with Blazor WASM.</li>
+</ul>
+
+<h3 id="-net-core">🚀 .NET Core</h3>
+
+<ul>
+  <li>Hamid Khan <a href="https://www.c-sharpcorner.com/article/cors-in-dotnet-core/">works with CORS in .NET Core</a>.</li>
+  <li>Over at CodeMaze, <a href="https://code-maze.com/how-to-send-client-specific-messages-using-signalr/">how to send client-specific messages using SignalR</a>.</li>
+  <li>Derek Comartin <a href="https://codeopinion.com/migrating-to-net-core-mission-complete">migrates to .NET Core</a>.</li>
+  <li>David Grace <a href="https://www.roundthecode.com/dotnet/entity-framework/log-data-changes-in-entity-framework-core-service-integration-testing-with-api">continues logging data changes in EF Core</a>.</li>
+  <li>Steve Gordon <a href="https://www.stevejgordon.co.uk/integration-testing-asp-net-core-applications-best-practices">talks about best practices when integration testing ASP.NET Core apps</a>.</li>
+  <li>Karthik Anandan <a href="https://www.syncfusion.com/blogs/post/shield-your-asp-net-mvc-web-applications-with-content-security-policy-csp.aspx">shields an ASP.NET MVC web app with Content Security Policy</a>.</li>
+  <li>Jeremy Wells <a href="https://medium.com/swlh/tdd-and-exception-handling-with-xunit-in-asp-net-core-f9ffe5dde800">walks through TDD and exception handling with xUnit in ASP.NET Core</a>.</li>
+  <li>Mark Seemann <a href="https://blog.ploeh.dk/2020/08/10/an-aspnet-core-url-builder/">writes an ASP.NET Core URL builder</a>.</li>
+  <li>Ryan Palmer <a href="https://www.compositional-it.com/news-blog/configuration-secrets-and-keyvault-with-asp-net-core/">walks through configuration, secrets, and KeyVault with ASP.NET Core</a>.</li>
+  <li>Matthew Soucoup <a href="https://codemilltech.com/authenticate-a-asp-net-core-web-app-with-microsoft-identity-web/">authenticates an ASP.NET Core web app with Microsoft.Identity.Web</a>.</li>
+</ul>
+
+<h3 id="-the-cloud">⛅ The cloud</h3>
+
+<ul>
+  <li>Jason Farrell <a href="https://jfarrell.net/2020/08/13/durable-functions-part-2-the-upload/">uploads a file using Azure Durable Functions</a>.</li>
+  <li>Rishit Mishra <a href="https://www.red-gate.com/simple-talk/dotnet/net-development/securing-web-application-secrets-through-azure-key-vault/">secures web app secrets through Azure Key Vault</a>.</li>
+  <li>Mitch Denny <a href="https://devblogs.microsoft.com/azure-sdk/azure-sdk-packaging-tools-and-repository-structure/">discusses packaging, tools, and repo structure for the Azure SDKs</a>.</li>
+  <li>Kevin Griffin <a href="https://consultwithgriff.com/how-to-redirect-with-azure-static-web-apps">redirects with Azure Static Web Apps</a>.</li>
+  <li>Abhijeet Jadhav <a href="https://www.c-sharpcorner.com/article/delta-queries-in-microsoft-graph-using-c-sharp/">queries the Microsoft Graph API using C#</a>.</li>
+</ul>
+
+<h3 id="-languages">📔 Languages</h3>
+
+<ul>
+  <li>Dave Brock (ahem) <a href="https://daveabrock.com/2020/08/14/records-spec">learns another few things about C# 9 records</a>.</li>
+  <li>Khalid Abuhakmeh <a href="https://khalidabuhakmeh.com/building-html-with-csharp">builds HTML with C#</a>.</li>
+  <li>Vishal Saroopchand <a href="https://devblogs.microsoft.com/premier-developer/go-and-csharp-comparison/">compares Go and C#</a>.</li>
+  <li>Raymond Chen <a href="https://devblogs.microsoft.com/oldnewthing/20200812-00/?p=104075">discusses hidden constraints on the result type in Concurrency Runtime tasks</a>.</li>
+  <li>Urs Enzler <a href="https://www.planetgeek.ch/2020/08/12/our-journey-to-f-equality-for-free/">talks about F# equality</a> and also <a href="https://www.planetgeek.ch/2020/08/11/our-journey-to-f-happy-path-coding/">happy path coding with F#</a>.</li>
+  <li>Jonathan Channon <a href="https://www.softwarepark.cc/blog/2020/8/7/understanding-f-type-aliases">discusses F# type aliases</a>.</li>
+  <li>Anthony Giretti <a href="https://anthonygiretti.com/2020/08/10/introducing-c-9-extending-partial-methods/">extends partial methods in C# 9</a>.</li>
+</ul>
+
+<h3 id="-tools">🔧 Tools</h3>
+
+<ul>
+  <li>Scott Hanselman <a href="https://www.hanselman.com/blog/FreeBooksForLearningAndGettingStartedWithCloudNativeNETApps.aspx">shows off free books for learning about cloud-native .NET apps</a>.</li>
+  <li>Michael Shpilt <a href="https://michaelscodingspot.com/productivity-tips-in-visual-studio/">offers five Visual Studio productivity tips</a>.</li>
+  <li>Josef Ottosson <a href="https://josef.codes/dotnet-pack-include-referenced-projects/">includes referenced projects in dotnet pack</a>.</li>
+  <li>Mads Kristensen <a href="https://devblogs.microsoft.com/visualstudio/use-visual-studio-in-presentation-mode/">shows off Presentation Mode in Visual Studio</a>.</li>
+</ul>
+
+<h3 id="-xamarin">📱 Xamarin</h3>
+
+<ul>
+  <li>Leomaris Reyes <a href="https://www.telerik.com/blogs/exploring-new-grid-structure-xamarin-forms">explores the new Xamarin.Forms grid structure</a> and also <a href="https://askxammy.com/replicating-streaming-ui-app-in-xamarin-forms/">replicates a streaming UI app</a>.</li>
+  <li>Dobrinka Yordanova <a href="https://www.telerik.com/blogs/telerik-mobile-blazor-bindings-for-xamarin">works on Mobile Blazor Bindings for Xamarin</a>.</li>
+  <li>Theodora Tataru <a href="https://devblogs.microsoft.com/xamarin/college-diary-xamarin-theodora-tataru/">builds a college diary in Xamarin.Forms</a>.</li>
+  <li>Jake Kirsch <a href="https://devblogs.microsoft.com/xamarin/xamarinforms-4-8-gradients-brushes/">talks about the new Xamarin.Forms 4.8 release</a>.</li>
+  <li>Nick Randolph <a href="https://nicksnettravels.builttoroam.com/xaml-basics-itemspanel">discusses the ItemsPanel</a>.</li>
+</ul>
+
+<h3 id="-podcasts">🎤 Podcasts</h3>
+
+<ul>
+  <li>The Xamarin Podcast discusses <a href="https://www.xamarinpodcast.com/76">brushes, gradients, and shapes</a>.</li>
+  <li>The .NET Core Show <a href="https://dotnetcore.show/episode-57-ml-net-with-luis-quintanilla/">talks to Luis Quintanilla about ML.NET</a>.</li>
+</ul>
+
+<h3 id="-videos">🎥 Videos</h3>
+
+<ul>
+  <li>Data Exposed <a href="https://channel9.msdn.com/Shows/Data-Exposed/Azure-SQL-Capacity-Planning-Overview">talks about Azure SQL capacity planning</a>.</li>
+  <li>The ON.NET Show <a href="https://channel9.msdn.com/Shows/On-NET/Using-Redis-as-a-NET-Core-Data-Store">uses Redis as a .NET Core data store</a>.</li>
+  <li>The Visual Studio Toolbox <a href="https://channel9.msdn.com/Shows/Visual-Studio-Toolbox/Source-Generators-in-CSharp">works through source generators in C#</a>.</li>
+</ul>
+:ET

@@ -1,0 +1,226 @@
+I"�V<p>When developing APIs in ASP.NET Core, you’ve got many tools at your disposal. Long gone are the days when you run your app from Visual Studio and call your <code class="language-plaintext highlighter-rouge">localhost</code> endpoint in your browser.</p>
+
+<p>Over the last several years, a lot of tools have emerged that use the OpenAPI specification—most commonly, the <a href="https://github.com/swagger-api">Swagger project</a>. Many ASP.NET Core API developers are familiar with <a href="https://swagger.io/tools/swagger-ui/">Swagger UI</a>, a REST documentation tool that allows developers—either those developing it or developers consuming it—to interact with an API from a nice interface built from a project’s <code class="language-plaintext highlighter-rouge">swagger.json</code> file. In the .NET world, the functionality comes from <a href="https://www.nuget.org/packages/Swashbuckle.AspNetCore.Swagger/">the Swashbuckle library</a>, at 80 million NuGet downloads and counting.</p>
+
+<p>Additionally, I’ve been impressed by <a href="https://github.com/dotnet/HttpRepl">the HttpRepl project</a>, which allows you explore your APIs from the command line. Different from utilities <a href="https://curl.se/">like curl</a>, it allows you to explore APIs from the command-line similar to how you explore directories and files—all from a simple and lightweight interface. You can <code class="language-plaintext highlighter-rouge">cd</code> into your endpoints and call them quickly to achieve lightning-fast feedback. Even better, it has OpenAPI support (including <a href="https://github.com/dotnet/HttpRepl/pull/432">the ability to perform OpenAPI validation on connect</a>).</p>
+
+<p>While these utilities are not new with ASP.NET Core 5, it’s now much easier to get started. This post will discuss these tools.</p>
+
+<p>Before you get started, you should have <a href="https://docs.microsoft.com/aspnet/core/tutorials/first-web-api?view=aspnetcore-5.0&amp;tabs=visual-studio">an ASP.NET Core API</a> ready—likely one with create-read-update-delete (CRUD) operations. Feel free <a href="https://github.com/daveabrock/HttpReplApi">to clone and use mine</a>, if you’d prefer.</p>
+
+<p>This post contains the following content.</p>
+
+<ul>
+  <li><a href="#whats-the-difference-between-openapi-and-swagger">What’s the difference between OpenAPI and Swagger?</a></li>
+  <li><a href="#use-swagger-ui-with-aspnet-core-projects-by-default">Use Swagger UI with ASP.NET Core projects by default</a>
+    <ul>
+      <li><a href="#how-its-enabled-and-how-you-can-opt-out">How it’s enabled, and how you can opt out</a></li>
+      <li><a href="#verify-the-middleware-and-launchsettingsjson">Verify the middleware and launchSettings.json</a></li>
+    </ul>
+  </li>
+  <li><a href="#use-httprepl-for-a-great-command-line-experience">Use HttpRepl for a great command-line experience</a>
+    <ul>
+      <li><a href="#install">Install</a></li>
+      <li><a href="#basic-operations">Basic operations</a></li>
+      <li><a href="#modify-data-with-a-default-editor">Modify data with a default editor</a></li>
+      <li><a href="#remove-repetition-with-a-script">Remove repetition with a script</a></li>
+      <li><a href="#learn-more-about-configuring-httprepl">Learn more about configuring HttpRepl</a></li>
+    </ul>
+  </li>
+  <li><a href="#wrap-up">Wrap up</a></li>
+</ul>
+
+<h1 id="whats-the-difference-between-openapi-and-swagger">What’s the difference between OpenAPI and Swagger?</h1>
+
+<p>If you’ve heard OpenAPI and Swagger used interchangeably, you might be wondering what the difference is.</p>
+
+<p>In short, OpenAPI is a specification used for documenting the capabilities of your API. Swagger is a set of tools from SmartBear (both open-source and commercial) that use the OpenAPI specification (like Swagger UI).</p>
+
+<h1 id="use-swagger-ui-with-aspnet-core-projects-by-default">Use Swagger UI with ASP.NET Core projects by default</h1>
+
+<p>For the uninitiated, the Swashbuckle project allows you to use Swagger UI—a tool that gives you the ability to render dynamic pages that allow to describe, document, and execute your API endpoints. Here’s how mine looks.</p>
+
+<p><img src="http://localhost:4001/images/swagger-ui-high-level.png" alt="A high-level look at my Swagger page" /></p>
+
+<p>And if you look at a sample POST (or any action), you’ll see a sample schema and response codes.</p>
+
+<p><img src="http://localhost:4001/images/movies-post.png" alt="A sample post in Swagger" /></p>
+
+<p>In previous versions of ASP.NET Core, you had to manually download the Swashbuckle package, configure the middleware, and optionally change your <code class="language-plaintext highlighter-rouge">launchSettings.json</code> file. Now, with ASP.NET Core 5, that’s baked in automatically.</p>
+
+<p>A big driver for the default OpenAPI support is <a href="https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-release-candidate-1/#azure-api-management-import">the integration with Azure API Management</a>. Now with OpenAPI support, the Visual Studio publishing experience offers an additional step—to automatically import APIs into Azure API Management. To the cloud!</p>
+
+<h2 id="how-its-enabled-and-how-you-can-opt-out">How it’s enabled, and how you can opt out</h2>
+
+<p>If you create an ASP.NET Core 5 Web API project, you’ll see an <strong>Enable OpenAPI support</strong> checkbox that’s enabled by default. Just deselect it if you don’t want it.</p>
+
+<p><img src="http://localhost:4001/images/enable-open-api-support.png" alt="Visual Studio OpenAPI checkbox" /></p>
+
+<p class="notice--info">If you create API projects using <code class="language-plaintext highlighter-rouge">dotnet new webapi</code> it’ll be baked in, too. (To opt out from OpenAPI support here, execute <code class="language-plaintext highlighter-rouge">dotnet new webapi --no-openapi true</code>.)</p>
+
+<h2 id="verify-the-middleware-and-launchsettingsjson">Verify the middleware and launchSettings.json</h2>
+
+<p>After you create a project, we can see it’s all done for us. If you open your <em>.csproj</em> file, you’ll see the reference:</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;ItemGroup&gt;</span>
+    <span class="nt">&lt;PackageReference</span> <span class="na">Include=</span><span class="s">"Swashbuckle.AspNetCore"</span> <span class="na">Version=</span><span class="s">"5.6.3"</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/ItemGroup&gt;</span>
+</code></pre></div></div>
+
+<p>Then, in the <code class="language-plaintext highlighter-rouge">ConfigureServices</code> method in your <code class="language-plaintext highlighter-rouge">Startup.cs</code>, you’ll see your Swagger doc attributes defined and injected (this information will display at the top of your Swagger UI page). You can <a href="https://docs.microsoft.com/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-5.0&amp;tabs=visual-studio#api-info-and-description">definitely add more to this</a>.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">void</span> <span class="nf">ConfigureServices</span><span class="p">(</span><span class="n">IServiceCollection</span> <span class="n">services</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">services</span><span class="p">.</span><span class="nf">AddControllers</span><span class="p">();</span>
+    <span class="n">services</span><span class="p">.</span><span class="nf">AddSwaggerGen</span><span class="p">(</span><span class="n">c</span> <span class="p">=&gt;</span>
+    <span class="p">{</span>
+        <span class="n">c</span><span class="p">.</span><span class="nf">SwaggerDoc</span><span class="p">(</span><span class="s">"v1"</span><span class="p">,</span> <span class="k">new</span> <span class="n">OpenApiInfo</span> <span class="p">{</span> <span class="n">Title</span> <span class="p">=</span> <span class="s">"HttpReplApi"</span><span class="p">,</span> <span class="n">Version</span> <span class="p">=</span> <span class="s">"v1"</span> <span class="p">});</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>And, in the <code class="language-plaintext highlighter-rouge">Configure</code> method in that same file you see the configuration of static file middleware:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">void</span> <span class="nf">Configure</span><span class="p">(</span><span class="n">IApplicationBuilder</span> <span class="n">app</span><span class="p">,</span> <span class="n">IWebHostEnvironment</span> <span class="n">env</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="nf">IsDevelopment</span><span class="p">())</span>
+    <span class="p">{</span>
+        <span class="n">app</span><span class="p">.</span><span class="nf">UseDeveloperExceptionPage</span><span class="p">();</span>
+        <span class="n">app</span><span class="p">.</span><span class="nf">UseSwagger</span><span class="p">();</span>
+        <span class="n">app</span><span class="p">.</span><span class="nf">UseSwaggerUI</span><span class="p">(</span><span class="n">c</span> <span class="p">=&gt;</span>
+        <span class="p">{</span>
+            <span class="n">c</span><span class="p">.</span><span class="nf">SwaggerEndpoint</span><span class="p">(</span><span class="s">"/swagger/v1/swagger.json"</span><span class="p">,</span> <span class="s">"HttpReplApi v1"</span><span class="p">);</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+
+    <span class="c1">// other services removed for brevity</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Then, in <code class="language-plaintext highlighter-rouge">launchSettings.json</code>, you’ll see your project launches the Swagger UI page with the <code class="language-plaintext highlighter-rouge">/swagger</code> path, instead of a lonely blank page.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"profiles"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"HttpReplApi"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"commandName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Project"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"dotnetRunMessages"</span><span class="p">:</span><span class="w"> </span><span class="s2">"true"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"launchBrowser"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"launchUrl"</span><span class="p">:</span><span class="w"> </span><span class="s2">"swagger"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"applicationUrl"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://localhost:5001;http://localhost:5000"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"environmentVariables"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"ASPNETCORE_ENVIRONMENT"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Development"</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Now that you’ve got this set up for you, you can go to town on documenting your API. You can <a href="https://docs.microsoft.com/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-5.0&amp;tabs=visual-studio#xml-comments">add XML documentation</a> and <a href="https://docs.microsoft.com/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-5.0&amp;tabs=visual-studio#data-annotations">data annotations</a>—two easy ways to boost your Swagger docs. For example, the <code class="language-plaintext highlighter-rouge">Produces</code> annotations help define the status codes to expect.</p>
+
+<p>From <a href="https://github.com/daveabrock/HttpReplApi/blob/master/HttpReplApi/Controllers/BandsController.cs">my <code class="language-plaintext highlighter-rouge">BandsController.cs</code></a>, I use a lot of <a href="https://docs.microsoft.com/dotnet/api/microsoft.aspnetcore.mvc.producesresponsetypeattribute?view=aspnetcore-5.0"><code class="language-plaintext highlighter-rouge">Produces</code> annotations</a>:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="nf">HttpDelete</span><span class="p">(</span><span class="s">"{id}"</span><span class="p">)]</span>
+<span class="p">[</span><span class="nf">ProducesResponseType</span><span class="p">(</span><span class="n">StatusCodes</span><span class="p">.</span><span class="n">Status204NoContent</span><span class="p">)]</span>
+<span class="p">[</span><span class="nf">ProducesResponseType</span><span class="p">(</span><span class="n">StatusCodes</span><span class="p">.</span><span class="n">Status404NotFound</span><span class="p">)]</span>
+<span class="p">[</span><span class="n">ProducesDefaultResponseType</span><span class="p">]</span>
+<span class="k">public</span> <span class="k">async</span> <span class="n">Task</span><span class="p">&lt;</span><span class="n">IActionResult</span><span class="p">&gt;</span> <span class="nf">Delete</span><span class="p">(</span><span class="kt">int</span> <span class="n">id</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="c1">// delete by id logic</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>I love that this is available by default, but would love to see more OpenAPI scaffolding in the templates. It might be a little opinionated, but adding some <code class="language-plaintext highlighter-rouge">Produces</code> annotations in the default <code class="language-plaintext highlighter-rouge">WeatherForecast</code> controller would allow for a better developer experience with Swagger out of the box (since it is now out of the box).</p>
+
+<h1 id="use-httprepl-for-a-great-command-line-experience">Use HttpRepl for a great command-line experience</h1>
+
+<p>You can use HttpRepl to test your ASP.NET Core Web APIs from the command-line quickly and easily.</p>
+
+<h2 id="install">Install</h2>
+
+<p>You install HttpRepl as a .NET Core Global Tool, by executing the following from the .NET Core CLI:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dotnet tool <span class="nb">install</span> <span class="nt">-g</span> Microsoft.dotnet-httprepl
+</code></pre></div></div>
+
+<p>As a global tool, you can run it from anywhere.</p>
+
+<h2 id="basic-operations">Basic operations</h2>
+
+<p>To get started, I can launch my app and connect to it from <code class="language-plaintext highlighter-rouge">httprepl</code>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>httprepl https://localhost:5001
+</code></pre></div></div>
+
+<p>If I do an <code class="language-plaintext highlighter-rouge">ls</code> or <code class="language-plaintext highlighter-rouge">dir</code>, I can look at my endpoints:</p>
+
+<p><img src="http://localhost:4001/images/localhost-dir.png" alt="Doing a dir from the root" /></p>
+
+<p>To execute a get on my <code class="language-plaintext highlighter-rouge">/bands</code> endpoint, I get a response payload, with headers:</p>
+
+<p><img src="http://localhost:4001/images/get-bands.png" alt="Doing a GET on bands" /></p>
+
+<p>Then, I could say <code class="language-plaintext highlighter-rouge">get {id}</code> to get a <code class="language-plaintext highlighter-rouge">Band</code> by id:</p>
+
+<p><img src="http://localhost:4001/images/get-eagles.png" alt="Doing a get by id" /></p>
+
+<h2 id="modify-data-with-a-default-editor">Modify data with a default editor</h2>
+
+<p>What happens when you want to update some data? You could do something like this…</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>post <span class="nt">--content</span> <span class="s2">"{"</span><span class="nb">id</span><span class="s2">":2,"</span>name<span class="s2">":"</span>Tool<span class="s2">"}"</span>
+</code></pre></div></div>
+
+<p>…but that’s only manageable for the simplest of scenarios. You’ll want to set up a default text editor to work with request bodies. You can construct a request, then HttpRepl will wait for you to save and close the tab or window.</p>
+
+<p>In HttpRepl, you can set various preferences, including a default editor. I’m using Visual Studio Code on Windows, so would execute something like this…</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pref <span class="nb">set </span>editor.command.default <span class="s2">"C:</span><span class="se">\P</span><span class="s2">rogram Files</span><span class="se">\M</span><span class="s2">icrosoft VS Code</span><span class="se">\C</span><span class="s2">ode.exe"</span>
+</code></pre></div></div>
+
+<p>If using Visual Studio Code, you’ll also want to pass a `–wait flag so VS Code waits for a closed file before returning.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pref <span class="nb">set </span>editor.command.default.arguments <span class="s2">"--wait"</span>
+</code></pre></div></div>
+
+<p>You can also <a href="https://docs.microsoft.com/aspnet/core/web-api/http-repl/?view=aspnetcore-5.0&amp;tabs=windows#view-the-settings">set various other preferences</a>, like color and indentation.</p>
+
+<p>Now, when you say <code class="language-plaintext highlighter-rouge">post</code> from your endpoint, VS Code opens a <code class="language-plaintext highlighter-rouge">.tmp</code> file with a default request body, then waits for you to save and close it. The POST should process successfully.</p>
+
+<p><img src="http://localhost:4001/images/post-brothers.png" alt="Performing a post" /></p>
+
+<p>With the ID in hand, I can do the same steps to modify using <code class="language-plaintext highlighter-rouge">put 5</code>, then run <code class="language-plaintext highlighter-rouge">get 5</code> to confirm my changes:</p>
+
+<p><img src="http://localhost:4001/images/put-get-brothers.png" alt="Performing a put" /></p>
+
+<p>If I want to delete my resource, I can execute <code class="language-plaintext highlighter-rouge">delete 5</code> and it’ll be gone. I tweeted a video of me cycling through the CRUD operations.</p>
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">I love HttpRepl. Check it out: going through the big four HTTP verbs in just 34 seconds! <br /><br />This isn&#39;t a race, and your models will be much more complex obviously, but it&#39;s a good demo of how fast your API development feedback can be.<br /><br />cc/ <a href="https://twitter.com/Scott_Addie?ref_src=twsrc%5Etfw">@Scott_Addie</a> <a href="https://twitter.com/bradygaster?ref_src=twsrc%5Etfw">@bradygaster</a> <a href="https://twitter.com/hashtag/dotnet?src=hash&amp;ref_src=twsrc%5Etfw">#dotnet</a> <a href="https://t.co/6w41j5esOk">pic.twitter.com/6w41j5esOk</a></p>&mdash; Dave (@daveabrock) <a href="https://twitter.com/daveabrock/status/1328413854859202561?ref_src=twsrc%5Etfw">November 16, 2020</a></blockquote>
+<script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<h2 id="remove-repetition-with-a-script">Remove repetition with a script</h2>
+
+<p>If I find myself using the same test scenarios, I can throw these commands in a <em>.txt</em> file instead. For example, I created an <em>api-script.txt</em> file that I execute from the root of my <code class="language-plaintext highlighter-rouge">httprepl</code> session:</p>
+
+<pre><code class="language-txt">cd Bands
+ls
+get
+post --content "{"id": 20, "name": "The Blue Medium Chili Peppers"}"
+put 20 --content "{"id": 20, "name": "The Red Mild Chili Peppers"}"
+get 20
+delete 20
+</code></pre>
+
+<p>Then I can run it using <code class="language-plaintext highlighter-rouge">run {path_to_script}</code>.</p>
+
+<h2 id="learn-more-about-configuring-httprepl">Learn more about configuring HttpRepl</h2>
+
+<p>This is a straightforward walkthrough, but you can do a whole lot more. I was impressed with the robust configuration options. This includes manually pointing to the OpenAPI description, verbose logging, setting preferences, configuring formatting, customizing headers and streaming, logging to a file, using additional HTTP verbs, testing secured endpoints, accessing Azure-hosted endpoints, and even configuring your tools to launch HttpRepl.</p>
+
+<p>All this information can be found at the <a href="https://docs.microsoft.com/en-us/aspnet/core/web-api/http-repl/?view=aspnetcore-5.0&amp;tabs=windows#manually-point-to-the-openapi-description-for-the-web-api">official doc,</a> wonderfully done by <a href="https://daveabrock.com/2020/08/15/dev-discussions-scott-addie">our friend</a> <a href="https://twitter.com/Scott_Addie">Scott Addie</a>.</p>
+
+<h1 id="wrap-up">Wrap up</h1>
+
+<p>In this post, we talked about the difference between OpenAPI and Swagger, using Swagger UI by default in your ASP.NET Core Web API projects, and how to use the HttpRepl tool.</p>
+
+<p>As always, let me know your experience with these tools.</p>
+:ET

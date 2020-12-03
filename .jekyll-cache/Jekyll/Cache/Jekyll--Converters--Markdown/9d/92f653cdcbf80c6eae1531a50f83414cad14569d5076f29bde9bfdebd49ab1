@@ -1,0 +1,256 @@
+I"�_<p>Static sites are so great. After all, you’re reading these words on a static site. Why bother with the overhead of dynamically generated files if you don’t need them? It’s not that static sites are boring—just that its served files, like HTML, aren’t generated dynamically. With less to do, these sites perform better and are cheaper to run.</p>
+
+<p>This works great for blogs like this one, but in many cases you’ll still need a server-side aspect. You’ll want to talk to some APIs and handle logic and whatnot. Traditionally, this would involve some storage providers like Azure Storage or Amazon S3. With the advent of serverless technologies like Azure Functions, we have even more to think about.</p>
+
+<p>Now, with Azure Static Web Apps, we’ve got the best of both worlds: a light front-end paired with a serverless API in one pretty package. (The API is optional, if you’re wondering.) With the recently announced Blazor support, I had to give it a shot.</p>
+
+<p>In this post, we’ll cover the following topics:</p>
+
+<ul>
+  <li><a href="#prerequisites">Prerequisites</a></li>
+  <li><a href="#our-application">Our application</a>
+    <ul>
+      <li><a href="#fallback-route-support">Fallback route support</a></li>
+      <li><a href="#cors-support">CORS support</a></li>
+    </ul>
+  </li>
+  <li><a href="#create-an-azure-static-web-app">Create an Azure Static Web App</a></li>
+  <li><a href="#inspect-the-workflow-file">Inspect the workflow file</a>
+    <ul>
+      <li><a href="#a-gotcha-about-packagejson">A gotcha about <code class="language-plaintext highlighter-rouge">package.json</code></a></li>
+    </ul>
+  </li>
+  <li><a href="#pull-request-sites">Pull request sites</a></li>
+  <li><a href="#a-note-on-custom-domains">A note on custom domains</a></li>
+  <li><a href="#wrap-up">Wrap up</a></li>
+  <li><a href="#references">References</a></li>
+</ul>
+
+<h1 id="prerequisites">Prerequisites</h1>
+
+<p>To work with this post, you’ll need:</p>
+
+<ul>
+  <li>An Azure account</li>
+  <li>A <a href="https://dotnet.microsoft.com/download">non-preview .NET Core SDK</a> (I am using <em>3.1.403</em>)</li>
+</ul>
+
+<p>While .NET 5 is weeks from going live at the time of this post, you aren’t able to deploy .NET 5 code to Azure Static Web Apps yet.</p>
+
+<h1 id="our-application">Our application</h1>
+
+<p>Before you create an Azure Static Web App instance, you’ll need an application hosted in GitHub—when you create the instance in Azure, it’ll ask for a repo and its details.</p>
+
+<p>I wrote a quick app called <em>Blast Off with Blazor</em> (and you can see it live at <a href="https://www.blastoffwithblazor.com/">blastoffwithblazor.com</a>). It’s an admittedly simple app at this time, and I’ll be adding to it over the next few months as I dig deep on Blazor concepts and best practices. Feel free to <a href="https://github.com/daveabrock/NASAImageOfDay">clone the GitHub repo</a> (and read the instructions in the <a href="https://github.com/daveabrock/NASAImageOfDay/blob/main/README.md">README.md file</a> for details on how to run it locally).</p>
+
+<p>The app is served over Blazor Web Assembly. When the app loads, it calls an Azure Function. The Function, in turn, calls NASA’s Astronomy Picture of the Day (APOD) API to get a picture that is out of this world—literally. The APOD site <a href="https://apod.nasa.gov/apod/">has been serving up</a> amazing images daily since June 16, 1995. Every time you reload the app, I’ll fetch a random image anytime between that start date and today.</p>
+
+<p>In the <code class="language-plaintext highlighter-rouge">Index.razor</code> file, I’m doing that in the <code class="language-plaintext highlighter-rouge">@code</code> block in the <code class="language-plaintext highlighter-rouge">OnInitializedAsync()</code> function (<a href="https://github.com/daveabrock/NASAImageOfDay/blob/main/Client/Pages/Index.razor">full code</a>):</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@code {
+    private Data.Image image;
+
+    protected override async Task OnInitializedAsync()
+    {
+        image = await http.GetFromJsonAsync<span class="nt">&lt;Data.Image&gt;</span>("api/image");
+    }
+}
+</code></pre></div></div>
+
+<p>In my Azure Function, in the <code class="language-plaintext highlighter-rouge">api/image</code> path, I call off to the APOD API (<a href="https://github.com/daveabrock/NASAImageOfDay/blob/main/Api/ImageGet.cs">full code</a>):</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="nf">FunctionName</span><span class="p">(</span><span class="s">"ImageGet"</span><span class="p">)]</span>
+<span class="k">public</span> <span class="k">static</span> <span class="k">async</span> <span class="n">Task</span><span class="p">&lt;</span><span class="n">IActionResult</span><span class="p">&gt;</span> <span class="nf">Run</span><span class="p">(</span>
+      <span class="p">[</span><span class="nf">HttpTrigger</span><span class="p">(</span><span class="n">AuthorizationLevel</span><span class="p">.</span><span class="n">Anonymous</span><span class="p">,</span> <span class="s">"get"</span><span class="p">,</span> <span class="n">Route</span> <span class="p">=</span> <span class="s">"image"</span><span class="p">)]</span> <span class="n">HttpRequest</span> <span class="n">req</span><span class="p">,</span>
+      <span class="n">ILogger</span> <span class="n">log</span><span class="p">)</span>
+<span class="p">{</span>
+      <span class="kt">var</span> <span class="n">apiKey</span> <span class="p">=</span> <span class="n">Environment</span><span class="p">.</span><span class="nf">GetEnvironmentVariable</span><span class="p">(</span><span class="s">"ApiKey"</span><span class="p">);</span>
+      <span class="kt">var</span> <span class="n">response</span> <span class="p">=</span> <span class="k">await</span> <span class="n">httpClient</span><span class="p">.</span><span class="nf">GetAsync</span><span class="p">(</span><span class="s">$"https://api.nasa.gov/planetary/apod?api_key=</span><span class="p">{</span><span class="n">apiKey</span><span class="p">}</span><span class="s">&amp;hd=true&amp;date=</span><span class="p">{</span><span class="nf">GetRandomDate</span><span class="p">()}</span><span class="s">"</span><span class="p">);</span>
+      <span class="kt">var</span> <span class="n">result</span> <span class="p">=</span> <span class="k">await</span> <span class="n">response</span><span class="p">.</span><span class="n">Content</span><span class="p">.</span><span class="nf">ReadAsStringAsync</span><span class="p">();</span>
+      <span class="k">return</span> <span class="k">new</span> <span class="nf">OkObjectResult</span><span class="p">(</span><span class="n">JsonConvert</span><span class="p">.</span><span class="nf">DeserializeObject</span><span class="p">(</span><span class="n">result</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Once I get a response back, I access the properties of the returned object to display the image, title, date, and copyright on the page. It’s not rocket science (well, it <em>kinda</em> is), but it’ll do.</p>
+
+<p class="notice--info">I won’t go to the moon and back on Blazor and Azure Functions in this post, as I’m focused on Azure Static Web Apps. In future posts, I’ll discuss each in greater detail.</p>
+
+<p>Here’s the application in action. Puts stars in your eyes, doesn’t it?</p>
+
+<p><img src="http://localhost:4001/images/blast-off-demo.png" alt="The Blast Off with Blazor app" /></p>
+
+<p>Before we blast off, let’s explore some app configuration.</p>
+
+<h2 id="fallback-route-support">Fallback route support</h2>
+
+<p>In single-page applications, fallback routes are important. Let’s assume I have a special path called <code class="language-plaintext highlighter-rouge">/nasa</code>. When I access the page, it’ll display the path, including <code class="language-plaintext highlighter-rouge">/nasa</code> in my browser, but if I refresh the page manually, by default my app won’t reload with <code class="language-plaintext highlighter-rouge">/nasa</code>. Instead, a 404 error can display because there isn’t a <code class="language-plaintext highlighter-rouge">/nasa</code> page on the “server” (or, in our case, there isn’t a server at all).</p>
+
+<p>Luckily, Azure Static Web Apps supports fallback routing. Drop a <code class="language-plaintext highlighter-rouge">routes.json</code> file in the root of your static assets folder (typically <code class="language-plaintext highlighter-rouge">wwwroot</code>) like so:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"routes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"route"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/*"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"serve"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/index.html"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"statusCode"</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">route</code> key makes sure to match all routes.</p>
+
+<h2 id="cors-support">CORS support</h2>
+
+<p>Because Azure Static Web Apps is configured with Azure Functions, you don’t have to deal with Cross-Origin Resource Sharing (CORS) issues—in short, this is when your browser blocks your request unless the API server allows it.</p>
+
+<p>However, you’ll need to do this in your local environment. In the <code class="language-plaintext highlighter-rouge">Properties</code> folder of your Azure Functions project, create a <code class="language-plaintext highlighter-rouge">launchSettings.json</code> file with this:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+     </span><span class="nl">"profiles"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+         </span><span class="nl">"Api"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+             </span><span class="nl">"commandName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Project"</span><span class="p">,</span><span class="w">
+             </span><span class="nl">"commandLineArgs"</span><span class="p">:</span><span class="w"> </span><span class="s2">"start --cors *"</span><span class="w">
+         </span><span class="p">}</span><span class="w">
+     </span><span class="p">}</span><span class="w">
+ </span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>I’m using Visual Studio tooling. If you instead want to use Azure Functions from the command line, you’ll need to do this inside a <a href="https://docs.microsoft.com/azure/azure-functions/functions-run-local?tabs=windows,csharp,bash#local-settings-file"><em>local.settings.json</em> file</a>.</p>
+
+<p>With the application ready to go, let’s head on over to the Azure Portal at <em><a href="https://portal.azure.com">portal.azure.com</a></em> to create our Azure Static Web App.</p>
+
+<h1 id="create-an-azure-static-web-app">Create an Azure Static Web App</h1>
+
+<p>Once you’re at the Azure Portal, search for <strong>static</strong> until you see <strong>Static Web Apps (Preview)</strong> show up—click that, and create a new instance.</p>
+
+<p>From there, do the following:</p>
+
+<ol>
+  <li>Select an existing subscription, and resource group (or create a new one).</li>
+  <li>Enter a suitable name and region for your app. You’ll see the only current SKU is the free one.</li>
+  <li>Click the <em>Sign in with GitHub</em> to, well, sign in with your GitHub credentials and give Azure Static Web Apps rights to act on your behalf.</li>
+  <li>Select your account, the repository where your code resides, and the branch.</li>
+  <li>After you select those, a <strong>Build Details</strong> section displays. Select the type of app (like Blazor). When workflows trigger, they can use these presets to run steps based on app type—all out of the box.</li>
+  <li><strong>Important</strong>: select the <strong>App location</strong>, <strong>Api location</strong>, and <strong>App artifact location</strong>, relative to your repo in GitHub.
+    <ul>
+      <li><strong>App location</strong> - in my case, the folder that contains my Blazor project file. The default location is <em>Client</em>.</li>
+      <li><strong>Api location</strong> - select where your Azure Function project resides. The default location is <em>Api</em>.</li>
+      <li><strong>App artifact location</strong> - the location of your deployed static files. The default is <em>wwwroot</em>.</li>
+    </ul>
+  </li>
+  <li>Finally, click <strong>Review + Create</strong>, then <strong>Create</strong>. It should take just a few seconds to deploy your instance.</li>
+</ol>
+
+<p>Your completed form should look similar to this:</p>
+
+<p><img src="http://localhost:4001/images/static-gh-details.png" alt="The Blast Off with Blazor app" /></p>
+
+<p>After the deployment completes, click <strong>Go to resource</strong>. You’ll see a bunch of links to your new URL, deployment history, and a workflow file. Before your site is ready, the workflow file executes right away (it resides in the <code class="language-plaintext highlighter-rouge">.github/workflows</code> directory of your repo).</p>
+
+<h1 id="inspect-the-workflow-file">Inspect the workflow file</h1>
+
+<p>The workflow file is a YAML file that instructs Azure Static Web Apps how to build your site. Here’s mine:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">name</span><span class="pi">:</span> <span class="s">Azure Static Web Apps CI/CD</span>
+
+<span class="na">on</span><span class="pi">:</span>
+  <span class="na">push</span><span class="pi">:</span>
+    <span class="na">branches</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">main</span>
+  <span class="na">pull_request</span><span class="pi">:</span>
+    <span class="na">types</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">opened</span><span class="pi">,</span> <span class="nv">synchronize</span><span class="pi">,</span> <span class="nv">reopened</span><span class="pi">,</span> <span class="nv">closed</span><span class="pi">]</span>
+    <span class="na">branches</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">main</span>
+
+<span class="na">jobs</span><span class="pi">:</span>
+  <span class="na">build_and_deploy_job</span><span class="pi">:</span>
+    <span class="na">if</span><span class="pi">:</span> <span class="s">github.event_name == 'push' || (github.event_name == 'pull_request' &amp;&amp; github.event.action != 'closed')</span>
+    <span class="na">runs-on</span><span class="pi">:</span> <span class="s">ubuntu-latest</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">Build and Deploy Job</span>
+    <span class="na">steps</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/checkout@v2</span>
+        <span class="na">with</span><span class="pi">:</span>
+          <span class="na">submodules</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Build And Deploy</span>
+        <span class="na">id</span><span class="pi">:</span> <span class="s">builddeploy</span>
+        <span class="na">uses</span><span class="pi">:</span> <span class="s">Azure/static-web-apps-deploy@v0.0.1-preview</span>
+        <span class="na">with</span><span class="pi">:</span>
+          <span class="na">azure_static_web_apps_api_token</span><span class="pi">:</span> <span class="s">$</span>
+          <span class="na">repo_token</span><span class="pi">:</span> <span class="s">$</span> <span class="c1"># Used for Github integrations (i.e. PR comments)</span>
+          <span class="na">action</span><span class="pi">:</span> <span class="s2">"</span><span class="s">upload"</span>
+          <span class="c1">###### Repository/Build Configurations - These values can be configured to match you app requirements. ######</span>
+          <span class="c1"># For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig</span>
+          <span class="na">app_location</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Client"</span> <span class="c1"># App source code path</span>
+          <span class="na">api_location</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Api"</span> <span class="c1"># Api source code path - optional</span>
+          <span class="na">app_artifact_location</span><span class="pi">:</span> <span class="s2">"</span><span class="s">wwwroot"</span> <span class="c1"># Built app content directory - optional</span>
+          <span class="c1">###### End of Repository/Build Configurations ######</span>
+
+  <span class="na">close_pull_request_job</span><span class="pi">:</span>
+    <span class="na">if</span><span class="pi">:</span> <span class="s">github.event_name == 'pull_request' &amp;&amp; github.event.action == 'closed'</span>
+    <span class="na">runs-on</span><span class="pi">:</span> <span class="s">ubuntu-latest</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">Close Pull Request Job</span>
+    <span class="na">steps</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Close Pull Request</span>
+        <span class="na">id</span><span class="pi">:</span> <span class="s">closepullrequest</span>
+        <span class="na">uses</span><span class="pi">:</span> <span class="s">Azure/static-web-apps-deploy@v0.0.1-preview</span>
+        <span class="na">with</span><span class="pi">:</span>
+          <span class="na">azure_static_web_apps_api_token</span><span class="pi">:</span> <span class="s">$</span>
+          <span class="na">action</span><span class="pi">:</span> <span class="s2">"</span><span class="s">close"</span>
+</code></pre></div></div>
+
+<p>This file looks daunting but as you look through it, it’s actually pretty simple. If there’s a direct push, or a pull request is created or is changed in <strong>my main branch</strong>, their Oryx build system—<a href="https://github.com/microsoft/Oryx">which automatically compiles source code into runnable artifacts</a>—detects and builds our app, and uploads its content (including Azure Functions) to Azure.</p>
+
+<p>Of course, you can modify this file to your liking.</p>
+
+<p>You can head over to the <strong>Actions</strong> section of your GitHub repository to monitor the status of your workflow and view any logging.</p>
+
+<h2 id="a-gotcha-about-packagejson">A gotcha about <code class="language-plaintext highlighter-rouge">package.json</code></h2>
+
+<p>I’d love to tell you the build succeeded on the first try, but it kept spacing out:</p>
+
+<p><img src="http://localhost:4001/images/oryx-error.png" alt="The Blast Off with Blazor app" /></p>
+
+<p>In my project, I use Gulp to build and deploy Tailwind CSS styles (<a href="https://chrissainty.com/integrating-tailwind-css-with-blazor-using-gulp-part-1/">thanks, Chris Sainty</a>). By accident, I deployed my <code class="language-plaintext highlighter-rouge">package.json</code> file to my repo. Because of that, Oryx detected a Node.js install, and therefore was looking for a <code class="language-plaintext highlighter-rouge">build</code> step in <code class="language-plaintext highlighter-rouge">package.json</code>. As a result, my build failed.</p>
+
+<p>This was a silly mistake on my end, but I can definitely see other scenarios where this could be an issue. Azure Static Web Apps is in preview, so they are ironing out some things, so this might get addressed—but now you know. If you want to push your <code class="language-plaintext highlighter-rouge">package.json</code> you would need to edit your workflow file to change build order, or a new <code class="language-plaintext highlighter-rouge">app_build_command</code> parameter.</p>
+
+<h1 id="pull-request-sites">Pull request sites</h1>
+
+<p>This is my favorite thing about Azure Static Web Apps: when you create a pull request against your main branch, <strong>GitHub Actions creates a temporary URL for you to view changes</strong>. (When the PR is merged and closed, the workflow runs and deletes your temporary environment.)</p>
+
+<p>For example, I created a PR to fix a minor bug. Once I click <strong>Create pull request</strong> in GitHub, a workflow will run and the PR will update with a link to the temporary environment:</p>
+
+<p><img src="http://localhost:4001/images/temp-site.png" alt="The Blast Off with Blazor app" /></p>
+
+<p>Additionally, if you hit up the <strong>Environments</strong> link in the Azure Portal, it’ll display everything nicely:</p>
+
+<p><img src="http://localhost:4001/images/environments.png" alt="The Blast Off with Blazor app" /></p>
+
+<h1 id="a-note-on-custom-domains">A note on custom domains</h1>
+
+<p>Azure Static Web Apps supports custom domains. Sort of. I can have <code class="language-plaintext highlighter-rouge">https://www.blastoffwithblazor.com</code> but not <code class="language-plaintext highlighter-rouge">https://blastoffwithblazor.com</code>. That’s right: root domain support is not included.</p>
+
+<p>Luckily, <a href="https://burkeholland.github.io/posts/static-app-root-domain/">Burke Holland has you covered</a>. I understand this impact of this change reaches greater than Azure Static Web Apps, so it might take some time to support.</p>
+
+<h1 id="wrap-up">Wrap up</h1>
+
+<p>This was … a blast. I hope it eclipsed your expectations. In this post, we discussed the value of Azure Static Web Apps. We walked through our out-of-this-world sample app, created an Azure Static Web app solution, explored the workflow file, explained some gotchas, and explored how pull request sites work.</p>
+
+<p>If you’re big on Blazor stay tuned—the app will be getting some enhancements as we learn more about Blazor together!</p>
+
+<p>Of course, if you have any questions <a href="https://twitter.com/daveabrock">comet me on Twitter</a>.</p>
+
+<h1 id="references">References</h1>
+
+<ul>
+  <li><a href="https://devblogs.microsoft.com/aspnet/azure-static-web-apps-with-blazor/">Azure Static Web Apps with .NET and Blazor</a> (Aaron Powell)</li>
+  <li><a href="https://www.hanselman.com/blog/blazor-webassembly-on-azure-static-web-apps">Blazor WebAssembly on Azure Static Web Apps</a> (Scott Hanselman)</li>
+  <li><a href="https://consultwithgriff.com/i-love-azure-static-web-apps/">I Love Azure Static Web Apps</a> (Kevin W. Griffin)</li>
+  <li><a href="https://swimburger.net/blog/dotnet/how-to-deploy-aspnet-blazor-webassembly-to-azure-static-web-apps">How to deploy Blazor WASM &amp; Azure Functions to Azure Static Web Apps</a> (Niels Swimberghe)</li>
+  <li><a href="https://burkeholland.github.io/posts/static-app-root-domain/">How to configure a root domain in an Azure Static Web App</a> (Burke Holland)</li>
+  <li><a href="https://docs.microsoft.com/azure/static-web-apps/">Azure Static Web Apps docs</a> (Microsoft Docs)</li>
+  <li><a href="https://docs.microsoft.com/azure/static-web-apps/getting-started?tabs=vanilla-javascript">Quickstart: Building your first static web app</a> (Microsoft Docs)</li>
+  <li><a href="https://docs.microsoft.com/learn/modules/publish-app-service-static-web-app-api-dotnet/">Publish a Blazor WebAssembly app and .NET API with Azure Static Web Apps</a> (Microsoft Learn)</li>
+</ul>
+:ET

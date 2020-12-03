@@ -1,0 +1,27 @@
+I"�<p>Here’s a weekly shout-out of articles, videos, and other content I found interesting.</p>
+
+<h2 id="development">Development</h2>
+
+<ul>
+  <li><a href="https://www.davepaquette.com/archive/2020/05/10/deploying-a-static-site-to-azure-using-the-az-cli.aspx">Deploying a Static Site to Azure Using the az CLI</a> (Dave Paquette)</li>
+  <li><a href="https://dmitripavlutin.com/javascript-object-destructuring/">How to Use Object Destructuring in JavaScript</a> (Dmitri Pavlutin)</li>
+  <li><a href="https://blog.j2i.net/2020/05/09/pushing-data-over-a-live-connection/">ASP.NET Core: Pushing Data over a Live Connection</a> (j2inet)</li>
+  <li><a href="https://www.danclarke.com/2020-more-succinct-csharp">Writing more Succinct C#</a> (Dan Clarke)</li>
+  <li><a href="https://blog.jetbrains.com/dotnet/2020/05/11/story-csproj-large-solutions-memory-usage/">A Story About .csproj, Large Solutions and Memory Usage</a> (Maarten Balliauw)</li>
+  <li><a href="https://wakeupandcode.com/signalr-in-asp-net-core-3-1/">SignalR in ASP .NET Core 3.1</a> (Shahed Chowdhuri)</li>
+  <li><a href="https://devblogs.microsoft.com/typescript/announcing-typescript-3-9/">Announcing TypeScript 3.</a> (Daniel Rosenwasser)</li>
+  <li><a href="https://khalidabuhakmeh.com/increase-file-upload-limit-for-aspdotnet">Increase ASP.NET File Upload Limits</a> (Khalid Abuhakmeh)</li>
+</ul>
+
+<h2 id="design-and-best-practices">Design and best practices</h2>
+
+<p><a href="https://newsignature.com/articles/git-branching-strategies/">Git Branching Strategies</a> (Chris Ayers)</p>
+
+<h2 id="general-technology-topics">General technology topics</h2>
+
+<ul>
+  <li><a href="https://www.zdnet.com/article/microsoft-adds-protection-against-reply-all-email-storms-in-office-365/">Microsoft adds protection against Reply-All email storms in Office 365</a> (ZDNet)</li>
+  <li><a href="https://www.cnet.com/news/eric-schmidt-who-led-googles-transformation-into-a-tech-giant-has-left-the-company/">Eric Schmidt, who led Google’s transformation into a tech giant, has left the company</a> (CNet)</li>
+  <li><a href="https://www.wired.com/story/thunderspy-thunderbolt-evil-maid-hacking/">Thunderbolt Flaws Expose Millions of PCs to Hands-On Hacking</a> (Wired)</li>
+</ul>
+:ET

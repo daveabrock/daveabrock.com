@@ -1,0 +1,115 @@
+I"S1<p class="notice--success">This is an archive of my weekly (free!) newsletter, <em>The .NET Stacks</em>. Consider <a href="https://dotnetstacks.com">subscribing today</a> to get this content right away! Subscribers don’t have to wait a week to receive the content.</p>
+
+<p>Happy Monday, everyone. I have to be honest, it feels awkward diving right into .NET after the last week or so, especially considering what’s happening in America right now. I’ll just say this before I get to it: I hope everyone is okay.</p>
+
+<h2 id="recovering-from-build">Recovering from Build</h2>
+
+<p>Build was great, but it was impossible trying to keep up with all the announcements. It’s always great to geek out on new advancements in the .NET ecosystem, but I knew I couldn’t focus on everything. Despite that, I’ve been able to unwind from the madness and think about two updates that developers might have missed but deserve some attention: Project Tye and YARP.</p>
+
+<h3 id="project-tye">Project Tye</h3>
+
+<p>When designed well, microservices are great. At the risk of sounding like a Gartner consultant, they help you with scalability, data isolation, allow teams to pick the best technology for the job (but not all jobs), and enable small and focused teams to write loosely coupled services that can be updated and deployed easily.</p>
+
+<p>But: let’s say that you’ve decided to quit your job and become Amazon’s newest competitor. You write up a quick web app and some services as REST APIs—an account management service. A shipping service. An inventory service. You also implement the <a href="https://dzone.com/articles/why-proxies-are-important-for-microservices">proxy design pattern</a> and create an API gateway to handle communication between these services and your web application. Because you love .NET, you’ve coded all this in a .NET Core MVC web app with four Core APIs behind it. You pat yourself on the back, fire off an email to your (former) boss to let him know you’re going to be rich, then call it a night.</p>
+
+<p>In the morning, you start debugging your services and quickly wonder if you can recall that email. You’ve just signed up for managing the infrastructure and development lifecycle of five applications—and as a result, debugging can be a real pain. And you haven’t even considered how you will deploy and manage your distributed application.</p>
+
+<p>This is where <a href="https://github.com/dotnet/tye">Project Tye comes in</a>, giving us hope for a better way: an experimental .NET Foundation project that promises to make “developing, testing, and deploying microservices and distributed applications easier.”</p>
+
+<p>The goals of Project Tye are:</p>
+
+<ul>
+  <li>Simplifying the development of microservices by providing the capability to run multiple services with a single command, as well as providing containers for dependencies and providing address discovery using simple conventions</li>
+  <li>Automating deployment of .NET applications to Kubernetes by generating manifests with minimal configuration using a single configuration file</li>
+</ul>
+
+<p>This project is in experimental mode but that also means you can make a big impact by getting involved. Check out the <a href="https://devblogs.microsoft.com/aspnet/introducing-project-tye/">Microsoft blog post</a> and the <a href="https://github.com/dotnet/tye">GitHub repository</a> for details. As for me, I’m excited about a simplified development process and looking forward to not having to run multiple Visual Studio applications to nail down an issue.</p>
+
+<h3 id="yarp">YARP</h3>
+
+<p>Do you use a reverse proxy? If you aren’t familiar with them, a few common use cases/scenarios:</p>
+
+<ul>
+  <li><strong>Security</strong>: a big use case, it takes requests and performs authentication/authorization</li>
+  <li><strong>Load balancing</strong>: a server can sit in front of your backend servers and distribute requests efficiently</li>
+  <li><strong>Optimization</strong>: they can manage compressing inbound/outbound data and provide caching, offloading intensive tasks from your core application servers</li>
+</ul>
+
+<p>YARP—which stands for YARP: A Reverse Proxy—is a new project that is focused on creating a reverse proxy server. According to the README at <a href="https://github.com/microsoft/reverse-proxy">the YARP repo</a>, Microsoft saw a lot of their internal teams either building a proxy or asking for one, so they got to work on a common solution.</p>
+
+<p>If you’re wondering “why not stick with what I have now, like nginx?” Feel free, Microsoft says, but this is suited for those who want a super-fast proxy server using infrastructure from the ASP.NET and .NET ecosystems. David Fowler, Microsoft’s partner software architect, promises to provide <a href="https://twitter.com/davidfowl/status/1253392545343606785">faster performance than nginx</a>. Proxies like nginx can be configuration headaches, for sure, so providing a simplified configuration model using .NET assets will definitely be big selling points.</p>
+
+<p>For more details, check out the <a href="https://devblogs.microsoft.com/dotnet/introducing-yarp-preview-1/">Microsoft blog post</a> and the <a href="https://github.com/microsoft/reverse-proxy">GitHub repository</a>. Much like with Tye, it is early and your feedback is appreciated and encouraged.</p>
+
+<h2 id="odds-and-ends">Odds and ends</h2>
+
+<p>This week, we were able to see the results of the <a href="https://insights.stackoverflow.com/survey/2020#overview">2020 Stack Overflow Developer Survey</a>. About 65,000 developers took part and this is what we learned:</p>
+
+<ul>
+  <li>Rust is again the “most loved” language—despite most people having no experience in it. TypeScript came in at #2, and C# at #8.</li>
+  <li>ASP.NET Core was the #1 “most loved” Web framework at 70.7%, outranking React, Vue, Express, and Gatsby, and also the #1 “most loved” other framework</li>
+</ul>
+
+<p>–</p>
+
+<p>The .NET Foundation provided their <a href="https://dotnetfoundation.org/blog">April/May 2020 update this week</a>. It’s worth checking out the update to see some new projects.</p>
+
+<p>A few highlights:</p>
+
+<ul>
+  <li><strong>Docker.DotNet</strong>, a library to interact with Docker Remote API endpoints in your .NET applications</li>
+  <li><strong>Python.NET</strong>, a package that gives Python programmers nearly seamless integration with the .NET 4.0+ CLR on Windows and Mono runtime on Linux and OSX</li>
+  <li><strong>FlubuCore</strong>, a cross platform build and deployment automation system that allows you to define your build and deployment scripts in C# using an intuitive fluent interface</li>
+</ul>
+
+<p>–</p>
+
+<p>There’s been plenty of demos on Blazor and all its capabilities, but I really recommend going through the latest <a href="https://www.youtube.com/watch?v=onI2_Q0wrdM">ASP.NET standup</a>, where the team showcases a demo app that isn’t just a typical “hello world” app that gets your feet wet. It’s called <a href="https://github.com/SteveSandersonMS/CarChecker">CarChecker</a> and shows off authentication, offline support, localization, browser storage, and more. It even has image recognition from ML.NET! Highly recommended.</p>
+
+<h2 id="community-roundup">Community roundup</h2>
+
+<h3 id="announcements">Announcements</h3>
+
+<ul>
+  <li>Microsoft <a href="https://devblogs.microsoft.com/aspnet/announcing-experimental-mobile-blazor-bindings-may-update/">updates us on experimental mobile Blazor bindings</a>.</li>
+  <li>Over at the Microsoft Open Source blog, they announced <a href="https://cloudblogs.microsoft.com/opensource/2020/05/26/announcing-cloud-native-workflows-dapr-logic-apps/">cloud-native workflows with Dapr and Logic Apps</a>.</li>
+  <li>The Service Bus Explorer in the Azure Portal is <a href="https://azure.microsoft.com/updates/sesrvice-bus-explorer/">now in preview</a>.</li>
+  <li>.NET desktop apps is <a href="https://devblogs.microsoft.com/dotnet/continuous-integration-workflow-template-for-net-core-desktop-apps-with-github-actions/">getting some love from GitHub Actions</a>.</li>
+  <li>Microsoft Learn has a <a href="https://docs.microsoft.com/learn/modules/microservices-aspnet-core/">new module on cloud-native ASP.NET Core microservices</a>.</li>
+</ul>
+
+<h3 id="blog-posts">Blog posts</h3>
+
+<ul>
+  <li>Scott Hanselman <a href="https://www.hanselman.com/blog/DevelopingOnDockerWithTheNewAndImprovedVisualStudioContainerToolsAndWSL2.aspx">develops on Docker with Visual Studio Container Tools and WSL2</a>.</li>
+  <li>Anthony Giretti talks about <a href="https://anthonygiretti.com/2020/05/24/visual-studio-2019-new-windows-terminal-has-arrived-how-to-enhance-it-with-posh-git-for-git-usage/">enhancing the new Windows Terminal with posh-git</a>.</li>
+  <li>Konrad Kokosa has <a href="https://tooslowexception.com/net-asyncawait-in-a-single-picture/">.NET async/await in a simple picture</a>.</li>
+  <li>Shahed Chowdhuri talks through <a href="https://wakeupandcode.com/unit-testing-in-asp-net-core-3-1/">unit testing in ASP.NET Core 3.1</a>.</li>
+  <li>Jeremy Likness <a href="https://blog.jeremylikness.com/blog/azure-ad-secured-serverless-cosmosdb-from-blazor-webassembly/">uses Blazor WASM for a serverless ComosDB solution authenticated by Azure Active Directory</a>.</li>
+  <li>AWS talks about <a href="https://aws.amazon.com/blogs/developer/10-years-of-building-net-on-aws/?utm_source=feedburner&amp;utm_medium=feed&amp;utm_campaign=Feed%3A+AwsDeveloperBlog+%28AWS+Developer+Blog%29">10 years of building .NET</a>.</li>
+  <li>Matthias Koch discusses <a href="https://blog.jetbrains.com/dotnet/2020/05/26/nullable-contexts-nullable-attributes/">nullable reference types in C# 8</a>.</li>
+  <li>Jason Roberts uses Microsoft.FeatureManagement to <a href="https://dontcodetired.com/blog/post/Conditional-HTML-Rendering-with-Microsoft-Feature-Flags-(MicrosoftFeatureManagement)">conditionally render HTML</a>.</li>
+  <li>Steve Gordon <a href="https://www.stevejgordon.co.uk/architecting-a-cloud-native-service-with-dotnet-and-aws">architects a cloud-native service with .NET and AWS</a>.</li>
+  <li>Jesse Liberty <a href="http://jesseliberty.com/2020/05/27/an-alert-from-the-viewmodel/?utm_source=feedburner&amp;utm_medium=feed&amp;utm_campaign=Feed%3A+JesseLiberty-SilverlightGeek+%28Jesse+Liberty%29">sends an alert from the view model</a>.</li>
+  <li>Vladimir Vozar walks though <a href="https://exceptionnotfound.net/overview-of-api-versioning-in-asp-net-core-3-0">API versioning in ASP.NET Core 3.x</a>.</li>
+  <li>Julio Sampaio talks about <a href="https://www.red-gate.com/simple-talk/dotnet/net-development/creating-templates-with-liquid-in-asp-net-core/">an alternative to Razor templating</a>.</li>
+</ul>
+
+<h3 id="podcastsvideos">Podcasts/videos</h3>
+
+<ul>
+  <li>The Syntax podcast has a quick chat about <a href="https://traffic.libsyn.com/secure/syntax/Syntax251.mp3">supporting IE11</a>.</li>
+  <li>The Visual Studio folks walkthough <a href="https://www.youtube.com/watch?v=aVEug50YpaM">debugging managed async code</a>.</li>
+  <li>The ASP.NET Monsters discusses <a href="https://www.youtube.com/watch?v=ptiki5yhWDU">staged rollouts with Microsoft.FeatureManagement</a>.</li>
+  <li>Over at ON.NET, they talk <a href="https://channel9.msdn.com/Shows/On-NET/ASPNET-Core-Series-MVC-and-Razor-Pages?WT.mc_id=DX_MVP4025064">MVC and Razor Pages</a> as well as <a href="https://channel9.msdn.com/Shows/On-NET/ASPNET-Core-Series-Blazor">Blazor</a>.</li>
+  <li>The .NET Rocks podcast <a href="http://www.dotnetrocks.com/default.aspx?ShowNum=1689">discusses building apps with Uno</a>.</li>
+  <li>A couple .NET community standups: a <a href="https://www.youtube.com/watch?v=onI2_Q0wrdM">Blazor release party</a>, and <a href="https://www.youtube.com/watch?v=vjIQ1xKU5xw">Build updates for desktop</a>.</li>
+  <li>A .NET design review <a href="https://www.youtube.com/watch?v=jhibZCgzB9o">for a few APIs</a>.</li>
+</ul>
+
+<h2 id="new-subscribers-and-feedback">New subscribers and feedback</h2>
+
+<p>Has this email been forwarded to you? Welcome! I’d love for you <a href="https://www.dotnetstacks.com">to subscribe</a> and join the community. I promise to guard your email address with my life.</p>
+
+<p>I would love to hear any feedback you have for The .NET Stacks! My goal is to make this the one-stop shop for weekly updates on developing in the .NET ecosystem, so I look forward to any feedback you can provide. You can directly reply to this email, or <a href="https://www.dotnetstacks.com">talk to me on Twitter as well</a>. See you next week!</p>
+:ET

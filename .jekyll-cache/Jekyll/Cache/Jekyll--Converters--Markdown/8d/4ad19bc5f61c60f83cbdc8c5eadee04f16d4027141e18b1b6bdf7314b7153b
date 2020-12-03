@@ -1,0 +1,160 @@
+I"EA<p><img src="https://raw.githubusercontent.com/daveabrock/daveabrock.github.io/master/THE%20.NET%20STACKS.png" alt="Newsletter image" /></p>
+
+<p>With .NET 5 shipping this week, it’s going to be such a release.</p>
+
+<p>On tap this week:</p>
+
+<ul>
+  <li>.NET 5 officially launches tomorrow</li>
+  <li>Are C# 9 records actually immutable by default?</li>
+  <li>Last week in the .NET world</li>
+</ul>
+
+<h1 id="net-5-officially-launches-tomorrow">.NET 5 officially launches tomorrow</h1>
+
+<p>After eight preview releases, two release candidates, and some tears—by me, working on the early preview bits—it’s finally happening: .NET 5 ships tomorrow. Of course, the release candidates shipped with a go-live license but everything becomes official tomorrow. You’ll be able to download official bits and we <a href="https://twitter.com/coolcsh/status/1325218584272936960">might even see it working with Azure App Service</a> (no pressure). There’s also .NET Conf, where you’ll get to <a href="https://www.dotnetconf.net/">geek out on .NET 5 for three straight days</a>.</p>
+
+<p>It’s been a long time coming—and it feels a bit longer with all this COVID-19 mess, doesn’t it? Even so, the “Introducing .NET 5” post <a href="https://devblogs.microsoft.com/dotnet/introducing-net-5/">hit about 18 months ago</a>—and with it, the promise of a unified platform (with Xamarin hitting .NET 6 because of pandemic-related resourcing constraints). We’re talking a single .NET runtime and framework however you’re developing an app, and a consistent release schedule (major releases every November).</p>
+
+<p>Of course, this leads to questions about what it means to say .NET Framework, .NET Standard, and .NET Core—not to mention how the support will work. I covered <a href="https://daveabrock.com/2020/10/31/dotnet-stacks-23">those not-sexy-but-essential questions two weeks ago</a>.</p>
+
+<p>Since I started this newsletter in May (we’re at Issue #25!), we’ve been dissecting what’s new week by week. (You can <a href="https://daveabrock.com/tags/#dotnet-stacks">look at the archives on my site</a>.) For a condensed version, here’s my favorite things about .NET 5—both big and small. (This is a little like talking about your favorite song or movie, so your opinions might differ.)</p>
+
+<h2 id="custom-json-console-logger">Custom JSON console logger</h2>
+
+<p>ASP.NET Core now ships with a <a href="https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-preview-8/#json-console-logger">built-in JSON formatter</a> that emits <em>structured</em> JSON logs to the console. Is this a huge change? No. Will it make my life easier on a daily basis. You know it.</p>
+
+<h2 id="enhanced-dotnet-watch-support">Enhanced <code class="language-plaintext highlighter-rouge">dotnet watch</code> support</h2>
+
+<p>In .NET 5, running <code class="language-plaintext highlighter-rouge">dotnet watch</code> on an ASP.NET Core project now launches the default browser and auto-refreshes on save. This is a great quality-of-life developer experience improvement, as we patiently await for this to hit Visual Studio.</p>
+
+<h2 id="open-api-spec-on-by-default-for-aspnet-core-projects">Open API spec on by default for ASP.NET Core projects</h2>
+
+<p>When you create a new API project using <code class="language-plaintext highlighter-rouge">dotnet new webapi</code>, <a href="https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-release-candidate-1/#open-api-specification-on-by-default">you’ll see OpenAPI output enabled by default</a>—meaning you won’t have to manually configure the Swashbuckle library and the Swagger UI page is enabled in development mode. This also means that F5 now <a href="https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-release-candidate-1/#better-f5-experience-for-web-api-projects">takes you straight to the Swagger page instead of a lonely 404</a>.</p>
+
+<h2 id="performance-improvements">Performance improvements</h2>
+
+<p>If you have some time to kill and aren’t scared off by low-level details, I’d highly recommend <a href="https://devblogs.microsoft.com/dotnet/performance-improvements-in-net-5/">Stephen Toub’s July post on .NET 5 performance improvements</a>. In short, text operations are 3x-5x faster, regular expressions are 7x faster with multiline expressions, serializing arrays and complex types in JSON are faster by 2x-5x, and much more.</p>
+
+<h2 id="ef-core-5-updates">EF Core 5 updates</h2>
+
+<p>EF Core 5 is also shipping with a ton of new features. <a href="https://docs.microsoft.com/ef/core/what-is-new/ef-core-5.0/plan">Where to begin</a>? Well, there’s many-to-many navigation properties (skip navigations), table-per-type inheritance mapping, filtered and split includes, general query enhancements, event counters, <code class="language-plaintext highlighter-rouge">SaveChanges</code> events, savepoints, split queries for related collections, database collations, and … well, <a href="https://docs.microsoft.com/ef/core/what-is-new/ef-core-5.0/whatsnew">check out the What’s New doc for the full treatment</a>.</p>
+
+<h2 id="single-file-apps">Single file apps</h2>
+
+<p>Single-file apps are now supported with .NET 5, meaning you can publish and distribute an app in a single executable. <a href="https://github.com/dotnet/runtime/issues/36590">Hooray</a>.</p>
+
+<h2 id="blazor-updates">Blazor updates</h2>
+
+<p>.NET 5 ships with a ton of Blazor improvements, including <a href="https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-preview-8/#css-isolation-for-blazor-components">CSS isolation</a>, <a href="https://docs.microsoft.com/aspnet/core/blazor/call-javascript-from-dotnet?view=aspnetcore-5.0#blazor-javascript-isolation-and-object-references">JavaScript isolation</a>, <a href="https://docs.microsoft.com/aspnet/core/blazor/components/virtualization">component virtualization</a>, <a href="https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-release-candidate-1/#blazor-support-for-ontoggle-event">toggle event support</a>, <a href="https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-preview-7/#blazor-webassembly-apps-now-target-net-5">switching WebAssembly apps from Mono to .NET 5</a>, <a href="https://docs.microsoft.com/aspnet/core/blazor/webassembly-lazy-load-assemblies">lazy loading</a>, <a href="https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-release-candidate-1/#blazor-webassembly-prerendering">server pre-rendering</a>, and so on.</p>
+
+<h2 id="c-9">C# 9</h2>
+
+<p>I’m super excited for the release of C# 9, especially the embracing of paradigms common in functional programming. With <a href="https://daveabrock.com/2020/06/29/c-sharp-9-deep-dive-inits">init-only properties</a> and <a href="https://daveabrock.com/2020/07/06/c-sharp-9-deep-dive-records">records</a>, C# developers have the flexibility to easily use immutable constructs in a mutable-by-design language. It might take some getting used to, but I love the possibilities. I see a lot of promise in keep the real-world object modeling, but also introducing immutability where treating objects as data makes sense.</p>
+
+<p>(There’s also great improvements with <a href="https://daveabrock.com/2020/07/09/c-sharp-9-top-level-programs">top-level programs</a>, <a href="https://daveabrock.com/2020/07/06/c-sharp-9-pattern-matching">pattern matching</a>, and <a href="https://daveabrock.com/2020/07/14/c-sharp-9-target-typing-covariants">target typing</a>.)</p>
+
+<h1 id="are-c-9-records-actually-immutable-by-default">Are C# 9 records actually immutable by default?</h1>
+
+<p>Speaking of records, there seems to be some confusion on if C# 9 records are immutable by default. The answer is: yes, and no. Records are immutable by default when using positional arguments. When you want to use them with object initializers, they aren’t—which makes sense, since initializers are more flexible in how objects are constructed.</p>
+
+<p>Feel free to <a href="https://daveabrock.com/2020/11/02/csharp-9-records-immutable-default">check out my post for the full details</a>.</p>
+
+<h1 id="happy-birthday-dad">Happy birthday, Dad</h1>
+
+<p>Someone has turned a lucky … um … well, numbers don’t matter, do they? Happy Birthday, Dad. You can thank him for … <em>waves hands</em> … all this. I’m not sure what I’d be doing without him encouraging my nerdy tendencies during my most awkward years, but I’m glad I’ll never have to find out. Have a good day, mister.</p>
+
+<p>When I said I like to wear many hats, I didn’t mean this one.</p>
+
+<p><img src="http://localhost:4001/images/dad-and-me.jpeg" alt="Picture with mom" /></p>
+
+<p>(Don’t worry, this is the last birthday wish. Back to regularly scheduled programming.)</p>
+
+<h1 id="-last-week-in-the-net-world">🌎 Last week in the .NET world</h1>
+
+<h2 id="-the-top-3">🔥 The Top 3</h2>
+
+<ul>
+  <li>Beth Massi <a href="https://devblogs.microsoft.com/dotnet/net-5-0-launches-at-net-conf-november-10-12">previews .NET Conf from November 10-12</a>.</li>
+  <li>Damien Bowden <a href="https://damienbod.com/2020/11/02/implement-a-blazor-full-text-search-using-azure-cognitive-search/">implements a Blazor full text search using Azure Cognitive Search</a>.</li>
+  <li>Irina Scurtu <a href="https://irina.codes/net-core-with-nginx-on-linux/">works with .NET Core with nginx on Linux</a>, and also <a href="https://irina.codes/net-api-as-a-linux-service/">talks about using a .NET API as a Linux service</a>.</li>
+</ul>
+
+<h2 id="-announcements">📢 Announcements</h2>
+
+<ul>
+  <li>Eilon Lipton <a href="https://devblogs.microsoft.com/aspnet/unified-ui-mobile-blazor-bindings-preview-5">runs through preview 5 of Blazor Mobile Bindings</a>.</li>
+  <li>AWS has <a href="https://aws.amazon.com/blogs/developer/announcing-the-end-of-support-for-the-aws-sdk-for-net-version-1">stopped supporting AWS SDK for .NET version 1</a>.</li>
+</ul>
+
+<h2 id="-community-and-events">📅 Community and events</h2>
+
+<ul>
+  <li>Microsoft Learn has launched a <a href="https://docs.microsoft.com/learn/challenges?id=58bdb63e-96b6-4598-afd1-d350438476b5&amp;WT.mc_id=dotnet-10219-masalnik&amp;_lrsc=89013caa-3a23-4196-b218-d4c4e53fa883">.NET Learn Challenge</a>.</li>
+  <li>The .NET Docs show <a href="https://www.youtube.com/watch?v=JBvGX2k23Jc">talks about navigating ML.NET with Bri Achtman and Luis Quintanilla</a>.</li>
+  <li>Just two .NET standups this week: Machine Learning <a href="https://www.youtube.com/watch?v=0DNWLorVIh4">talks TorchSharp &amp; Tensor programming</a>, and Xamarin <a href="https://www.youtube.com/watch?v=Y0bEAy6yxMQ">discusses Mobile Blazor Bindings</a>.</li>
+</ul>
+
+<h2 id="-aspnet-core--blazor">😎 ASP.NET Core / Blazor</h2>
+
+<ul>
+  <li>Dave Brock (ahem) <a href="https://daveabrock.com/2020/11/08/blast-off-blazor-update-head">talks about updating the HTML head from a Blazor component</a>.</li>
+  <li>Jon Hilton <a href="https://www.telerik.com/blogs/migrating-mvc-to-blazor">talks about migrating from MVC to Blazor</a>.</li>
+  <li>Marinko Spasojevic <a href="https://code-maze.com/use-browser-functionalities-with-blazor-webassembly/">uses browser functionalities</a> and also <a href="https://code-maze.com/how-to-call-csharp-methods-from-javascript-in-blazor-webassembly/">calls C# methods from JavaScript in Blazor WebAssembly</a>.</li>
+  <li>Kristoffer Strube <a href="https://blog.elmah.io/how-to-send-push-notifications-to-a-browser-in-asp-net-core/">sends push notifications to a browser in ASP.NET Core</a>.</li>
+  <li>Paul Michaels <a href="https://www.pmichaels.net/2020/10/31/tag-helper-not-working/">documents some recent tag helper issues</a>.</li>
+  <li>Sam Xu <a href="https://devblogs.microsoft.com/odata/routing-in-asp-net-core-8-0-preview">introduces ASP.NET Core OData 8.0 routing</a>.</li>
+  <li>Imar Spaanjaars <a href="https://imar.spaanjaars.com/609/implementing-health-checks-in-aspnet-framework-applications">discusses implementing health checks in ASP.NET Framework apps</a>.</li>
+  <li>Jason Gaylord discusses building APIs with GraphQL and .NET Core <a href="https://www.jasongaylord.com/blog/2020/11/03/build-api-graphql-dotnet-core-part-1">post 1</a>, <a href="https://www.jasongaylord.com/blog/2020/11/04/build-api-graphql-dotnet-core-part-2">post 2</a>.</li>
+  <li>Ricardo Peres <a href="https://weblogs.asp.net/ricardoperes/asp-net-core-pitfalls-areas">talks about some gotchas with ASP.NET Core areas</a>.</li>
+</ul>
+
+<h2 id="-the-cloud">⛅ The cloud</h2>
+
+<ul>
+  <li>David Grace <a href="https://www.roundthecode.com/dotnet/asp-net-core-web-hosting/dealing-asp-net-core-web-api-access-restrictions-errors-azure">deals with ASP.NET Core Web API access restrictions and errors in Azure</a>.</li>
+  <li>Justin Yoo <a href="https://techcommunity.microsoft.com/t5/apps-on-azure/github-actions-dns-amp-ssl-certificate-on-azure-functions">writes about GitHub Actions, DNS, and SSL certs on Azure Functions</a>.</li>
+  <li>Tore Nestenius <a href="https://www.edument.se/en/blog/post/storing-the-asp-net-core-data-protection-key-ring-in-azure-key-vault">stores the ASP.NET Core Data Protection Key Ring in Azure Key Vault</a>.</li>
+  <li>Laurent Bugnion <a href="https://galasoft.ch/posts/2020/11/best-practice-when-naming-durable-functions-in-c">talks about the best practice when naming Durable Functions in C#</a>.</li>
+  <li>Joe “Hulk Hogan” Guadagno works with <a href="https://www.josephguadagno.net/2020/11/03/nlog-dependency-injection-and-azure-functions-oh-my">NLog, dependency injection, and Azure Functions</a>.</li>
+</ul>
+
+<h2 id="-languages">📔 Languages</h2>
+
+<ul>
+  <li>Dave Brock (ahem) asks: <a href="https://daveabrock.com/2020/11/02/csharp-9-records-immutable-default">are C# 9 records immutable by default</a>?</li>
+  <li>Anthony Giretti <a href="https://anthonygiretti.com/2020/11/01/introducing-c-9-extension-getenumerator-support-for-foreach-loops/">works with GetEnumerator extension support for foreach in C# 9</a>.</li>
+  <li>Jiří Činčura <a href="https://www.tabsoverspaces.com/233842-new-environment-processid-in-net-5">discusses the new Environment.ProcessId in .NET 5</a>.</li>
+  <li>Steve Gordon <a href="https://www.stevejgordon.co.uk/additional-http-sockets-dns-and-tls-telemetry-in-dotnet-5">discusses additional HTTP, sockets, DNS, and TLS telemetry in .NET 5</a>.</li>
+  <li>Thomas Levensque <a href="https://thomaslevesque.com/2020/10/30/using-csharp-9-records-as-strongly-typed-ids/">uses C# 9 records as strongly-typed IDs</a>.</li>
+  <li>Khalid Abuhakmeh <a href="https://khalidabuhakmeh.com/looking-at-system-io-path">takes a look at System.IO.Path</a>.</li>
+</ul>
+
+<h2 id="-tools">🔧 Tools</h2>
+
+<ul>
+  <li>Derek Comartin <a href="https://codeopinion.com/cqrs-myths-3-most-common-misconceptions">talks about CQRS myths</a>.</li>
+  <li>Tim Heuer <a href="https://timheuer.com/blog/generate-github-actions-workflow-from-cli/">generates a GitHub Actions workflow file from the dotnet CLI</a>.</li>
+  <li>Kunal Chowdhury <a href="https://www.kunal-chowdhury.com/2020/11/advanced-git-tips.html">offers some advanced Git tips</a>.</li>
+</ul>
+
+<h2 id="-xamarin">📱 Xamarin</h2>
+
+<ul>
+  <li>Vicente Gerardo Guzmán Lucio <a href="https://www.syncfusion.com/blogs/post/protecting-sensitive-data-in-the-background-in-xamarin-forms.aspx">protects sensitive data in the background</a>.</li>
+  <li>Leomaris Reyes <a href="https://www.telerik.com/blogs/best-xamarin-forms-app-examples">walks through the best Xamarin Forms app examples</a>, and also <a href="https://www.telerik.com/blogs/getting-started-with-text-to-speech-in-xamarin-forms">gets started with text-to-speech</a>.</li>
+</ul>
+
+<h2 id="-podcasts">🎤 Podcasts</h2>
+
+<p>The .NET Rocks podcast <a href="https://www.dotnetrocks.com/default.aspx?ShowNum=1712">discusses Cake 1.0 with Mattias Karlsson</a>.</p>
+
+<h2 id="-videos">🎥 Videos</h2>
+
+<ul>
+  <li>The Loosely Coupled Show <a href="https://www.youtube.com/watch?v=pZx0X2hDx7A">asks: should you learn a functional programming language</a>?</li>
+  <li>The Visual Studio Toolbox <a href="https://channel9.msdn.com/Shows/Visual-Studio-Toolbox/GitHub-Codespaces">talks about GitHub Codespaces</a>.</li>
+  <li>The folks at Compositional IT <a href="https://www.youtube.com/watch?v=kLoLl3kqpfk&amp;feature=youtu.be&amp;ab_channel=CompositionalIT">talk quickly about SAFE Stack web apps pn Azure Static Web Apps</a>.</li>
+  <li>Over at ON.NET, they talk about <a href="https://www.youtube.com/watch?v=GfTlbjuWU5Q">the inner loop with VS Code and GitHub</a>, and also <a href="https://www.youtube.com/watch?v=iDAYdrFHqGU">real-time data fetching with GraphQL and Blazor</a>.</li>
+</ul>
+:ET

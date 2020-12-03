@@ -1,0 +1,106 @@
+I"�0<p class="notice--success">This is an archive of my weekly (free!) newsletter, <em>The .NET Stacks</em>. Consider <a href="https://dotnetstacks.com">subscribing today</a> to get this content right away! Subscribers don’t have to wait a week to receive the content.</p>
+
+<p>On tap this week:</p>
+
+<ul>
+  <li>gRPC-Web for .NET</li>
+  <li>Try out C# 9 in LinqPad</li>
+  <li>Checking in on the .NET Foundation</li>
+  <li>Community roundup</li>
+</ul>
+
+<h2 id="grpc-web-for-net-officially-released-this-week">gRPC-Web for .NET officially released this week</h2>
+
+<p>Microsoft <a href="https://devblogs.microsoft.com/aspnet/grpc-web-for-net-now-available/">announced this week</a> that gRPC-Web for .NET is officially available, after offering it in preview in January. Before discussing what problem it solves, let’s step back with a quick primer on gRPC for the uninitiated.</p>
+
+<p>gRPC is a high-performance Remote Procedure Call (RPC) framework, that is language-agnostic to boot (see <a href="https://grpc.io/">the gRPC site</a>.) If this concept is new to you, you are probably wondering one of two things (or both): (1) how does this compare to HTTP APIs, and (2) how is this different than WCF, which I have previously associated with RPC calls?</p>
+
+<h3 id="how-is-grpc-different-than-http-apis">How is gRPC different than HTTP APIs?</h3>
+
+<p>Your typical workflow of retrieving data over the wire likely involves HTTP APIs, such as REST, with either JSON or XML. Here’s a rundown of some key differences:</p>
+
+<ul>
+  <li>REST APIs offer optional schema/contract support using OpenAPI/Swagger, while it is required in gRPC using a <em>.proto</em> definition. This file defines the contact of your gRPC services and messages. You’ve likely noticed that REST is open to a lot of … interpretation, and a contract model is a huge benefit.</li>
+  <li>While existing API models use regular HTTP, gRPC is designed for HTTP/2 and the performance benefits it provides, such as compression and multiplexing. While HTTP APIs can use HTTP/2, it is not designed for it by default like gRPC is.</li>
+  <li>gRPC offers bi-directional streaming, while HTTP APIs only offer client or server streaming.</li>
+  <li>gRPC offers first-class code generation support, by sharing the <em>.proto</em> file between client and server implementations, while HTTP APIs require additional tooling and OpenAPI support.</li>
+</ul>
+
+<h3 id="how-is-grpc-different-than-wcf">How is gRPC different than WCF?</h3>
+
+<p>So, to answer the second question, how is this different than your experience with WCF? The main use case for RPC is coding with coordination between the client and the server with the idea of a single platform without a networking dependency.</p>
+
+<p>With these benefits, you can see gRPC coming in handy for microservices in need of efficiency gains and/or point-to-point real-time requirements. Where gRPC shines over WCF - in addition to what I outlined above - is not requiring the dated SOAP protocol, no .NET language dependency, and the Protobuf serialization model (an extremely efficient binary message format).</p>
+
+<h3 id="grpc-web-for-net-resolving-browser-support-issue">gRPC-Web for .NET: resolving browser support issue</h3>
+
+<p>Of course, gRPC doesn’t come without weaknesses. Human readability is an issue, as gRPC messages are encoded by default. But the real limitation is the limited browser support, if at all. The HTTP/2 support is awesome, but there isn’t a browser today that can control requests over the Web for gRPC clients. Browsers do not require HTTP/2 and aren’t mature enough to support it yet. This opens up a need to tooling that provides <em>some</em> gRPC browser support.</p>
+
+<p>This is the need that gRPC-Web for .NET fills. gRPC-Web provides a JavaScript client that all modern browsers support, and a server proxy. The client, in turn, calls the proxy and the proxy forwards on the gRPC requests - allowing you to prevent hacking some nginx magic.</p>
+
+<p>Your browser needs are likely high these days, with SPAs and Blazor, so this provides a lot of benefits. Try it out by <a href="https://devblogs.microsoft.com/aspnet/grpc-web-for-net-now-available/">checking out the announcement</a> and going through the <a href="https://docs.microsoft.com/aspnet/core/grpc/browser?view=aspnetcore-3.1">documentation</a>, and a <a href="https://github.com/grpc/grpc-dotnet/tree/master/examples#browser">sample app</a>.</p>
+
+<h3 id="play-with-c-9-today">Play with C# 9 today</h3>
+
+<p>I <a href="https://daveabrock.com/2020/06/18/reduce-mental-energy-with-c-sharp">played around with C# 9 a little bit this week</a>. C# 9 is slated for release with .NET 5 in November 2020. Lucky for the community, it’s a lot easier to play with the preview bits. You can <a href="https://twitter.com/linqpad/status/1273191238087225345">now use the LinqPad tool</a>! Just enable a checkbox in your settings, and you’re good to go. You don’t even need to install anything. Give it a shot and let me know what you think.</p>
+
+<p>My main takeaway is: things are getting a lot more functional and immutable.</p>
+
+<h3 id="checking-in-with-the-net-foundation">Checking in with the .NET Foundation</h3>
+
+<p>I don’t think I’m going out on a limb by saying Microsoft is going through a rough patch with the OSS community right now. The progress in Microsoft embracing OSS in the last decade, and their reputation, took a hard hit with the issues surrounding AppGet - even the biggest Microsoft fans would probably admit the communication and openness was severely lacking, and a weekend blog post <a href="https://devblogs.microsoft.com/commandline/winget-install-learning/">skirting around things</a> didn’t seem to help. It’s triggered several community responses <a href="https://twitter.com/hhariri/status/1267066538504445952">like this</a>. For those of us in the community who have backed Microsoft’s efforts, it’s a little sad.</p>
+
+<p>This seems to have placed renewed focus on the .NET Foundation, showcased as <em>an independent, non-profit organization established to support an innovative, commercially friendly, open-source ecosystem around the .NET platform</em>. A big benefit here is community outreach, and, as Microsoft being a corporation due to shareholders, they obviously have some interest there. With board elections coming up, it’s definitely high time to make an impact (with the caveats/analysis <a href="https://seankilleen.com/2020/06/thoughts-on-the-net-foundations-revised-election-process/">written here</a>).</p>
+
+<p>While community folks are encouraged to participate, I’m also hoping this is Microsoft’s opportunity to become more open, honest, and communicative with the developer community.</p>
+
+<h2 id="community-roundup">Community roundup</h2>
+
+<p>We had a light week this week, but still have some good stuff below from the community.</p>
+
+<h3 id="from-microsoft">From Microsoft</h3>
+
+<ul>
+  <li>Leslie Richardson continues <a href="https://devblogs.microsoft.com/visualstudio/debugging-async-code-parallel-stacks-for-tasks/">debugging async code with parallel stacks for tasks</a>.</li>
+  <li>gRPC-Web for .NET <a href="https://devblogs.microsoft.com/aspnet/grpc-web-for-net-now-available/">is now officially released</a>.</li>
+  <li>Some advice on <a href="https://azure.microsoft.com/blog/optimize-your-azure-costs-to-help-meet-your-financial-objectives/">how to optimize your Azure costs</a>.</li>
+  <li>A cool study of <a href="https://techcommunity.microsoft.com/t5/azure-global/machine-learning-on-azure-for-baseball-decision-analysis/ba-p/1474902">machine learning on Azure for baseball decision analysis</a>.</li>
+  <li>A walkthrough of <a href="https://devblogs.microsoft.com/xamarin/xamarin-forms-4-7/">what’s in Xamarin.Forms 4.7</a>.</li>
+</ul>
+
+<h3 id="blog-posts">Blog posts</h3>
+
+<ul>
+  <li>Rick Strahl discusses <a href="https://weblog.west-wind.com/posts/2020/Jun/12/Adding-Additional-Mime-Mappings-to-the-Static-File-Provider">adding additional MIME mappings to the static file provider</a>.</li>
+  <li>Shahed Chowdhuri walks through <a href="https://wakeupandcode.com/validation-in-asp-net-core-3-1/">ASP.NET Core 3.1 validation</a> and <a href="https://wakeupandcode.com/worker-service-in-net-core-3-1/">the Worker Service</a>.</li>
+  <li>Sam Basu talks about <a href="https://www.telerik.com/blogs/7-things-to-enjoy-maui-and-dotnet-maui">7 things to enjoy in MAUI</a>.</li>
+  <li>Anthony Giretti <a href="https://anthonygiretti.com/2020/06/16/introducing-c-9-init-only-properties/">introduces C# 9 init-only properties</a> and <a href="https://anthonygiretti.com/2020/06/17/introducing-c-9-records/">records</a>.</li>
+  <li>Andrew Lock adds <a href="https://andrewlock.net/adding-host-filtering-to-kestrel-in-aspnetcore/">host filtering to Kestrel in ASP.NET Core</a>.</li>
+  <li>Dave Brock <a href="https://daveabrock.com/2020/06/17/use-feature-flags-azure-app-config">talks about feature flags with Azure App Configuration</a> and <a href="https://daveabrock.com/2020/06/18/reduce-mental-energy-with-c-sharp">tours C# 9</a>.</li>
+  <li>Andy Leonard <a href="https://andyleonard.blog/2020/06/an-introduction-to-azure-data-factory-rest-api/">introduces the Azure Data Factory REST API</a>.</li>
+  <li>Daniel Hindrikes talks about <a href="https://danielhindrikes.se/index.php/2020/06/10/get-started-with-tinymvvm/">TinyMvvm and Xamarin.Forms</a>.</li>
+  <li>Gary Woodfine on <a href="https://garywoodfine.com/the-continuous-integration-check-in-dance/">the continuous integration check-in dance</a>.</li>
+  <li>Joseph Guadagno <a href="https://www.josephguadagno.net/2020/06/12/protecting-an-asp-net-core-api-with-microsoft-identity-platform">protects an ASP.NET Core Web API with Microsoft Identity Platform</a>.</li>
+  <li>Mark Heath discusses which database to use in <a href="https://markheath.net/post/azure-serverless-database">your Azure serverless app</a>.</li>
+  <li>Patrick Smacchia offers some <a href="https://blog.ndepend.com/10-visual-studio-solution-explorer-productivity-tips/">Visual Studio Solution Explorer productivity tips</a>.</li>
+</ul>
+
+<h3 id="podcastsvideos">Podcasts/videos</h3>
+
+<ul>
+  <li>At the Visual Studio toolbox, Scott Hunter talks .NET 5 in <a href="https://channel9.msdn.com/Shows/Visual-Studio-Toolbox/NET-with-Scott-Hunter-Part-1">two</a> <a href="https://channel9.msdn.com/Shows/Visual-Studio-Toolbox/NET-with-Scott-Hunter-Part-2">parts</a>, and the EF Core <a href="https://channel9.msdn.com/Shows/Visual-Studio-Toolbox/Entity-Framework-Core-In-Depth-Part-3">in-depth series continues</a>.</li>
+  <li>ON.NET talks about <a href="https://channel9.msdn.com/Shows/On-NET/ASPNET-Core-Series-Tracing">tracing</a> and <a href="https://channel9.msdn.com/Shows/On-NET/ASPNET-Core-Series-Performance-Testing-Techniques">performance testing techniques</a>.</li>
+  <li>The Complete Developer Podcast talks about <a href="https://completedeveloperpodcast.com/episode-255/">REST anti-patterns</a>.</li>
+  <li>The ASP.NET community standup discusses <a href="https://www.youtube.com/watch?v=QIDxGbSJhBE&amp;t=4s">performance infrastructure</a>.</li>
+  <li>This week, <a href="https://www.youtube.com/watch?v=Ot8PTydQi2k">two</a> <a href="https://www.youtube.com/watch?v=t-X09mGPvNM">different</a> GitHub quick reviews.</li>
+  <li>The Xamarin Show talks <a href="https://channel9.msdn.com/Shows/XamarinShow/Cross-platform-Images-Simplified-with-ResizetizerNT--The-Xamarin-Show">Resizetizer.NT for cross-platform images</a>.</li>
+  <li>All of this week’s Blazor 2020 sessions <a href="https://www.youtube.com/watch?v=XoizucRjxgU&amp;feature=youtu.be">are on YouTube</a>.</li>
+  <li>The Azure Functions team <a href="https://www.youtube.com/watch?v=8jzvH-iqcEo">caught up on things</a>.</li>
+</ul>
+
+<h2 id="new-subscribers-and-feedback">New subscribers and feedback</h2>
+
+<p>Has this email been forwarded to you? Welcome! I’d love for you <a href="https://www.dotnetstacks.com">to subscribe</a> and join the community. I promise to guard your email address with my life.</p>
+
+<p>I would love to hear any feedback you have for The .NET Stacks! My goal is to make this the one-stop shop for weekly updates on developing in the .NET ecosystem, so I look forward to any feedback you can provide. You can directly reply to this email, or <a href="https://www.dotnetstacks.com">talk to me on Twitter as well</a>. See you next week!</p>
+:ET

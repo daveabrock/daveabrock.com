@@ -1,0 +1,136 @@
+<p>A couple of weeks ago, I needed to find a way to better manage new functionality for a feature that was not ready yet (it broke stuff). We didn’t know exactly when the feature would be shipped, but we also didn’t want to deal with branch and merging headaches when the moment came.</p>
+
+<p>My first thought: this was a perfect candidate for <a href="https://www.martinfowler.com/articles/feature-toggles.html">feature flags</a> (or feature toggles). This allows you to merge code into a production branch, but only enable when ready. Instead of waiting for developers to be ready, you’re waiting for the end user to be ready.</p>
+
+<p>Instead of writing this logic and having to deal with the corner case headaches, I knew Microsoft <a href="https://github.com/microsoft/FeatureManagement-Dotnet">shipped</a> a <code class="language-plaintext highlighter-rouge">Microsoft.FeatureManagement</code> library.</p>
+
+<p>Unfortunately, that was all I knew and took this as a great opportunity to dig deeper. I learned a ton and will be dividing my new-found knowledge into four blog posts over the next several weeks.</p>
+
+<p>I’ll be writing a few posts on this topic:</p>
+
+<ul>
+  <li>Part 1, this post: Introducing the <code class="language-plaintext highlighter-rouge">Microsoft.FeatureManagement</code> library</li>
+  <li>Part 2: <a href="https://daveabrock.com/2020/05/30/introducing-feature-management-aspnetcore">Use Microsoft.FeatureManagement.AspNetCore to filter actions and HTML</a></li>
+  <li>Part 3: <a href="https://daveabrock.com/2020/06/07/custom-filters-in-core-flags">Implement custom filters in your ASP.NET Core feature flags</a></li>
+  <li>Part 4: <a href="https://daveabrock.com/2020/06/17/use-feature-flags-azure-app-config">Manage feature flags with Azure App Configuration</a></li>
+</ul>
+
+<h1 id="create-sample-application-and-add-nuget-packages">Create sample application and add NuGet packages</h1>
+
+<p>For this post, I’ll be using an ASP.NET Core Web Application with the traditional <code class="language-plaintext highlighter-rouge">Model-View-Controller</code> scaffolding. If you want to code along with me, make sure to create a new project. You can do this from the Visual Studio UI, or if VS Code is your style, the <code class="language-plaintext highlighter-rouge">dotnet</code> CLI by executing <code class="language-plaintext highlighter-rouge">dotnet new mvc</code>.
+Once you create your project, you’ll need to install <code class="language-plaintext highlighter-rouge">Microsoft.FeatureManagement</code>. You can do this in one of two ways:</p>
+
+<ul>
+  <li>From the NuGet Package Manager (easiest way is to right-click your solution in Visual Studio, then clicking <strong>Manage NuGet Packages</strong>)</li>
+  <li>From the <code class="language-plaintext highlighter-rouge">dotnet</code> CLI, you can execute the <code class="language-plaintext highlighter-rouge">dotnet add package Microsoft.FeatureManagement</code> command</li>
+</ul>
+
+<p>(While we are using an ASP.NET Core application, the library depends on .NET Standard 2.0—so even non-.NET Core applications can benefit.)</p>
+
+<p>Once the package is installed, update the dependency injection in <code class="language-plaintext highlighter-rouge">Startup.cs</code> to the following:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">Microsoft.FeatureManagement</span><span class="p">;</span>
+<span class="k">public</span> <span class="k">void</span> <span class="nf">ConfigureServices</span><span class="p">(</span><span class="n">IServiceCollection</span> <span class="n">services</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">services</span><span class="p">.</span><span class="nf">AddControllersWithViews</span><span class="p">();</span>
+    <span class="n">services</span><span class="p">.</span><span class="nf">AddFeatureManagement</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>You’re now ready to get this party started!</p>
+
+<h1 id="a-simple-example">A simple example</h1>
+
+<p>To get the gist of feature flags, we can just update the default message for the app that ships with the default ASP.NET Core scaffolding. Out of the box, the message says, <code class="language-plaintext highlighter-rouge">Welcome</code>. Let’s change it so that the message says <code class="language-plaintext highlighter-rouge">Welcome to Feature Flags</code> when the functionality is enabled.
+The <code class="language-plaintext highlighter-rouge">Microsoft.FeatureManagement</code> library will check your <code class="language-plaintext highlighter-rouge">appsettings.json</code> file for its configuration. By default, it will look for a <code class="language-plaintext highlighter-rouge">FeatureManagement</code> section. Let’s add an entry now.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"Logging"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"LogLevel"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"Default"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Information"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"Microsoft"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Warning"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"Microsoft.Hosting.Lifetime"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Information"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"FeatureManagement"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"WelcomeText"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"AllowedHosts"</span><span class="p">:</span><span class="w"> </span><span class="s2">"*"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>In your <code class="language-plaintext highlighter-rouge">Models</code> folder, create an <code class="language-plaintext highlighter-rouge">IndexViewModel.cs</code> file and include the <code class="language-plaintext highlighter-rouge">Message</code> property.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">IndexViewModel</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Message</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Then, in <code class="language-plaintext highlighter-rouge">Views/Home/Index.cshtml</code>, update the file to this:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@model IndexViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+<span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"text-center"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;h1</span> <span class="na">class=</span><span class="s">"display-4"</span><span class="nt">&gt;</span>@Model.Message<span class="nt">&lt;/h1&gt;</span>
+    <span class="nt">&lt;p&gt;</span>Learn about <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">"https://docs.microsoft.com/aspnet/core"</span><span class="nt">&gt;</span>building Web apps with ASP.NET Core<span class="nt">&lt;/a&gt;</span>.<span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</code></pre></div></div>
+
+<p>Here, we are including the model we created, and rendering its <code class="language-plaintext highlighter-rouge">Message</code> property. We will soon introduce logic to populate the message with a certain value, whether feature flags are enabled in our application.
+Next, let’s open up <code class="language-plaintext highlighter-rouge">HomeController.cs</code> and implement the <code class="language-plaintext highlighter-rouge">IFeatureManager</code> service by injecting it into the constructor.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">HomeController</span> <span class="p">:</span> <span class="n">Controller</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IFeatureManager</span> <span class="n">_featureManager</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nf">HomeController</span><span class="p">(</span><span class="n">IFeatureManager</span> <span class="n">featureManager</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">_featureManager</span> <span class="p">=</span> <span class="n">featureManager</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">// stuff we'll include soon</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">IFeatureManager</code> interface looks like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">interface</span> <span class="nc">IFeatureManager</span>
+<span class="p">{</span>
+    <span class="n">IAsyncEnumerable</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;</span> <span class="nf">GetFeatureNamesAsync</span><span class="p">();</span>
+    <span class="n">Task</span><span class="p">&lt;</span><span class="kt">bool</span><span class="p">&gt;</span> <span class="nf">IsEnabledAsync</span><span class="p">(</span><span class="kt">string</span> <span class="n">feature</span><span class="p">);</span>
+    <span class="n">Task</span><span class="p">&lt;</span><span class="kt">bool</span><span class="p">&gt;</span> <span class="n">IsEnabledAsync</span><span class="p">&lt;</span><span class="n">TContext</span><span class="p">&gt;(</span><span class="kt">string</span> <span class="n">feature</span><span class="p">,</span> <span class="n">TContext</span> <span class="n">context</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>We’ll use <code class="language-plaintext highlighter-rouge">IsEnabledAsync</code> to check for the feature we specified in <code class="language-plaintext highlighter-rouge">appsettings.json</code>. We could pass the string directly, but a better way would be to add a class to store these strings. To do that, create a file in the root of the project called <code class="language-plaintext highlighter-rouge">FeatureFlags.cs</code>.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">FeatureFlags</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">const</span> <span class="kt">string</span> <span class="n">WelcomeMessage</span> <span class="p">=</span> <span class="s">"Welcome Message"</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>There, I feel better. Back to <code class="language-plaintext highlighter-rouge">HomeController.cs</code>, change the <code class="language-plaintext highlighter-rouge">Index</code> action method to the following:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">async</span> <span class="n">Task</span><span class="p">&lt;</span><span class="n">IActionResult</span><span class="p">&gt;</span> <span class="nf">Index</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="kt">var</span> <span class="n">indexViewModel</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">IndexViewModel</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">Message</span> <span class="p">=</span> <span class="k">await</span> <span class="n">_featureManager</span><span class="p">.</span><span class="nf">IsEnabledAsync</span><span class="p">(</span><span class="s">"WelcomeMessage"</span><span class="p">)</span>
+                  <span class="p">?</span> <span class="s">"Welcome to the feature flag"</span>
+                  <span class="p">:</span> <span class="s">"Welcome"</span>
+    <span class="p">};</span>
+    <span class="k">return</span> <span class="nf">View</span><span class="p">(</span><span class="n">indexViewModel</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>In the <code class="language-plaintext highlighter-rouge">Index</code> view action, we are calling <code class="language-plaintext highlighter-rouge">IsEnabledAsync</code> and passing in our flag’s name from the <code class="language-plaintext highlighter-rouge">appsettings.json</code> file. If that value is <code class="language-plaintext highlighter-rouge">true</code> the <code class="language-plaintext highlighter-rouge">Message</code> will display <code class="language-plaintext highlighter-rouge">Welcome to the feature flag</code> and if not, <code class="language-plaintext highlighter-rouge">Welcome</code>. The complexity you deal with every day, right?
+If you run your app, you just see the standard welcome message, because your feature flag is set to <code class="language-plaintext highlighter-rouge">false</code> in your configuration.
+<img src="http://localhost:4001/images/feature-flag-welcome-before.PNG" alt="Before turning on flag" /></p>
+
+<p>Now, if you go to your <code class="language-plaintext highlighter-rouge">appsettings.json</code> file and set <code class="language-plaintext highlighter-rouge">WelcomeText</code> to true and restart the <em>page</em>, you’ll see the feature flag in action! (You only have to restart the page, and not the app, as the configuration provider handles the change without an app restart!)</p>
+
+<p><img src="http://localhost:4001/images/feature-flag-welcome-after.PNG" alt="After turning on flag" /></p>
+
+<p>When thinking in terms of deployment, you can set release variables and whatnot to better manage when to turn these on. We will discuss these when we talk about integrating with Azure.</p>

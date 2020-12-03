@@ -1,0 +1,171 @@
+<p>We’ve been quite busy, my friends. In this C# 9 deep dive series, we’ve looked at <a href="https://daveabrock.com/2020/06/29/c-sharp-9-deep-dive-inits">init-only features</a>, <a href="https://daveabrock.com/2020/07/06/c-sharp-9-deep-dive-records">records</a>, <a href="https://daveabrock.com/2020/07/06/c-sharp-9-pattern-matching">pattern matching</a>, and then <a href="https://daveabrock.com/2020/07/09/c-sharp-9-top-level-programs">top-level programs</a>. To complete this series (before showing off everything in a single app), we’ll discuss the last two items featured in <a href="https://devblogs.microsoft.com/dotnet/welcome-to-c-9-0/#improved-target-typing">the Build 2020 announcement</a>: target typing and covariant returns. These are not related, but I’ve decided to bundle these in a single blog post.</p>
+
+<p>This is the fifth post in a six-post series on C# 9 features in-depth:</p>
+
+<ul>
+  <li>Post 1 - <a href="https://daveabrock.com/2020/06/29/c-sharp-9-deep-dive-inits">Init-only features</a></li>
+  <li>Post 2 - <a href="https://daveabrock.com/2020/07/06/c-sharp-9-deep-dive-records">Records</a></li>
+  <li>Post 3 - <a href="https://daveabrock.com/2020/07/06/c-sharp-9-pattern-matching">Pattern matching</a></li>
+  <li>Post 4 - <a href="https://daveabrock.com/2020/07/09/c-sharp-9-top-level-programs">Top-level programs</a></li>
+  <li>Post 5 (<em>this post</em>) - Target typing and covariant returns</li>
+  <li>Post 6 - <a href="https://daveabrock.com/2020/07/21/c-sharp-9-scavenger-hunt">Putting it all together with a scavenger hunt</a></li>
+</ul>
+
+<p>This post covers the following topics.</p>
+
+<ul>
+  <li><a href="#improved-target-typing">Improved target typing</a>
+    <ul>
+      <li><a href="#target-typed-new-expressions">Target-typed <code class="language-plaintext highlighter-rouge">new</code> expressions</a></li>
+      <li><a href="#target-typing-with-conditional-operators">Target typing with conditional operators</a></li>
+    </ul>
+  </li>
+  <li><a href="#covariant-returns">Covariant returns</a></li>
+  <li><a href="#wrapping-up">Wrapping up</a></li>
+</ul>
+
+<h1 id="improved-target-typing">Improved target typing</h1>
+
+<p>C# 9 includes improved support for target typing. What is target typing, you say? It’s what C# uses, normally in expressions, for getting a type from its context. A common example would be the use of the <code class="language-plaintext highlighter-rouge">var</code> keyword. The type can be inferred from its context, without you needing to explicitly declare it.</p>
+
+<p>The improved target typing in C# 9 comes in two flavors: <code class="language-plaintext highlighter-rouge">new</code> expressions and target-typing <code class="language-plaintext highlighter-rouge">??</code> and <code class="language-plaintext highlighter-rouge">?:</code>.</p>
+
+<h2 id="target-typed-new-expressions">Target-typed <code class="language-plaintext highlighter-rouge">new</code> expressions</h2>
+
+<p>With target-typed <code class="language-plaintext highlighter-rouge">new</code> expressions, you can leave out the type you instantiate. At first glance, this appears to only work with direct instantiation and not coupled with <code class="language-plaintext highlighter-rouge">var</code> or constructs like ternary statements.</p>
+
+<p>Let’s take a condensed <code class="language-plaintext highlighter-rouge">Person</code> class from previous posts:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">Person</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="kt">string</span> <span class="n">_firstName</span><span class="p">;</span>
+    <span class="k">private</span> <span class="kt">string</span> <span class="n">_lastName</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">Person</span><span class="p">(</span><span class="kt">string</span> <span class="n">firstName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">lastName</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">_firstName</span> <span class="p">=</span> <span class="n">firstName</span><span class="p">;</span>
+        <span class="n">_lastName</span> <span class="p">=</span> <span class="n">lastName</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>To instantiate a new <code class="language-plaintext highlighter-rouge">Person</code>, you can omit the type on the right-hand side of the equality statement.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Program</span>
+<span class="p">{</span>
+    <span class="k">static</span> <span class="k">void</span> <span class="nf">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">Person</span> <span class="n">person</span> <span class="p">=</span> <span class="k">new</span> <span class="p">(</span><span class="s">"Tony"</span><span class="p">,</span> <span class="s">"Stark"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>A big advantage to target-typed <code class="language-plaintext highlighter-rouge">new</code> expressions is when you are initializing new collections. If I wanted to create a list of multiple <code class="language-plaintext highlighter-rouge">Person</code> objects, I wouldn’t need to worry about including the type every time I create a new object.</p>
+
+<p>With the same <code class="language-plaintext highlighter-rouge">Person</code> class in place, you can change the <code class="language-plaintext highlighter-rouge">Main</code> function to do this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Program</span>
+<span class="p">{</span>
+    <span class="k">static</span> <span class="k">void</span> <span class="nf">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">personList</span> <span class="p">=</span> <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">Person</span><span class="p">&gt;</span>
+        <span class="p">{</span>
+            <span class="k">new</span> <span class="p">(</span><span class="s">"Tony"</span><span class="p">,</span> <span class="s">"Stark"</span><span class="p">),</span>
+            <span class="k">new</span> <span class="p">(</span><span class="s">"Howard"</span><span class="p">,</span> <span class="s">"Stark"</span><span class="p">),</span>
+            <span class="k">new</span> <span class="p">(</span><span class="s">"Clint"</span><span class="p">,</span> <span class="s">"Barton"</span><span class="p">),</span>
+            <span class="k">new</span> <span class="p">(</span><span class="s">"Captain"</span><span class="p">,</span> <span class="s">"America"</span><span class="p">)</span>
+            <span class="c1">// ...</span>
+        <span class="p">};</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="target-typing-with-conditional-operators">Target typing with conditional operators</h2>
+
+<p>Speaking of ternary statements, we can now infer types by using the conditional operators. This works well with <code class="language-plaintext highlighter-rouge">??</code>, the <a href="https://docs.microsoft.com/dotnet/csharp/language-reference/operators/null-coalescing-operator">null-coalescing operator</a>. The <code class="language-plaintext highlighter-rouge">??</code> operator returns the value of what’s on the left if it is <em>not null</em>. Otherwise, the right-hand side is evaluated and returned.</p>
+
+<p>So, imagine we have some objects that shared the same base class, like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">Person</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="kt">string</span> <span class="n">_firstName</span><span class="p">;</span>
+    <span class="k">private</span> <span class="kt">string</span> <span class="n">_lastName</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">Person</span><span class="p">(</span><span class="kt">string</span> <span class="n">firstName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">lastName</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">_firstName</span> <span class="p">=</span> <span class="n">firstName</span><span class="p">;</span>
+        <span class="n">_lastName</span> <span class="p">=</span> <span class="n">lastName</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">Student</span> <span class="p">:</span> <span class="n">Person</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="kt">string</span> <span class="n">_favoriteSubject</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">Student</span><span class="p">(</span><span class="kt">string</span> <span class="n">firstName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">lastName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">favoriteSubject</span><span class="p">)</span> <span class="p">:</span> <span class="k">base</span><span class="p">(</span><span class="n">firstName</span><span class="p">,</span> <span class="n">lastName</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">_favoriteSubject</span> <span class="p">=</span> <span class="n">favoriteSubject</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">Superhero</span> <span class="p">:</span> <span class="n">Person</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="kt">string</span> <span class="n">_maxSpeed</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">Superhero</span><span class="p">(</span><span class="kt">string</span> <span class="n">firstName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">lastName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">maxSpeed</span><span class="p">)</span> <span class="p">:</span> <span class="k">base</span><span class="p">(</span><span class="n">firstName</span><span class="p">,</span> <span class="n">lastName</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">_maxSpeed</span> <span class="p">=</span> <span class="n">maxSpeed</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>While the code below does not get past the compiler in C# 8, it will in C# 9 because there’s a target (base) type that is convert-able:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="k">void</span> <span class="nf">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">Student</span> <span class="n">student</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Student</span> <span class="p">(</span><span class="s">"Dave"</span><span class="p">,</span> <span class="s">"Brock"</span><span class="p">,</span> <span class="s">"Programming"</span><span class="p">);</span>
+    <span class="n">Superhero</span> <span class="n">hero</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Superhero</span> <span class="p">(</span><span class="s">"Tony"</span><span class="p">,</span> <span class="s">"Stark"</span><span class="p">,</span> <span class="s">"10000"</span><span class="p">);</span>
+
+    <span class="n">Person</span> <span class="n">anotherPerson</span> <span class="p">=</span> <span class="n">student</span> <span class="p">??</span> <span class="n">hero</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="covariant-returns">Covariant returns</h1>
+
+<p>It has been a long time, coming—almost two decades of begging and pleading, actually. With C# 9, it looks like return type covariance is finally coming to the language. You can now say bye-bye to implementing some interface workarounds. OK, so just saying <em>return type covariance</em> makes me sound super smart, but what is it?</p>
+
+<p>With return type covariance, you can override a base class method (that has a less-specific type) with one that returns a more specific type.</p>
+
+<p>Before C# 9, you would have to return the same type in a situation like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">virtual</span> <span class="n">Person</span> <span class="nf">GetPerson</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// this is the parent (or base) class</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">Person</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">override</span> <span class="n">Person</span> <span class="nf">GetPerson</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// you can return the child class, but still return a Person</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">Student</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now, you can return the more specific type in C# 9.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">virtual</span> <span class="n">Person</span> <span class="nf">GetPerson</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// this is the parent (or base) class</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">Person</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">override</span> <span class="n">Student</span> <span class="nf">GetPerson</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// better!</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">Student</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="wrapping-up">Wrapping up</h1>
+
+<p>In this post, we discussed how C# 9 makes improvements with target types and covariant returns. We discussed target-typing <code class="language-plaintext highlighter-rouge">new</code> expressions and their benefits (especially when initializing collections). We also discussed target typing with conditional operators. Finally, we discussed the long-awaited return type covariance feature in C# 9.</p>

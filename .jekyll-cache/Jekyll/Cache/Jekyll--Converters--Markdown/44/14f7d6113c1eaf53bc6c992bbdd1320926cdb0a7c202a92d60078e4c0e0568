@@ -1,0 +1,39 @@
+I"�<p>Here’s a weekly Friday shout-out of articles, videos, and other content I found interesting.</p>
+
+<h2 id="development-and-testing">Development and testing</h2>
+
+<ul>
+  <li><a href="https://wakeupandcode.com/production-tips-for-asp-net-core-3-1-web-apps/">Production Tips for ASP.NET Core 3.1 Web Apps</a> (Shahed Chowdhuri)</li>
+  <li><a href="https://css-tricks.com/can-javascript-detect-the-browsers-zoom-level/">Can JavaScript Detect the Browser’s Zoom Level?</a> (Chris Coyier)</li>
+  <li><a href="https://www.carlrippon.com/typescript-assertion-signatures/">TypeScript Assertion Signatures</a> (Carl Rippon)</li>
+  <li><a href="https://developer.okta.com/blog/2020/04/17/most-exciting-promise-dotnet-5">The Most Exciting Promise of .NET 5</a> (Heather Downing)</li>
+  <li><a href="https://jdan.github.io/98.css/">98.css - a design system for building faithful recreations of old UIs</a> (Jordan Scales)</li>
+  <li><a href="https://michaelscodingspot.com/memory-profilers-principles/">Demystifying Memory Profilers in C# .NET Part 1: The Principles</a> (Michael Shpilt)</li>
+  <li><a href="https://devblogs.microsoft.com/visualstudio/creating-and-packaging-net-standard-library/">Creating and Packaging a .NET Standard library</a> (Sayed-Ibrahim-Hashimi)</li>
+</ul>
+
+<h2 id="youtube">YouTube</h2>
+
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=B-PJus9AaII">Deploying to Azure with GitHub Actions</a> (Azure DevOps)</li>
+  <li><a href="https://www.youtube.com/watch?v=-9unw5kfx_o">Codeless application monitoring with Azure Monitor</a> (dotNET)</li>
+</ul>
+
+<h2 id="developer-productivity">Developer productivity</h2>
+
+<ul>
+  <li><a href="https://martinfowler.com/articles/branching-patterns.html">Patterns for Managing Source Code Branches</a> (Martin Fowler)</li>
+  <li><a href="https://codewithoutrules.com/2020/04/20/productivity-skills/">Doing more with less time: critical skills for productive programmers</a> (Itamar Turner-Trauring)</li>
+  <li><a href="https://opensource.com/article/20/4/git-merge-conflict">How to resolve a git merge conflict</a> (Brian Breniser)</li>
+</ul>
+
+<h2 id="general-technology-topics">General technology topics</h2>
+
+<ul>
+  <li><a href="https://blog.danslimmon.com/2019/08/02/stop-apologizing-for-bugs/">Stop Apologizing for Bugs</a> (Dan Slimmon)</li>
+  <li><a href="https://thenewstack.io/the-disconnect-between-developers-and-application-security/">The Disconnect Between Developers and Application Security</a> (Mike Melanson)</li>
+  <li><a href="https://www.hanselman.com/blog/QuarantineWorkIsNotRemoteWork.aspx">Quarantine work is not remote work</a> (Scott Hanselman)</li>
+  <li><a href="https://www.nytimes.com/2020/04/19/technology/facebook-app-gaming.html">Facebook to Introduce an App for Gaming</a> (New York Times)</li>
+  <li><a href="https://www.nytimes.com/2020/04/20/technology/zoom-security-dropbox-hackers.html">Zoom’s Security Woes Were No Secret to Business Partners Like Dropbox</a> (New York Times)</li>
+</ul>
+:ET

@@ -1,0 +1,48 @@
+I"#<p>I was writing some vanilla JavaScript this weekend - it has been quite awhile since I did so. As I’ve been writing mostly C# code lately, what always gets me with JavaScript isn’t its pain points or subtle nuances. It’s the different behavior from compiled languages I’m often used to, like C# or Java. No matter how often I work in JS, as long as I’m committed to being a polyglot, it’ll trip me up to the point that it’s just a little bit of an annoyance.</p>
+
+<p>Take this seemingly simple JavaScript code. What will be output to the browser console?</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">myString</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">I am outside the function</span><span class="dl">'</span><span class="p">;</span>
+<span class="kd">function</span> <span class="nx">myFunction</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">myString</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">myString</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">I am inside the function</span><span class="dl">'</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="nx">myFunction</span><span class="p">();</span>
+</code></pre></div></div>
+
+<p>Was your guess <code class="language-plaintext highlighter-rouge">I'm outside the function</code>? Or was it <code class="language-plaintext highlighter-rouge">I'm inside the function</code>? I hate to let you down, but in either case you would be incorrect.</p>
+
+<p>In your favorite browser’s developer tools, the console will log <code class="language-plaintext highlighter-rouge">undefined</code>. But why?</p>
+
+<p>In JavaScript, functions create brand new scopes. If we condense the example a little:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">myFunction</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// new scope, the variable is inaccessible outside the function</span>
+    <span class="kd">var</span> <span class="nx">myString</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">I am inside the function</span><span class="dl">'</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nx">myFunction</span><span class="p">();</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">myString</span><span class="p">);</span> <span class="c1">// undefined!</span>
+</code></pre></div></div>
+
+<p>Of course, if you’ve worked in JavaScript (or basically any programming language) you can’t expect to declare a variable without an assignment and expect to get anything back but <code class="language-plaintext highlighter-rouge">null</code> or, in JavaScript’s case, <code class="language-plaintext highlighter-rouge">undefined</code> when I do something like this:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">dave</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">dave</span><span class="p">);</span> <span class="c1">// will log undefined</span>
+</code></pre></div></div>
+
+<p>So, if we look at this again:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">myString</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">I am outside the function</span><span class="dl">'</span><span class="p">;</span>
+<span class="kd">function</span> <span class="nx">myFunction</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">myString</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">myString</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">I am inside the function</span><span class="dl">'</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="nx">myFunction</span><span class="p">();</span>
+</code></pre></div></div>
+
+<p>To take all we’ve learned, we need to be aware of how something called <a href="https://developer.mozilla.org/en-US/docs/Glossary/Hoisting">hoisting</a> works. For our purposes just know this: variable declarations in JS are always hoisted to the top of the current scope – variable assignments <strong>are not</strong>.</p>
+
+<p>So here, the declaration is hoisted to the top of the scope - or, in our case, the <code class="language-plaintext highlighter-rouge">myFunction()</code> function. So before the <code class="language-plaintext highlighter-rouge">console.log</code> statement in the function, you can basically envision a <code class="language-plaintext highlighter-rouge">var myString</code> in the first line of the function. And, of course, knowing this now it is clear to see why the logging statement will come back as <code class="language-plaintext highlighter-rouge">undefined</code>.</p>
+
+<p>Just remember this: <strong>always</strong> define your variables at the top of the <strong>current</strong> scope. Always.</p>
+:ET

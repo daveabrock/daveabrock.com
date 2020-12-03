@@ -1,0 +1,46 @@
+I"<p>I’ve been geeking out on a lot of Twitch streams lately. I think it’s a fantastic way to learn and engage with other folks. I find I’ll learn more by watching someone code in a natural environment and asking questions as you go. And with most streams getting archived, you can consume them as they fit your schedule.</p>
+
+<p>I keep track of a few, but knowing I was missing some folks I sent out a tweet:</p>
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">I would like to start a thread to discover AWESOME .NET Twitch streams. I currently enjoy <a href="https://twitter.com/LaylaCodesIt?ref_src=twsrc%5Etfw">@LaylaCodesIt</a>, <a href="https://twitter.com/dotnetdocsshow?ref_src=twsrc%5Etfw">@dotnetdocsshow</a>, <a href="https://twitter.com/jguadagno?ref_src=twsrc%5Etfw">@jguadagno</a>, and <a href="https://twitter.com/ljquintanilla?ref_src=twsrc%5Etfw">@ljquintanilla</a>. But I *know* I&#39;m missing so much great community work.<br /><br />Who else?!</p>&mdash; Dave Brock 💻 ☁️ (@daveabrock) <a href="https://twitter.com/daveabrock/status/1304792412678651906?ref_src=twsrc%5Etfw">September 12, 2020</a></blockquote>
+<script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>As a result of my responses, I thought I’d keep a collection of awesome .NET streams for everyone to reference. If I left out your favorite stream, it wasn’t intentional—please <a href="https://twitter.com/daveabrock/status/1304792412678651906">respond to the tweet</a> or leave a comment below to get added to the list. I just ask that you suggest streams that are somewhat active (every few months or so).</p>
+
+<h1 id="the-live-coders">The Live Coders</h1>
+
+<p>For a good first stop, hit up <a href="https://livecoders.dev/members">The Live Coders</a>, a group of tech streamers across all platforms (not just .NET). You can <a href="https://livecoders.dev/members">browse the members page</a> for folks tagged with .NET categories (or learn more about non-.NET tech).</p>
+
+<h1 id="general-net-topics">General .NET topics</h1>
+
+<ul>
+  <li><a href="https://www.twitch.tv/425Show">The 425 Show</a></li>
+  <li><a href="https://www.twitch.tv/alexslotte">Alex Slotte</a></li>
+  <li><a href="https://www.twitch.tv/brianlagunas">Brian Lagunas</a></li>
+  <li><a href="https://www.twitch.tv/copperbeardy">CopperBeardy</a></li>
+  <li><a href="https://www.twitch.tv/cldubya">Corey Weathers</a></li>
+  <li><a href="https://www.twitch.tv/bynaryshef">Douglas Starnes</a></li>
+  <li><a href="https://www.twitch.tv/edcharbeneau">Ed Charbeneau</a></li>
+  <li><a href="https://www.twitch.tv/gep13">Gary Ewan Park</a></li>
+  <li><a href="https://www.twitch.tv/csharpfritz">Jeff Fritz</a></li>
+  <li><a href="https://www.twitch.tv/jguadagno">Joe Guadagno</a></li>
+  <li><a href="https://www.twitch.tv/siliconorchid">Jim McG</a></li>
+  <li><a href="https://www.twitch.tv/1kevgriff">Kevin Griffin</a></li>
+  <li><a href="https://www.twitch.tv/laylacodesit">Layla Porter</a></li>
+  <li><a href="https://www.twitch.tv/lqdev1">Luis Quintanilla</a></li>
+  <li><a href="https://www.twitch.tv/codingwithluce">Luce Carter</a></li>
+  <li><a href="https://www.twitch.tv/coderushed">Mark Miller</a></li>
+  <li><a href="https://www.twitch.tv/m2devdotnet">Matt Millican</a></li>
+  <li><a href="https://www.twitch.tv/baldbeardedbuilder">Michael Jolley</a></li>
+  <li><a href="https://www.twitch.tv/ardalis">Steve Smith</a></li>
+</ul>
+
+<h1 id="microsoft">Microsoft</h1>
+
+<ul>
+  <li><a href="https://www.twitch.tv/thedotnetdocs">The .NET Docs</a></li>
+  <li><a href="https://dotnet.microsoft.com/platform/community/standup">.NET Community Standups</a></li>
+  <li><a href="https://www.twitch.tv/visualstudio">Visual Studio Remote Office Hours</a></li>
+  <li><a href="https://www.twitch.tv/microsoftdeveloper">Microsoft Developer</a></li>
+</ul>
+:ET

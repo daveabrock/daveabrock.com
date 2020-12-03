@@ -1,0 +1,94 @@
+I"w)<p class="notice--success">This is an archive of my weekly (free!) newsletter, <em>The .NET Stacks</em>. Consider <a href="https://dotnetstacks.com">subscribing today</a> to get this content right away! Subscribers don’t have to wait a week to receive the content.</p>
+
+<p>In this week’s issue we will be talking about:</p>
+
+<ul>
+  <li>Native .NET feature flags</li>
+  <li>Working with Kubernetes clusters locally in Visual Studio</li>
+  <li>Community roundup</li>
+</ul>
+
+<h2 id="native-net-feature-flags">Native .NET feature flags</h2>
+
+<p>Have you implemented feature flags (or feature toggles) in your applications? They’re a great way to easily enable and disable system features and behaviors without changing code. They can generate complexity if not managed well, but the benefits are great when it comes to A/B testing, gradual rollouts, and managing long-living branches. Martin Fowler has a <a href="https://martinfowler.com/articles/feature-toggles.html">good language-agnostic overview on the topic</a>.</p>
+
+<p>Until somewhat recently, to get this capability in .NET you had to either roll your own solution or depend on an external library such as LaunchDarkly and Esquio. You can now use native Microsoft libraries to accomplish much of this functionality. Microsoft provides the Microsoft.FeatureManagement library (supported by .NET Standard 2.0, meaning compatibility with .NET Framework!) and Microsoft.FeatureManagement.AspNetCore. I’ve noticed a lot of folks in the community are writing about it (including <a href="https://daveabrock.com/2020/06/07/custom-filters-in-core-flags.html">yours truly</a>!), as it’s easy to use and has a pretty solid feature set. The external libraries still hold value with their advanced functionality and support but if you need something to accomplish most of what you need, all on top of ASP.NET configuration, you’ve got it</p>
+
+<p>The libraries are open-sourced, where you can see much of the benefits:</p>
+
+<ul>
+  <li>Pre-packaged feature filters, and the ability to write your own with the IFeatureManager interface</li>
+  <li>Easy service registration in ASP.NET Core middleware</li>
+  <li>Ability to gate features at the controller/action level with FeatureGate</li>
+  <li>Support for a <code class="language-plaintext highlighter-rouge">&lt;feature&gt;</code> tag helper to get away from the @if Razor syntax and to assist with conditional rendering</li>
+  <li>HttpContext support</li>
+  <li>Ability to execute flags if a set of flags are specified, and the ability to check for missing feature filters
+For details, check out <a href="https://docs.microsoft.com/azure/azure-app-configuration/quickstart-feature-flag-aspnet-core?tabs=core2x">the docs</a>.</li>
+</ul>
+
+<h2 id="new-visual-studio-feature-local-process-with-kubernetes">New Visual Studio feature: Local Process with Kubernetes</h2>
+
+<p>Microsoft rolled out a new preview of Visual Studio 2019 this week (<a href="https://devblogs.microsoft.com/visualstudio/visual-studio-2019-v16-7-preview-2/">16.7 Preview 2</a>, to be exact - if you aren’t aware, you can install these with regular Visual Studio side-by-side). It’s easy to gloss over another preview, but the VS team has introduced a new feature feature: <a href="https://devblogs.microsoft.com/visualstudio/introducing-local-process-with-kubernetes-for-visual-studio%E2%80%AF2019/">Local Process with Kubernetes</a>.</p>
+
+<p>Kubernetes, love it as we might, is Latin for “overly complicated.” (It’s true, you don’t need to Google it.) Even if you have a solid workflow down, it involves updating your source code, building a container image, and deploying to your cluster - and forcing you to manage Dockerfile and Kubernetes manifest files. If you have a lot of microservices, each with their own data stores, it’s a real, actual headache.</p>
+
+<p>Using Local Process with Kubernetes, you connect your machine to your Kubernetes cluster and don’t need to compile all your dependencies every single time. Environment variables, connection strings, and the like are inherited by the local microservice code. Under the covers, the feature redirects traffic between your connected cluster and your development machine.</p>
+
+<p>It looks promising. If you try it out, let me know how it goes (you can reply to this email, or the Twitter links are below).</p>
+
+<p>(You can also use this feature <a href="https://docs.microsoft.com/azure/dev-spaces/how-to/local-process-kubernetes-vs-code">in Visual Studio Code</a>.)</p>
+
+<h2 id="odds-and-ends">Odds and ends</h2>
+
+<p>Authentication and security is not easy, and a pain point for those with simple scenarios in ASP.NET Core. It is designed to be standard-based, but the learning curve is real. The <a href="https://twitter.com/HumanCompiler/status/1269042512997396480">community is listening</a>.</p>
+
+<p>–</p>
+
+<p>Need a Blazor fix? Register for <a href="https://blazorday.net/planning">Blazor Day on June 18</a>.</p>
+
+<h2 id="community-roundup">Community roundup</h2>
+
+<h3 id="from-microsoft">From Microsoft</h3>
+
+<ul>
+  <li>As mentioned above, Microsoft released <a href="https://devblogs.microsoft.com/visualstudio/visual-studio-2019-v16-7-preview-2/">Visual Studio v16.7 Preview 2</a>, and with it comes a new <a href="https://devblogs.microsoft.com/visualstudio/introducing-local-process-with-kubernetes-for-visual-studio%E2%80%AF2019/">Local Process with Kubernetes feature</a>.</li>
+  <li>Microsoft provides updates for <a href="https://devblogs.microsoft.com/cosmosdb/build-2020-recap-whats-new-in-azure-cosmos-dbs-api-for-mongodb/">Azure CosmosDB’s API for MongoDB</a>.</li>
+  <li>Andrew Clinick writes about the <a href="https://devblogs.microsoft.com/commandline/winget-install-learning/">WinGet/AppGet confusion</a>. However we got here, I think Microsoft can do better than a Saturday morning blog post that skirts around the concerns from the OSS community.</li>
+</ul>
+
+<h3 id="blog-posts">Blog posts</h3>
+
+<ul>
+  <li>Damien Bowden discusses <a href="https://damienbod.com/2020/05/29/login-and-use-asp-net-core-api-with-azure-ad-auth-and-user-access-tokens/">using an ASP.NET Core API with Azure Active Directory auth and user access token</a>.</li>
+  <li>A busy week for Telerik, as their folks write about <a href="https://www.telerik.com/blogs/what-blazor-needs-an-ecosystem">needing a Blazor ecosystem</a>, <a href="https://www.telerik.com/blogs/fiddler-for-xamarin-developers">Fiddler for Xamarin devs</a>, and <a href="https://www.telerik.com/blogs/test-in-production-with-fiddler">testing in production with Fiddler</a>.</li>
+  <li>A quick note about <a href="https://weblogs.asp.net/ricardoperes/dynamic-payloads-in-asp-net-core">dynamic payloads in ASP.NET Core</a>.</li>
+  <li>Andrew Lock walks through <a href="https://andrewlock.net/customising-aspnetcore-identity-without-editing-the-pagemodel/">customizing the ASP.NET Core default UI without editing PageModels</a>.</li>
+  <li>Jeremy Likness <a href="https://blog.jeremylikness.com/blog/dynamically-build-linq-expressions/">dynamically builds LINQ expressions</a>.</li>
+  <li>Derek Comartin <a href="https://codeopinion.com/configuring-errors-and-warnings-in-c/">configures errors and warnings in C#</a>.</li>
+  <li>Brady Gaster talks about downr 3.0, a Markdown-powered blogging engine - <a href="https://bradygaster.com/posts/introducing-downr-3">now updated for ASP.NET Core 3.1 and Blazor WebAssembly</a>.</li>
+  <li>Karthik Chintala <a href="https://coderethinked.com/how-does-asp-net-core-processes-a-request/">breaks down how ASP.NET Core processes a request</a>.</li>
+  <li>Ken Dale <a href="https://rimdev.io/default-system-text-json-settings-dont-roundtrip-serialize-deserialize-through-test-server/">noticed that System.Text.Json settings don’t roundtrip</a>.</li>
+  <li>Rikam Palkar <a href="https://www.c-sharpcorner.com/article/asynchronous-programming-with-async-await/">walks through an async/await example</a>.</li>
+  <li>Jason Gaylord talks about <a href="https://www.jasongaylord.com/blog/2020/06/04/dotnet-5-preview-4-and-visual-studio-2019">his experiences installing the latest .NET 5 bits</a> and Visual Studio 2019 previews and also <a href="https://www.jasongaylord.com/blog/2020/06/01/creating-your-first-azure-static-web-app">creating your first Azure Static Web App</a>.</li>
+  <li>Dominique St-Amand <a href="https://www.domstamand.com/live-notifications-from-an-azure-keyvault-to-your-slack/">discusses live notifications from Azure Key Vault to Slack</a>.</li>
+  <li>James McCaffrey <a href="https://visualstudiomagazine.com/articles/2020/06/03/clustering-non-numeric-data.aspx">clusters non-numeric data using C#</a>.</li>
+  <li>Over at the Stack Overflow blog, some <a href="https://stackoverflow.blog/2020/05/29/why-kubernetes-getting-so-popular/">insights on the popularity of Kubernetes</a>.</li>
+  <li>Jon P. Smith breaks down the <a href="https://www.thereformedprogrammer.net/ef-core-in-depth-what-happens-when-ef-core-reads-from-the-database/">anatomy of database reads in Entity Framework Core</a>.</li>
+</ul>
+
+<h3 id="podcastsvideos">Podcasts/videos</h3>
+
+<ul>
+  <li>.NET Rocks <a href="https://www.dotnetrocks.com/default.aspx?ShowNum=1690">talks testing Blazor apps</a>.</li>
+  <li>The Azure podcast <a href="http://azpodcast.azurewebsites.net/post/Episode-332-Azure-Edge-Zones">talks about Azure Edge Zones</a>.</li>
+  <li>Keith Beller discusses <a href="https://devblogs.microsoft.com/premier-developer/managing-cloud-ready-net-app-secrets-in-visual-studio/">managing cloud-ready .NET app secrets in Visual Studio</a>.</li>
+  <li>ON.NET talks about <a href="https://www.youtube.com/watch?v=HJ_cfB77454">SameSite cookie security</a>.</li>
+  <li>A stream of <a href="https://www.youtube.com/watch?v=VE3T-ckgZuI">GitHub Quick Reviews</a>, and <a href="https://www.youtube.com/watch?v=H3obznO9_uo">two</a> <a href="https://www.youtube.com/watch?v=P1w3Tc7Oyqk">more</a> .NET design reviews.</li>
+</ul>
+
+<h2 id="new-subscribers-and-feedback">New subscribers and feedback</h2>
+
+<p>Has this email been forwarded to you? Welcome! I’d love for you <a href="https://www.dotnetstacks.com">to subscribe</a> and join the community. I promise to guard your email address with my life.</p>
+
+<p>I would love to hear any feedback you have for The .NET Stacks! My goal is to make this the one-stop shop for weekly updates on developing in the .NET ecosystem, so I look forward to any feedback you can provide. You can directly reply to this email, or <a href="https://www.dotnetstacks.com">talk to me on Twitter as well</a>. See you next week!</p>
+:ET

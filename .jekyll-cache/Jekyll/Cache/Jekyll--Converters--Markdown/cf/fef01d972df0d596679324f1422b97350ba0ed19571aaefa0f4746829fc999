@@ -1,0 +1,63 @@
+I"q <p class="notice--success">This is the full interview from my discussion with James Hickey in my weekly (free!) newsletter, <em>The .NET Stacks</em>. Consider <a href="https://dotnetstacks.com">subscribing today</a>!</p>
+
+<p>When designing a real production system—especially over the web—there’s a lot to think about past coding features for stakeholders. For example, how do you manage events? What about scheduling tasks? What about your caching mechanism? A lot of these considerations make you wonder if they should be supplied out-of-the-box with ASP.NET Core.</p>
+
+<p>James Hickey’s <a href="https://github.com/jamesmh/coravel">Coravel project is here to assist</a>. Billed as a “near-zero config .NET Core library that makes task scheduling, caching, queuing, mailing, event broadcasting, and more a breeze,” it ships with an impressive set of free features—and you can look at Coravel Pro for a professional admin panel, UI management, health metrics, and more.</p>
+
+<p>I caught up with James to talk about his project, software design, and more.</p>
+
+<p>(You can reach out to James Hickey <a href="https://twitter.com/jamesmh_dev">through Twitter</a>, browse to the <a href="https://github.com/jamesmh/coravel">Coravel GitHub repo</a>, and <a href="https://www.blog.jamesmichaelhickey.com/">check out his site</a>.)</p>
+
+<p><img src="http://localhost:4001/images/james-hickey.jpg" alt="James Hickey" /></p>
+
+<h2 id="what-are-you-up-to-these-days-whats-your-main-gig-like">What are you up to these days? What’s your main gig like?</h2>
+
+<p>I’m currently working full-time as a senior .NET developer at a small SaaS company—this will be changing come the new year 😉.</p>
+
+<p>I’m mostly working on building a mobile API and application using .NET Core and Ionic/Angular for the product. There’s also a lot of refactoring involved—hurray for legacy technology!</p>
+
+<p>I also do some contract stuff on the side.</p>
+
+<h2 id="as-the-author-of-refactoring-typescript-what-are-your-biggest-tips-on-keeping-a-codebase-healthy">As the author of Refactoring TypeScript, what are your biggest tips on keeping a codebase healthy?</h2>
+
+<ul>
+  <li>Simplicity rules the day. If you “feel” like your solution is getting complicated, then step back or take a 15-minute walk!</li>
+  <li>Reuse is over-hyped. It leads to coupling. Coupling more often-than-not causes trouble down the road.</li>
+  <li>Abstract I/O from other kinds of logic. Don’t do direct database or file system access from the core logic in your system. Put that behind an interface.</li>
+  <li>If you want to get good at designing code, then get good at knowing how to build unit tests that have minimal (or no) mocking/stubbing.</li>
+  <li>Use automated quality analyzers to fail builds when code standards are violated.</li>
+  <li><a href="https://blog.codinghorror.com/the-broken-window-theory/">Fix broken windows</a>.</li>
+</ul>
+
+<h2 id="lets-talk-about-your-coravel-project-i-love-your-bold-selling-point-near-zero-config-net-core-micro-framework-that-makes-advanced-application-features-like-task-scheduling-caching-queuing-event-broadcasting-and-more-a-breeze-can-you-walk-through-what-caused-you-to-pursue-this-project-how-coravel-can-help-me-and-how-it-works-with-existing-net-projects">Let’s talk about your Coravel project. I love your bold selling point: “Near-zero config .NET Core micro-framework that makes advanced application features like Task Scheduling, Caching, Queuing, Event Broadcasting, and more a breeze!” Can you walk through what caused you to pursue this project, how Coravel can help me, and how it works with existing .NET projects?</h2>
+
+<p>Back in the day when I was building <em>.aspx</em> WebForms, I discovered the PHP framework Laravel and loved how it included all these additional features like queuing, task scheduling, and so on out of the box. When .NET Core was gaining traction, I found myself wanting some of the conveniences of Laravel but in .NET Core.</p>
+
+<p>Coravel can help you get a new project up-and-running faster by including things like automated task scheduling, background task queuing, and so on out of the box without having to install extra infrastructure. It works with any .NET Core projects and is (supposed to be) super easy to install, configure and use.</p>
+
+<h2 id="for-scheduling-and-event-management-i-know-a-lot-of-folks-like-utilizing-things-like-triggered-azure-functions-and-service-bus-and-the-likeis-there-an-advantage-to-using-coravel-over-that">For scheduling and event management, I know a lot of folks like utilizing things like triggered Azure Functions and Service Bus and the like—is there an advantage to using Coravel over that?</h2>
+
+<p>One disadvantage is that Coravel doesn’t (yet!) support distributed scheduling, queuing, and caching features. One advantage though, again, is you don’t have to install any additional infrastructure. You can install a NuGet package, add a couple lines of code and you’re good-to-go!</p>
+
+<p>You can use Coravel and these other products together, too. For example, we often use a distributed service bus to integrate separate systems via async messaging. Coravel can support the internal integration within a system—like how you might emit domain events between aggregates. Doing this in-memory has certain advantages. Jimmy Bogard, for example, <a href="https://lostechies.com/jimmybogard/2014/05/13/a-better-domain-events-pattern/">has written about using in-memory domain event processing</a>.</p>
+
+<h2 id="i-know-by-default-coravel-caching-is-in-memory-but-has-options-to-persist-to-a-database-how-does-this-compare-to-something-like-redis">I know by default, Coravel caching is in-memory (but has options to persist to a database). How does this compare to something like Redis?</h2>
+
+<p>Again, using Coravel you won’t have to muck around with installing, configuring, and so on with that additional infrastructure. Redis is a fantastic product and I’m hoping to eventually offer providers for Coravel to hook into Redis—which could make using Redis caching, messaging, and so on even easier. I just need to find some time 😉.</p>
+
+<h2 id="do-you-view-coravel-as-an-enhancement-over-the-bcl-or-filling-in-for-some-of-its-shortcomings-this-is-part-of-a-broader-thought-about-osss-role-within-net-core">Do you view Coravel as an enhancement over the BCL, or filling in for some of its shortcomings? This is part of a broader thought about OSS’s role within .NET Core.</h2>
+
+<p>I view Coravel as enhancements over the BCL. I wouldn’t expect to see these features included in a barebones console application, for example. But when it comes to web applications, these are all features that you’ll need pretty much out-of-the-gate if it’s anything more than a demo application.</p>
+
+<h2 id="im-a-fan-of-your-loosely-coupled-show-that-you-run-with-derek-comartin-sure-beats-the-tightly-coupled-showa-great-spot-to-discuss-software-architecture-and-design-in-such-a-fluid-industry-are-there-any-firm-principles-you-are-stubborn-about">I’m a fan of your “Loosely Coupled Show” that you run with Derek Comartin (sure beats the “Tightly Coupled Show”)—a great spot to discuss software architecture and design. In such a fluid industry, are there any firm principles you are stubborn about?</h2>
+
+<p>Generally, I stick with using a feature folder approach to structuring any projects I work on. I’ve <a href="https://builtwithdot.net/blog/changing-how-your-code-is-organized-could-speed-development-from-weeks-to-days">written about this before</a> and Derek <a href="https://codeopinion.com/organizing-code-by-feature-using-vertical-slices/">just wrote about it</a>. I’m a huge fan of CQRS and think it fits perfectly with the feature folders approach.</p>
+
+<p>I’ve given a talk on these topics <a href="https://www.youtube.com/watch?v=36G6-vwwpe8&amp;feature=youtu.be">at the Florida .NET meetup</a> if anyone’s interested in hearing more about it.</p>
+
+<p>Otherwise, the tips I had for one of the other questions apply to this question too 👍.</p>
+
+<h2 id="what-is-your-one-piece-of-programming-advice">What is your one piece of programming advice?</h2>
+
+<p>Make sure you get lots of sleep and step outside once in a while. 😅</p>
+:ET

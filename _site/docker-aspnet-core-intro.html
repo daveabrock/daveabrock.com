@@ -1,0 +1,254 @@
+<p>As a developer, do you ever think about all the time you spend … <em>not developing</em>? Among the work we do to get things working—I like to call it <em>meta-work</em>—infrastructure is the most frustrating and the biggest headache. It takes so much of our time and impacts our ability to deliver value quickly.</p>
+
+<p>Thanks to software containerization—and, specifically, Docker—we can improve our workflow significantly. We can think of containers as isolated environments that allow us to run our software quickly. These containers allow us to package running images that include all our code and dependencies on any environment.</p>
+
+<p>To be clear, I am <em>tremendously</em> late to this party. (Like, dinner is over and people are starting to ask “where’s Dave?” as if I got in an accident on the way there.) While I’ve always known about Docker from a high level—the value it brings, how to get an image, and so on—my new job responsibilities have forced me to understand it on a tremendously deeper level.</p>
+
+<p>While I’ve seen a lot of great posts on this topic (such as <a href="https://www.stevejgordon.co.uk/docker-dotnet-developers-part-1">Steve Gordon’s wonderful series from 2017</a>), I wanted to write about all I’m learning—and hopefully it can help you, too.</p>
+
+<p>I’ll be walking through Docker containers in three posts:</p>
+
+<ul>
+  <li><em>This post</em>: Getting started (core concepts, run a pre-built image)</li>
+  <li><em>Next post</em>: Diving deep (create image from existing app, considerations)</li>
+  <li><em>Last post</em>: Publishing to Azure Kubernetes Service (AKS)</li>
+</ul>
+
+<p>Armed with this knowledge, I’ll then be writing about container orchestration using Kubernetes.</p>
+
+<p>This post covers the following topics.</p>
+
+<ul>
+  <li><a href="#ensure-docker-and-git-is-installed">Ensure Docker and Git is installed</a></li>
+  <li><a href="#how-docker-works">How Docker works</a>
+    <ul>
+      <li><a href="#what-is-a-host">What is a host?</a></li>
+      <li><a href="#base-images-and-parent-images">Base images and parent images</a></li>
+      <li><a href="#using-a-dockerfile">Using a Dockerfile</a></li>
+      <li><a href="#a-note-on-ports">A note on ports</a></li>
+    </ul>
+  </li>
+  <li><a href="#fetch-build-and-run-a-prebuilt-docker-image">Fetch, build, and run a prebuilt Docker image</a>
+    <ul>
+      <li><a href="#serve-image-over-https">Serve image over HTTPS</a>
+        <ul>
+          <li><a href="#windows">Windows</a></li>
+          <li><a href="#macoslinux">MacOS/Linux</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#image-cleanup">Image cleanup</a></li>
+  <li><a href="#wrap-up">Wrap up</a></li>
+</ul>
+
+<h1 id="ensure-docker-and-git-is-installed">Ensure Docker and Git is installed</h1>
+
+<p>Before starting this post, make sure you have the following installed:</p>
+
+<ul>
+  <li><a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">Git</a></li>
+  <li><a href="https://www.docker.com/products/docker-desktop">Docker Desktop</a></li>
+</ul>
+
+<p>Confirm your Docker install by executing <code class="language-plaintext highlighter-rouge">docker -v</code> in your terminal.</p>
+
+<h1 id="how-docker-works">How Docker works</h1>
+
+<p>When we talk about packaging our software, we’re not just talking about code (if only it was that simple). There’s our operating system, the code itself, packages, libraries, binaries, and more. For example, you might be developing a .NET Core app on Linux with a database, while using a reverse proxy configuration. That sentence alone should be rationale enough for standardized environments.</p>
+
+<p>When we’re running an image, that’s our container. If an image is our blueprint, the container is an instance of it running in memory. These images are immutable: you can’t change them once they’re built. This guarantees isolation, consistency, and performance.</p>
+
+<h2 id="what-is-a-host">What is a host?</h2>
+
+<p>A host is the OS where Docker is run. If you’re running Linux containers like most of the world, Docker shares the host kernel if the binary can access the kernel directly—preventing a need for a container OS.</p>
+
+<p>Windows containers do need a container OS that is part of the packaged image, however, for file system access and memory management. Windows containers come in handy (and are essential) if you’re running things dependent on Windows APIs, like legacy .NET Framework apps. If you don’t have those needs, Linux containers are almost always the way to go.</p>
+
+<h2 id="base-images-and-parent-images">Base images and parent images</h2>
+
+<p>To Docker, a <em>base image</em> utilizes their minimal image, called <code class="language-plaintext highlighter-rouge">scratch</code>. It’s an <a href="https://docs.docker.com/develop/develop-images/baseimages/">empty container image</a>. It’s the equivalent of a piece of white paper: you’ve got something to draw with, but you’ll need to do the sketching.</p>
+
+<p>Typically, you’ll instead build from a <em>parent image</em>, an image you can use as a starting point for your images—in developer language, a base class. Instead of using a base image to install an OS and a runtime, you can use a parent image instead.</p>
+
+<p>Much like the <a href="https://www.bmc.com/blogs/saas-vs-paas-vs-iaas-whats-the-difference-and-how-to-choose/">IaaS vs. PaaS arguments in the cloud space</a>, it comes down to control and how dirty you want your hands to get.</p>
+
+<h2 id="using-a-dockerfile">Using a Dockerfile</h2>
+
+<p>Docker uses a <code class="language-plaintext highlighter-rouge">Dockerfile</code>, a file that contains instructions on how to build an image. In a <code class="language-plaintext highlighter-rouge">Dockerfile</code> you’ll specify the image to use, commands to run, artifacts (your app and its dependencies), exposed ports, and what to run when the container starts running.</p>
+
+<p>We’ll get into much more detail in the next post, but here’s a sample <code class="language-plaintext highlighter-rouge">Dockerfile</code>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Step 1: Specify your base image</span>
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1
+
+<span class="c"># Step 2: Copy project file to the /src container folder</span>
+WORKDIR /src
+COPY <span class="o">[</span><span class="s2">"MyCoolApp/MyCoolApp.csproj"</span>, <span class="s2">"MyCoolApp/"</span><span class="o">]</span>
+
+<span class="c"># Step 3: Run a restore to download dependencies</span>
+RUN dotnet restore <span class="s2">"MyCoolApp/MyCoolApp.csproj"</span>
+
+<span class="c"># Step 4: Copy app code to the container</span>
+COPY <span class="nb">.</span> <span class="nb">.</span>
+WORKDIR <span class="s2">"/src/MyCoolApp"</span>
+
+<span class="c"># Step 5: Build the app in Release mode</span>
+RUN dotnet build <span class="s2">"MyCoolApp.csproj"</span> <span class="nt">-c</span> Release <span class="nt">-o</span> /app
+
+<span class="c"># Step 6: Publish the application</span>
+RUN dotnet publish <span class="s2">"MyCoolApp.csproj"</span> <span class="nt">-c</span> Release <span class="nt">-o</span> /app
+
+<span class="c"># Step 7: Expose port 80 in the container</span>
+EXPOSE 80
+
+<span class="c"># Step 8: Move the /app folder and run the compiled app</span>
+WORKDIR /app
+ENTRYPOINT <span class="o">[</span><span class="s2">"dotnet"</span>, <span class="s2">"MyCoolApp.dll"</span><span class="o">]</span>
+</code></pre></div></div>
+
+<p>With this <code class="language-plaintext highlighter-rouge">Dockerfile</code>, you’ll then be able to run something like <code class="language-plaintext highlighter-rouge">docker build -t mycoolapp .</code> to build your image.</p>
+
+<h2 id="a-note-on-ports">A note on ports</h2>
+
+<p>Pay special attention to Step 7, where we open a port on the Docker container. You might think a common port, 80, should be open by default. It is not. By default, Docker doesn’t allow inbound requests to your container. You will need to <em>explicitly</em> tell Docker.</p>
+
+<p>If you fetch and run a pre-built image from Docker Hub using <code class="language-plaintext highlighter-rouge">docker run</code> and get errors, you need to run it with the <code class="language-plaintext highlighter-rouge">-p</code> flag. A common use is <code class="language-plaintext highlighter-rouge">-p 8000:80</code>, which maps port 80 in your container to port 8000 on your local machine.</p>
+
+<p>Armed with this knowledge, we’re ready to get our feet wet by running a pre-built ASP.NET Core image. (In the next post, we’ll Docker-ize an app we wrote.)</p>
+
+<h1 id="fetch-build-and-run-a-prebuilt-docker-image">Fetch, build, and run a prebuilt Docker image</h1>
+
+<p>To access existing Docker images, they must be hosted in a container registry. The most common public registry is <a href="https://hub.docker.com/search?q=&amp;type=image">Docker Hub</a>. When I go to the Docker Hub and search for <strong>.net core</strong>, you’ll see quite a few repositories hosted by Microsoft.</p>
+
+<p><img src="http://localhost:4001/images/docker-hub.png" alt="Docker Hub" /></p>
+
+<p>We’re going to fetch an existing ASP.NET Core sample app. Head on over <a href="https://hub.docker.com/_/microsoft-dotnet-core-samples">to the samples repo to look at the instructions</a>.</p>
+
+<p class="notice--info">The first thing you see is a sample command to <code class="language-plaintext highlighter-rouge">docker pull</code> the image. That’ll work just fine, but when we run the image, Docker will <code class="language-plaintext highlighter-rouge">pull</code> it for us automatically if it doesn’t exist.</p>
+
+<p>To run the sample app based on a pre-built image, execute the following from your terminal:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run <span class="nt">-p</span> 8000:80 <span class="nt">--name</span> my_sample mcr.microsoft.com/dotnet/core/samples:aspnetapp
+</code></pre></div></div>
+
+<p>This command both fetches and runs our container, which is stored at <code class="language-plaintext highlighter-rouge">mcr.microsoft.com/dotnet/core/samples</code>, has a tag of <code class="language-plaintext highlighter-rouge">aspnetapp</code> (tags are text labels that assist with versioning), and uses the <code class="language-plaintext highlighter-rouge">-p</code> flag to map port 80 on the Docker host to port 8000 on your local machine.</p>
+
+<p class="notice--warning">If you received an error because of a port conflict, you’ll need to select a port that you aren’t currently using.</p>
+
+<p>Your output should be similar to the following:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Unable to find image <span class="s1">'mcr.microsoft.com/dotnet/core/samples:aspnetapp'</span> locally
+aspnetapp: Pulling from dotnet/core/samples
+fa2fa425bc39: Already exists
+9fb46f3edd09: Pull <span class="nb">complete
+</span>39a135016f79: Pull <span class="nb">complete
+</span>4f3a5a9bf323: Pull <span class="nb">complete
+</span>67b18db7ec89: Pull <span class="nb">complete
+</span>53bfb409e62d: Pull <span class="nb">complete
+</span>e223eece4c87: Pull <span class="nb">complete
+</span>85af4a87bdd5: Pull <span class="nb">complete
+</span>d445ffa5a90f: Pull <span class="nb">complete
+</span>1fd0bebc24e8: Pull <span class="nb">complete
+</span>Digest: sha256:d7e0b7f7380d07d2ab32f4082a194e4bc8ac4374cd8bce9c7495f980cf59804f
+Status: Downloaded newer image <span class="k">for </span>mcr.microsoft.com/dotnet/core/samples:aspnetapp
+warn: Microsoft.AspNetCore.DataProtection.Repositories.FileSystemXmlRepository[60]
+      Storing keys <span class="k">in </span>a directory <span class="s1">'C:\Users\ContainerUser\AppData\Local\ASP.NET\DataProtection-Keys'</span> that may not be persisted outside of the container. Protected data will be unavailable when container is destroyed.
+info: Microsoft.Hosting.Lifetime[0]
+      Now listening on: http://[::]:80
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Production
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:<span class="se">\a</span>pp
+</code></pre></div></div>
+
+<p>To take a look at the state of your running images, run the <code class="language-plaintext highlighter-rouge">docker ps</code> command. (Alternatively, you can run <code class="language-plaintext highlighter-rouge">docker ps -a</code> to see the status of all running and stopped containers—<a href="https://docs.docker.com/engine/reference/commandline/ps/">check out the docs for all your options</a>.)</p>
+
+<p>The terminal responds with a bunch of great information (too much for a readable screenshot) with your container ID, image registry location, command used to run it, when it was created, the status, and the ports its using.</p>
+
+<p>Now, launch your favorite browser and enter <code class="language-plaintext highlighter-rouge">http://localhost:8000</code> (or whatever port you specified):</p>
+
+<p><img src="http://localhost:4001/images/dockered-core.png" alt="A view of our pre-built image" /></p>
+
+<p>See how easy that was? Now <strong>that</strong> is the value of containerization—going out, fetching an image, and not having to worry about all the ridiculous infrastructure headaches.</p>
+
+<p>When we run <code class="language-plaintext highlighter-rouge">docker image list</code> we can see a listing of our installed images, and our new one is right at the top:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REPOSITORY                       TAG      IMAGE ID            CREATED             SIZE
+mcr.microsoft.com/dotnet/aspnet  5.0      c946cb101055        3 weeks ago         352MB
+</code></pre></div></div>
+
+<p>You’ll notice that the app is served over HTTP by default (and good catch, by the way).</p>
+
+<h2 id="serve-image-over-https">Serve image over HTTPS</h2>
+
+<p>When we’re playing around locally, HTTP is fine. But if we want to mimic real-world scenarios—and with containerization, the whole point is predictable environments!—we should get in the habit of running our containers over HTTPS. The instructions are <em>slightly</em> different between Windows and macOS/Linux (and with the assumption you are using a pre-built Linux container).</p>
+
+<p>In either platform, the behavior is the same: self-signed development certificates are provisioned for your container over <code class="language-plaintext highlighter-rouge">localhost</code>. Then, you’ll be able to access your app from:</p>
+
+<ul>
+  <li>http://localhost:8000</li>
+  <li>https://localhost:8001</li>
+</ul>
+
+<h3 id="windows">Windows</h3>
+
+<p>From your Windows terminal, execute the following commands (and replace <code class="language-plaintext highlighter-rouge">mypassword</code> with something more memorable):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dotnet dev-certs https <span class="nt">-ep</span> %USERPROFILE%<span class="se">\.</span>aspnet<span class="se">\h</span>ttps<span class="se">\a</span>spnetapp.pfx <span class="nt">-p</span> mypassword
+dotnet dev-certs https <span class="nt">--trust</span>
+</code></pre></div></div>
+
+<p>Then, execute <code class="language-plaintext highlighter-rouge">docker run</code> doing the following (changing <code class="language-plaintext highlighter-rouge">mypassword</code> accordingly):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run <span class="nt">--rm</span> <span class="nt">-it</span> <span class="nt">-p</span> 8000:80 <span class="nt">-p</span> 8001:443 <span class="nt">-e</span> <span class="nv">ASPNETCORE_URLS</span><span class="o">=</span><span class="s2">"https://+;http://+"</span> <span class="nt">-e</span> <span class="nv">ASPNETCORE_HTTPS_PORT</span><span class="o">=</span>8001 <span class="nt">-e</span> <span class="nv">ASPNETCORE_Kestrel__Certificates__Default__Password</span><span class="o">=</span><span class="s2">"mypassword"</span> <span class="nt">-e</span> <span class="nv">ASPNETCORE_Kestrel__Certificates__Default__Path</span><span class="o">=</span>/https/aspnetapp.pfx <span class="nt">-v</span> %USERPROFILE%<span class="se">\.</span>aspnet<span class="se">\h</span>ttps:/https/ mcr.microsoft.com/dotnet/core/samples:aspnetapp
+</code></pre></div></div>
+
+<h3 id="macoslinux">MacOS/Linux</h3>
+
+<p>From your Mac/Linux terminal, execute the following commands (and replace <code class="language-plaintext highlighter-rouge">mypassword</code> with something more memorable):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dotnet dev-certs https <span class="nt">-ep</span> <span class="k">${</span><span class="nv">HOME</span><span class="k">}</span>/.aspnet/https/aspnetapp.pfx <span class="nt">-p</span> mypassword
+dotnet dev-certs https <span class="nt">--trust</span>
+</code></pre></div></div>
+
+<p>Then, execute the following (changing <code class="language-plaintext highlighter-rouge">mypassword</code> accordingly):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run <span class="nt">--rm</span> <span class="nt">-it</span> <span class="nt">-p</span> 8000:80 <span class="nt">-p</span> 8001:443 <span class="nt">-e</span> <span class="nv">ASPNETCORE_URLS</span><span class="o">=</span><span class="s2">"https://+;http://+"</span> <span class="nt">-e</span> <span class="nv">ASPNETCORE_HTTPS_PORT</span><span class="o">=</span>8001 <span class="nt">-e</span> <span class="nv">ASPNETCORE_Kestrel__Certificates__Default__Password</span><span class="o">=</span><span class="s2">"mypassword"</span> <span class="nt">-e</span> <span class="nv">ASPNETCORE_Kestrel__Certificates__Default__Path</span><span class="o">=</span>/https/aspnetapp.pfx <span class="nt">-v</span> <span class="k">${</span><span class="nv">HOME</span><span class="k">}</span>/.aspnet/https:/https/ mcr.microsoft.com/dotnet/core/samples:aspnetapp
+</code></pre></div></div>
+
+<p>Check out the Microsoft documentation <a href="https://github.com/dotnet/dotnet-docker/blob/master/samples/host-aspnetcore-https.md">for the complete details</a>.</p>
+
+<h1 id="image-cleanup">Image cleanup</h1>
+
+<p>If you’re done playing with your image, you can get rid of it. To do so, we will stop and then remove the image (if it’s stopped, you can always skip to the last part).</p>
+
+<p>Before we delete our container, we’ll stop it first. To stop our container, run the following command:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker stop my_sample
+</code></pre></div></div>
+
+<p>If successful, the terminal will respond with its best “I am Groot” impression:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>my_sample
+</code></pre></div></div>
+
+<p>You can now remove the container with the following command:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker <span class="nb">rm </span>my_sample
+</code></pre></div></div>
+
+<p class="notice--warning">Yes, we could have run <code class="language-plaintext highlighter-rouge">docker container rm -f my_sample</code> to do it all at once. I wouldn’t recommend this forceful approach, as it does not perform a graceful shutdown.</p>
+
+<p>You just removed the containers you created. If you also want to delete the images they are built from, use the <code class="language-plaintext highlighter-rouge">docker image rm</code> command, like this (all containers using this image must be removed first):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker image <span class="nb">rm </span>mcr.microsoft.com/dotnet/core/samples:aspnetapp
+</code></pre></div></div>
+
+<h1 id="wrap-up">Wrap up</h1>
+
+<p>In this post, we got our feet wet with Docker. We discussed its value and core concepts such as hosts, base and parent images, and using a <code class="language-plaintext highlighter-rouge">Dockerfile</code>. Then, we fetched, built, and ran a pre-built ASP.NET Core container image. We served the container over HTTPs, and then discarded the container and its image.</p>
+
+<p>Stay tuned for the next post as we use this knowledge to Dockerize our existing applications.</p>

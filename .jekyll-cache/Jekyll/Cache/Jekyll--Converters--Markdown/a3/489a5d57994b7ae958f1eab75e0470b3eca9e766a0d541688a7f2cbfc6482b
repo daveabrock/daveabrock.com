@@ -1,0 +1,175 @@
+I"z[<p>Building location-aware applications is a snap with the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/Using_geolocation">HTML5 Geolocation APIs</a>. These APIs allows you to retrieve a user’s location – with the user’s permission – as a one-time request or over a period of time. This post will walk you through how to implement the Geolocation API.</p>
+
+<h3 id="checking-for-support">Checking for support</h3>
+
+<p>When implementing the Geolocation APIs, the first thing you’ll want to do is see if geolocation is supported by a user’s browser. (You’ll notice that the geolocation functionality is <a href="http://caniuse.com/#feat=geolocation">supported by virtually all browsers</a>, but you know what they say about assuming.) You can check by writing code that <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/in">uses the in operator</a>; this returns <code class="language-plaintext highlighter-rouge">true</code> if the geolocation property exists in the window’s navigator object.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">supportsGeolocation</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="dl">'</span><span class="s1">geolocation</span><span class="dl">'</span> <span class="k">in</span> <span class="nb">navigator</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now that you can use the Geolocation API, you can use the <code class="language-plaintext highlighter-rouge">position.coords</code> property to retrieve some of the following values:</p>
+
+<ul>
+  <li>The <code class="language-plaintext highlighter-rouge">latitude</code> and <code class="language-plaintext highlighter-rouge">longitude</code> attributes are geographic coordinates specified in decimal degrees.</li>
+  <li>The <code class="language-plaintext highlighter-rouge">altitude</code> attribute denotes the height of the position, specified in meters. If the implementation cannot provide altitude information, the value of this attribute must be null.</li>
+  <li>The <code class="language-plaintext highlighter-rouge">accuracy</code> attribute denotes the accuracy level of the latitude and longitude coordinates. It is specified in meters and must be supported by all implementations.</li>
+  <li>The <code class="language-plaintext highlighter-rouge">altitudeAccuracy</code> attribute is specified in meters. If the implementation cannot provide altitude information, the value of this attribute must be null.</li>
+  <li>The <code class="language-plaintext highlighter-rouge">heading</code> attribute denotes the direction of travel of the hosting device and is specified in degrees, where 0° ≤ heading &lt; 360°, counting clockwise relative to the true north. If the implementation cannot provide heading information, the value of this attribute must be null. If the hosting device is stationary, then the value of the heading attribute must be NaN.</li>
+  <li>The <code class="language-plaintext highlighter-rouge">speed</code> attribute denotes the magnitude of the horizontal component of the hosting device’s current velocity and is specified in meters per second. If the implementation cannot provide speed information, the value of this attribute must be null.</li>
+</ul>
+
+<p>From here, you can decide if you want to get a user’s current location (one-time event), or watch a current position (specified time).</p>
+
+<h3 id="getting-current-location">Getting current location</h3>
+
+<p>There are many scenarios where you just want to get a user’s location once – like, where is a user’s closest movie theater or grocery store? If this is what you’re after, then you can call the <code class="language-plaintext highlighter-rouge">getCurrentLocation</code> method from the <code class="language-plaintext highlighter-rouge">navigator.geolocation</code> object.</p>
+
+<p>This method sends an async request to detect the user’s position. When the position is determined, a callback function is executed. You can optionally provide a second callback function to be executed if an error occurs and also a third parameter as an <code class="language-plaintext highlighter-rouge">options</code> object. In the <code class="language-plaintext highlighter-rouge">options</code> object, you can set the following attributes:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">enableHighAccuracy</code> – get the best possible result, even if it takes longer (default is false)</li>
+  <li><code class="language-plaintext highlighter-rouge">timeout</code> – timeout, in milliseconds, that the browser will wait for a response (the default is -1, meaning there is no timeout)</li>
+  <li><code class="language-plaintext highlighter-rouge">maximumAge</code> – specifies that a cached location is acceptable, so long as it isn’t longer than the milliseconds that you specify (the default is 0, meaning a cached location is not used)</li>
+</ul>
+
+<p>In the following example, I’ll build a simple page that asks a user to click a button that will execute a function to find a user’s location. The information will be displayed in the <code class="language-plaintext highlighter-rouge">location</code> div.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;html&gt;</span>
+    <span class="nt">&lt;head&gt;</span>
+        <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"js/current-location.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+    <span class="nt">&lt;/head&gt;</span>
+    <span class="nt">&lt;body&gt;</span>
+        <span class="nt">&lt;p&gt;&lt;button</span> <span class="na">onclick=</span><span class="s">"findMe()"</span><span class="nt">&gt;</span>Show my location<span class="nt">&lt;/button&gt;&lt;/p&gt;</span>
+        <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"location"</span><span class="nt">&gt;&lt;/div&gt;</span>
+    <span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+
+<p>The following example retrieves the <code class="language-plaintext highlighter-rouge">latitude</code>, <code class="language-plaintext highlighter-rouge">longitude</code>, and <code class="language-plaintext highlighter-rouge">accuracy</code> of the current user, given that they give permission to access their location. After getting this information, we’ll display a Google Maps image of their location, easily accessible by using the Google Maps API, which takes <code class="language-plaintext highlighter-rouge">latitude</code> and <code class="language-plaintext highlighter-rouge">longitude</code> as parameters.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">findMe</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">output</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">"</span><span class="s2">location</span><span class="dl">"</span><span class="p">);</span>
+
+  <span class="kd">function</span> <span class="nx">success</span><span class="p">(</span><span class="nx">position</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">latitude</span>  <span class="o">=</span> <span class="nx">position</span><span class="p">.</span><span class="nx">coords</span><span class="p">.</span><span class="nx">latitude</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">longitude</span> <span class="o">=</span> <span class="nx">position</span><span class="p">.</span><span class="nx">coords</span><span class="p">.</span><span class="nx">longitude</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">accuracy</span> <span class="o">=</span> <span class="nx">position</span><span class="p">.</span><span class="nx">coords</span><span class="p">.</span><span class="nx">accuracy</span><span class="p">;</span>
+
+    <span class="nx">output</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">&lt;ul&gt; </span><span class="se">\</span><span class="s1">
+                        &lt;li&gt;Latitude: </span><span class="dl">'</span> <span class="o">+</span> <span class="nx">latitude</span> <span class="o">+</span> <span class="dl">'</span><span class="s1"> degrees&lt;/li&gt; </span><span class="se">\</span><span class="s1">
+                        &lt;li&gt;Longitude: </span><span class="dl">'</span> <span class="o">+</span> <span class="nx">longitude</span> <span class="o">+</span> <span class="dl">'</span><span class="s1"> degrees&lt;/li&gt; </span><span class="se">\</span><span class="s1">
+                        &lt;li&gt;Accuracy: </span><span class="dl">'</span> <span class="o">+</span> <span class="nx">accuracy</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">m&lt;/li&gt; </span><span class="se">\</span><span class="s1">
+                        &lt;/ul&gt;</span><span class="dl">'</span><span class="p">;</span>
+
+    <span class="kd">var</span> <span class="nx">img</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Image</span><span class="p">();</span>
+    <span class="nx">img</span><span class="p">.</span><span class="nx">src</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">https://maps.googleapis.com/maps/api/staticmap?center=</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">latitude</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">,</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">longitude</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">&amp;zoom=13&amp;size=300x300&amp;sensor=false</span><span class="dl">"</span><span class="p">;</span>
+    <span class="nx">output</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">img</span><span class="p">);</span>
+  <span class="p">};</span>
+
+  <span class="kd">function</span> <span class="nx">error</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">output</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">Unable to retrieve your location!</span><span class="dl">"</span><span class="p">;</span>
+  <span class="p">};</span>
+
+  <span class="nx">output</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">Getting location ...</span><span class="dl">"</span><span class="p">;</span>
+
+  <span class="kd">var</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="na">enableHighAccuracy</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+      <span class="na">timeout</span><span class="p">:</span> <span class="mi">3000</span><span class="p">,</span>
+      <span class="na">maximumAge</span><span class="p">:</span> <span class="mi">20000</span>
+  <span class="p">};</span>
+
+  <span class="nb">navigator</span><span class="p">.</span><span class="nx">geolocation</span><span class="p">.</span><span class="nx">getCurrentPosition</span><span class="p">(</span><span class="nx">success</span><span class="p">,</span> <span class="nx">error</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="monitoring-current-location">Monitoring current location</h3>
+
+<p>If you see a user’s position changing frequently, like with turn-by-turn directions,  you can set up a callback function that you call with the updated position information. You can accomplish this by using the <code class="language-plaintext highlighter-rouge">watchPosition</code> function. This function has the same parameters as <code class="language-plaintext highlighter-rouge">getCurrentPosition</code>.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">watchPosition</code> method returns an ID that can be used to identify who or what is watching the position. Then, when you wish to stop watching a user’s location, you can use the <code class="language-plaintext highlighter-rouge">clearWatch</code> method which takes the ID as a parameter.</p>
+
+<p>In this case, we have another simple page that has buttons to start and stop watching a user’s position. The position information will display in the <code class="language-plaintext highlighter-rouge">message</code> div.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;html&gt;</span>
+    <span class="nt">&lt;head&gt;</span>
+        <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"js/jquery-3.1.0.min.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+        <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"js/watch-position.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+    <span class="nt">&lt;/head&gt;</span>
+    <span class="nt">&lt;body&gt;</span>
+        <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"message"</span><span class="nt">&gt;&lt;/div&gt;</span>
+        <span class="nt">&lt;button</span> <span class="na">id=</span><span class="s">"startLocation"</span><span class="nt">&gt;</span>Start<span class="nt">&lt;/button&gt;</span>
+        <span class="nt">&lt;button</span> <span class="na">id=</span><span class="s">"stopLocation"</span><span class="nt">&gt;</span>Stop<span class="nt">&lt;/button&gt;</span>
+    <span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+
+<p>In the JavaScript file, we’ll start by initializing a <code class="language-plaintext highlighter-rouge">watchId</code>, using jQuery to initiate click events (more on that in a second), checking to see if the API is supported, and then writing a utility method that will show the information in the <code class="language-plaintext highlighter-rouge">message</code> div.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">watchId</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">#startLocation</span><span class="dl">'</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">,</span> <span class="nx">getLocation</span><span class="p">);</span>
+    <span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">#stopLocation</span><span class="dl">'</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">,</span> <span class="nx">endWatch</span><span class="p">);</span>
+<span class="p">})</span>
+
+<span class="kd">function</span> <span class="nx">supportsGeolocation</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="dl">'</span><span class="s1">geolocation</span><span class="dl">'</span> <span class="k">in</span> <span class="nb">navigator</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">showMessage</span><span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">#message</span><span class="dl">'</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>And now, here’s where the magic happens: if a user’s browser supports geolocation, we call <code class="language-plaintext highlighter-rouge">watchPosition</code>, which in this case take a success callback, an optional error callback, and an optional options parameter.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">getLocation</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">supportsGeolocation</span><span class="p">())</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="na">enableHighAccuracy</span><span class="p">:</span> <span class="kc">true</span>
+        <span class="p">};</span>
+        <span class="nx">watchId</span> <span class="o">=</span> <span class="nb">navigator</span><span class="p">.</span><span class="nx">geolocation</span><span class="p">.</span><span class="nx">watchPosition</span><span class="p">(</span><span class="nx">showPosition</span><span class="p">,</span> <span class="nx">showError</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">showMessage</span><span class="p">(</span><span class="dl">"</span><span class="s2">Geolocation is not supported by this browser.</span><span class="dl">"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">showPosition</span><span class="p">(</span><span class="nx">position</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">datetime</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nx">position</span><span class="p">.</span><span class="nx">timestamp</span><span class="p">).</span><span class="nx">toLocaleString</span><span class="p">();</span>
+    <span class="nx">showMessage</span><span class="p">(</span><span class="dl">"</span><span class="s2">Latitude: </span><span class="dl">"</span> <span class="o">+</span> <span class="nx">position</span><span class="p">.</span><span class="nx">coords</span><span class="p">.</span><span class="nx">latitude</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">&lt;br /&gt;</span><span class="dl">"</span>
+              <span class="o">+</span> <span class="dl">"</span><span class="s2">Longitude: </span><span class="dl">"</span> <span class="o">+</span> <span class="nx">position</span><span class="p">.</span><span class="nx">coords</span><span class="p">.</span><span class="nx">longitude</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">&lt;br /&gt;</span><span class="dl">"</span>
+              <span class="o">+</span> <span class="dl">"</span><span class="s2">Timestamp: </span><span class="dl">"</span> <span class="o">+</span> <span class="nx">datetime</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">showError</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">switch</span> <span class="p">(</span><span class="nx">error</span><span class="p">.</span><span class="nx">code</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="nx">error</span><span class="p">.</span><span class="nx">PERMISSION_DENIED</span><span class="p">:</span>
+            <span class="nx">showMessge</span><span class="p">(</span><span class="dl">"</span><span class="s2">User denied Geolocation access request.</span><span class="dl">"</span><span class="p">);</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="k">case</span> <span class="nx">error</span><span class="p">.</span><span class="nx">POSITION_UNAVAILABLE</span><span class="p">:</span>
+            <span class="nx">showMessage</span><span class="p">(</span><span class="dl">"</span><span class="s2">Location information unavailable.</span><span class="dl">"</span><span class="p">);</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="k">case</span> <span class="nx">error</span><span class="p">.</span><span class="nx">TIMEOUT</span><span class="p">:</span>
+            <span class="nx">showMessage</span><span class="p">(</span><span class="dl">"</span><span class="s2">Get user location request timed out.</span><span class="dl">"</span><span class="p">);</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="k">case</span> <span class="nx">error</span><span class="p">.</span><span class="nx">UNKNOWN_ERROR</span><span class="p">:</span>
+            <span class="nx">showMessage</span><span class="p">(</span><span class="dl">"</span><span class="s2">An unknown error occurred.</span><span class="dl">"</span><span class="p">);</span>
+            <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Finally, when the user clicks the Stop button, the <code class="language-plaintext highlighter-rouge">clearWatch</code> method is called and the browser stops tracking the user’s location.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">endWatch</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">watchId</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nb">navigator</span><span class="p">.</span><span class="nx">geolocation</span><span class="p">.</span><span class="nx">clearWatch</span><span class="p">(</span><span class="nx">watchId</span><span class="p">);</span>
+        <span class="nx">watchId</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="nx">showMessage</span><span class="p">(</span><span class="dl">"</span><span class="s2">Monitoring complete.</span><span class="dl">"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+:ET

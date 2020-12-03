@@ -1,0 +1,120 @@
+I"�%<p>Have you used NDepend before? If you’ve been working on .NET for some time, you may have either used it or heard of it—I believe it’s been around since 2007 or so.</p>
+
+<p>If you aren’t familiar, NDepend is a robust static code analysis tool that allows you to gain a concrete understanding of your project’s complexity, technical debt, associations, dependencies, and more. You can easily integrate NDepend into your daily workflow with a Visual Studio extension and it also has extensions for your build pipelines as well.</p>
+
+<p>I gave NDepend 2020.1 a test spin and have been using it the last few weeks. I’ll spend the rest of the post writing about my experiences.</p>
+
+<p>I couldn’t possibly go through <strong>all</strong> the features and functionality that NDepend offers, so this post will show off what caught my eye. You can <a href="https://www.ndepend.com/docs/getting-started-with-ndepend">take a look at the docs for the full treatment</a>.</p>
+
+<p class="notice--info"><em>Disclaimer</em>: I am reviewing NDepend with a free review license.</p>
+
+<p>This post covers the following topics.</p>
+
+<ul>
+  <li><a href="#attach-ndepend-to-your-net-solution">Attach NDepend to your .NET solution</a></li>
+  <li><a href="#review-the-ndepend-dashboard">Review the NDepend dashboard</a>
+    <ul>
+      <li><a href="#technical-debt-severity-levels">Technical debt severity levels</a></li>
+    </ul>
+  </li>
+  <li><a href="#visualizing-complexity">Visualizing complexity</a></li>
+  <li><a href="#understand-dependencies">Understand dependencies</a></li>
+  <li><a href="#query-code-with-the-cqlinq-syntax">Query code with the CQLinq syntax</a></li>
+  <li><a href="#integrate-ndepend-with-your-continuous-integration-pipeline">Integrate NDepend with your continuous integration pipeline</a></li>
+  <li><a href="#wrap-up">Wrap up</a></li>
+</ul>
+
+<h1 id="attach-ndepend-to-your-net-solution">Attach NDepend to your .NET solution</h1>
+
+<p>Once you install NDepend, the easiest way to get started is to attach NDepend to an existing .NET solution in Visual Studio.</p>
+
+<p>In your version of Visual Studio, enter <strong>ndepend</strong> in your global search bar at the top, and click <strong>Analyze a VS solution</strong>. Browse to a solution file you want NDepend to analyze, then click <strong>OK</strong>. At the next screen, select the assemblies you want analyzed, and let NDepend loose.</p>
+
+<p>The first time you analyze, a beginner-friendly screen will ask you how you want to proceed. Click <strong>View NDepend Dashboard</strong>.</p>
+
+<p><img src="http://localhost:4001/images/ndepend-what-to-do.png" alt="go to NDepend dashboard" /></p>
+
+<h1 id="review-the-ndepend-dashboard">Review the NDepend dashboard</h1>
+
+<p>The dashboard gives you a nice view of overall tech debt, quality gates, and issue and rule estimation. My sample app needs some work but … in my career, I’ve definitely seen worse.</p>
+
+<p><img src="http://localhost:4001/images/dashboard.png" alt="go to NDepend dashboard" /></p>
+
+<p>You can drill into the dashboard to get details about any violations.</p>
+
+<h2 id="technical-debt-severity-levels">Technical debt severity levels</h2>
+
+<p>If you’re wondering about the NDepend severity levels, here’s some guides:</p>
+
+<ul>
+  <li><strong>Info</strong> - a small improvement can be made</li>
+  <li><strong>Minor</strong> - a type of warning that won’t have a significant impact if not addressed</li>
+  <li><strong>Major</strong> - should be fixed quickly but can wait until the next run</li>
+  <li><strong>Critical</strong> - these issues shouldn’t move to production</li>
+  <li><strong>Blocker</strong> - it must be fixed</li>
+</ul>
+
+<p>Once you improve your code, you can rerun the analysis again and NDepend will show you how you improved from the last baseline.</p>
+
+<h1 id="visualizing-complexity">Visualizing complexity</h1>
+
+<p>It’s been a few years since I last worked with NDepend, and a welcome new addition I noticed is the visualization of cyclomatic complexity. While it doesn’t tell the whole story, high complexity numbers are typically bad news for code quality and testability.</p>
+
+<p>Here you’ll see a nice visualization view where you can hover over “trouble spots” in your application. In the top-left of the image, you’ll see details about the offending method (I hovered over the redness).</p>
+
+<p><img src="http://localhost:4001/images/visualizer.png" alt="visualize code complexity" /></p>
+
+<p>This capability isn’t just for cyclomatic complexity—you can do it for documentation (comments), test coverage, and more. It’s a great way to see the high-level state of your application.</p>
+
+<p>I can personally see a lot of value in using the <a href="https://www.ndepend.com/docs/monitor-test-coverage#identify-which-code-need-more-test">code coverage visualization</a>, as it easily shows which components are in need of more coverage.</p>
+
+<h1 id="understand-dependencies">Understand dependencies</h1>
+
+<p>NDepend ships with a dependencies view that allows you to visualize the relationships between your projects. It’s an interactive view, where you can click and hover over dependencies, to see how tightly or loosely coupled your dependencies are.</p>
+
+<p><img src="http://localhost:4001/images/graph.png" alt="visualize code complexity" /></p>
+
+<p>If you tell your boss something is taking a while because it’s a “bowl of spaghetti” and he or she wants evidence, here’s where you can get it.</p>
+
+<h1 id="query-code-with-the-cqlinq-syntax">Query code with the CQLinq syntax</h1>
+
+<p>NDepend offers Code Query LINQ (CQLinq) to query .NET code through the use of LINQ queries. If you want greater control of the metrics, or want a one-off result, it’s a great capability. You can use any C# LINQ syntax.</p>
+
+<p>Let’s say I want to find any methods where the cyclomatic complexity is greater than 10.</p>
+
+<p>The first thing I notice is the Intellisense-like previews as I type:</p>
+
+<p><img src="http://localhost:4001/images/intellisense.png" alt="cqlinq" /></p>
+
+<p>Now, I can execute the query like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">from</span> <span class="n">m</span> <span class="k">in</span> <span class="n">Methods</span> <span class="k">where</span> <span class="n">m</span><span class="p">.</span><span class="n">CyclomaticComplexity</span> <span class="p">&gt;</span> <span class="m">10</span>
+<span class="k">select</span> <span class="k">new</span> <span class="p">{</span> <span class="n">m</span><span class="p">,</span> <span class="n">m</span><span class="p">.</span><span class="n">CyclomaticComplexity</span> <span class="p">}</span>
+</code></pre></div></div>
+
+<p>I don’t need to click a Run button or anything—the results will populate automatically.</p>
+
+<p><img src="http://localhost:4001/images/cqlinq-results.png" alt="cqlinq" /></p>
+
+<p>I can run this just once, or even save my queries for later use. As a C# developer you’re likely familiar with the LINQ syntax, so this offers a great and quick way for you to grab just the data you need.</p>
+
+<h1 id="integrate-ndepend-with-your-continuous-integration-pipeline">Integrate NDepend with your continuous integration pipeline</h1>
+
+<p>To make the greatest impact to your team, you can use NDepend with your CI tools—it supports any major CI tool like Azure DevOps/TFS, TeamCity, Jenkins, SonarQube, and more. You will need to purchase a <a href="https://www.ndepend.com/editions">Build Machine Edition <em>or</em> Azure DevOps/TFS Edition license for this capability</a>.</p>
+
+<p>If you are using something like Azure DevOps, you can use an extension that contains a build task. This will produce the dashboard at a moment’s notice, just like we saw in our local Visual Studio.</p>
+
+<p>Much like how you can enforce quality gates in your CI tooling for code coverage and coding conventions, you can also do for NDepend. The extension ships with a dozen quality gates for things such as technical debt amount or issues with a particular severity—for example, you could enforce a gate where developers don’t push any code with Major or Critical issues. The quality gates are also C# LINQ queries, so you <a href="https://mailstat.us/tr/t/2elpw4ntkesbnhaa/9/https://www.ndepend.com/docs/quality-gates#Customization">can easily tweak existing gates or create new ones</a>.</p>
+
+<p>On top of enforcing code quality across the team, you have the advantage of the metrics in one place (and not scattered across dev machines) and also can report progress up the chain, if needed.</p>
+
+<p>This is a powerful capability and if you’re paying for NDepend already, you should give this serious consideration. This will morph your use of NDepend from “we should really fix those issues” to “we’ve set a standard to not introduce anything to our codebase with these issues”—a huge difference.</p>
+
+<p>Take a look at the <a href="https://www.ndepend.com/docs/azure-devops-tfs-vsts-integration-ndepend">NDepend CI documentation</a> for more details.</p>
+
+<h1 id="wrap-up">Wrap up</h1>
+
+<p>In this article, I took a test drive through the latest version of NDepend. Once we attached NDepend to a sample solution, we discussed the NDepend dashboard, complexity visualization, the dependency graphs, querying code with the CQLinq syntax, and reviewed its CI capabilities.</p>
+
+<p>I was happy to get acquainted with NDepend once again and take a look at the improvements it has made over the years, and see that it’s still the best-in-class tool for .NET static analysis. If you have the budget for it, you can’t go wrong.</p>
+:ET

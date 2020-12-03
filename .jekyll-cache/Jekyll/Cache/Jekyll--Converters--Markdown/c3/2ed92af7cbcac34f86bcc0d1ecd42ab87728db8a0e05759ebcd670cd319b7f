@@ -1,0 +1,76 @@
+I"�!<p class="notice--success">This is an archive of my weekly (free!) newsletter, <em>The .NET Stacks</em>. Consider <a href="https://dotnetstacks.com">subscribing today</a> to get this content right away! Subscribers don’t have to wait a week to receive the content.</p>
+
+<p>Welcome to the very first issue of <em>The .NET Stacks</em>! I appreciate all of you for being my first subscribers—even before it was even launched. If you have any suggestions, you can simply reply to this email or <a href="https://twitter.com/dotnetstacks">hit me up on Twitter</a>. And if you like what you see, I would love for you to <a href="https://www.dotnetstacks.com">share with others</a> as well. Let’s get started!</p>
+
+<h2 id="3-things-to-keep-you-informed">3 things to keep you informed</h2>
+
+<p>The three things you need to know to keep you current and impress your colleagues (the details of which are in this newsletter):</p>
+
+<ol>
+  <li>Blazor Web Assembly support is now live! This gives you the ability to debug C# in the browser and use one language for your <em>entire</em> development experience (while you may need to use some interop libraries). Need to work on the front-end, but don’t have a team with a good JavaScript skillset? Are you a one-person shop too overwhelmed to learn JavaScript? Well, there you go.</li>
+  <li>With .NET 5, to be released in November 2020, comes the vision of “One .NET,” including Xamarin! A core tenet is producing one .NET runtime and framework that can be used everywhere.</li>
+  <li>C# 9 is coming along, which brings a ton of improvements like init-only properties and records (among many, many other things)</li>
+</ol>
+
+<h2 id="microsoft-build">Microsoft Build</h2>
+
+<p>As you may have heard, Microsoft Build occurred this week—from the comfort of our homes. The real question is: will we ever want to go back, after having this go so seamlessly?</p>
+
+<p>All the content is available for on-demand viewing on the Build site and Channel 9. Here are the keynotes:</p>
+
+<ul>
+  <li><a href="https://mybuild.microsoft.com/sessions/23912de2-1531-4684-b85a-d57ac30af09e?source=sessions">Empowering every developer, with Satya Nadella</a></li>
+  <li><a href="https://mybuild.microsoft.com/sessions/871ef73f-f04a-405b-a0fa-01d7433067d1?source=sessions">Every developer is welcome, with Scott Hanselman and guests</a></li>
+  <li><a href="https://mybuild.microsoft.com/sessions/80ec2639-35c3-462b-8155-1ef52c29310c?source=sessions">Azure: Invent with purpose</a></li>
+  <li><a href="https://mybuild.microsoft.com/sessions/828faeb1-b24f-427f-bfce-078b8c0f4fd5?source=sessions">Building the tools to work and learn, with Rajesh Jha and guests</a></li>
+</ul>
+
+<p>On top of the keynotes, there were several valuable break-out sessions that you can <a href="https://mybuild.microsoft.com/">watch at your convenience</a>. Of course, a ton of announcements/news:</p>
+
+<ul>
+  <li>The new Windows Terminal is <a href="https://devblogs.microsoft.com/commandline/windows-terminal-1-0/">live with the 1.0 release</a>. Who thought you could have fun with the terminal?</li>
+  <li>The official Windows Package Manager is <a href="https://devblogs.microsoft.com/commandline/windows-package-manager-preview/">now in preview</a>.</li>
+  <li>C# 9 is <a href="https://devblogs.microsoft.com/dotnet/welcome-to-c-9-0/">really coming along</a>, and <a href="https://devblogs.microsoft.com/dotnet/f-5-update-for-net-5-preview-4/">so is F# 5</a>.</li>
+  <li>Not new, but definitely showcased by Scott Hanselman and others at Build: <a href="https://github.com/microsoft/PowerToys">PowerToys</a>, a set of powerful utilities for Windows.</li>
+  <li>Preview 4 of .NET 5 is <a href="https://devblogs.microsoft.com/dotnet/announcing-net-5-preview-4-and-our-journey-to-one-net/">now available</a>. .NET 5, the culmination of the “One .NET” mission, will be released in November.</li>
+  <li>Microsoft <a href="https://devblogs.microsoft.com/dotnet/introducing-net-multi-platform-app-ui/">released .NET Multi-Platform App UI (.NET MAUI)</a>, the evolution of Xamarin.Forms into unified .NET (in .NET 6). This promises the ability to write code for any device from a single codebase.</li>
+  <li>C# in the browser is finally GA, <a href="https://devblogs.microsoft.com/aspnet/blazor-webassembly-3-2-0-now-available/">with Blazor WebAssembly support</a>! It’s turned into a mature ecosystem very quickly.</li>
+  <li>While announced before Build, they showcased Visual Studio Codespaces (formerly Visual Studio Online), which allows you to <a href="https://devblogs.microsoft.com/visualstudio/introducing-visual-studio-codespaces/">work with fully-configured environments on the fly</a>, even from the browser.</li>
+  <li>Azure Static Web Apps have rolled out (in preview), and <a href="https://azure.microsoft.com/services/app-service/static/">looks quite promising</a>.</li>
+  <li>Learn TV <a href="https://docs.microsoft.com/learn/tv/">is now live</a>.</li>
+</ul>
+
+<h2 id="thought-of-the-week">Thought of the week</h2>
+
+<p>For many of us who have been writing .NET for awhile, we can easily split Microsoft into two companies: the Gates/Ballmer years (“OId Microsoft”), with its resistance to open source in favor of world dominance and Microsoft lock-in; and two, the kindler/gentler Microsoft who strives to be open to all, in favor of driving business to its Azure offerings (“New Microsoft”).</p>
+
+<p>When New Microsoft announced the Windows Package Manager, it was met with quite a bit of skepticism from the community, and caused one spirited GitHub discussion. Leaders in the space, like Chocolatey, don’t seem to be worried yet, but some folks in the community are asking: why is this needed, with so many community projects out there that already solve this problem (or are further along)? Microsoft points at the issues delivering a native app as well as security considerations.</p>
+
+<p>Microsoft’s stance of “if you are happy with what you use, great” comes off to some as a little naive, considering how the remnants of Old Microsoft still linger to some folks. As for the community, some patience would help without jumping to conclusions, as Microsoft has open-sourced this and is open to feedback—and New Microsoft has a track record of working with developers, not against them.</p>
+
+<h2 id="from-the-community">From the community</h2>
+
+<p>This section is a bit brief because of all the Build announcements, but alas:</p>
+
+<ul>
+  <li>A couple .NET design reviews this week: <a href="https://www.youtube.com/watch?v=C5W7f10eX3Q">connection abstractions</a> and <a href="https://www.youtube.com/watch?v=4JGzVdL4mkI&amp;t=6232s">ARM</a>.</li>
+  <li>Ben Foster talks about <a href="https://benfoster.io/blog/binding-validating-enums-aspnet-core/">binding and validating enums for ASP.NET Core</a>.</li>
+  <li>Jason Roberts <a href="https://dontcodetired.com/blog/post/Microsoft-Feature-Flags-Controlling-Features-with-Feature-Filters-(MicrosoftFeatureManagement)">illustrates the power of feature filters in the Microsoft.FeatureManagement library</a>.</li>
+  <li>Thomas Levesque <a href="https://thomaslevesque.com/2020/05/15/things-every-csharp-developer-should-know-1-hash-codes/">talks hash codes</a>.</li>
+  <li>Shahed Chowdhuri <a href="https://wakeupandcode.com/tag-helper-authoring-in-asp-net-core-3-1/">discusses tag helper authoring in ASP.NET Core 3.1</a>.</li>
+  <li>Thomas Ardal shows <a href="https://blog.elmah.io/implementing-always-signed-in-with-asp-net-core-and-azure/">how to implement always signed in with ASP.NET Core and Azure</a>.</li>
+  <li>Steve Fenton talks about <a href="https://www.stevefenton.co.uk/2020/05/csharp-9-simplified-console-apps/">simplified console apps with C# 9</a>.</li>
+</ul>
+
+<h2 id="what-are-you-building">What are you building?</h2>
+
+<p>Care to show off what you’re building? Reach out at hey@dotnetstacks.com, and it might be featured in a future newsletter.</p>
+
+<h2 id="tweet-of-the-week">Tweet of the week</h2>
+
+<p><img src="http://localhost:4001/images/tweet-of-week.png" alt="tweet of the week" /></p>
+
+<h2 id="feedback">Feedback?</h2>
+
+<p>I would love to hear any feedback you have for The .NET Stacks! For a little while, I’ll be trying some new things—as with software, some might work and some might not. My goal is to make this the one-stop shop for weekly updates on developing in the .NET ecosystem, so I look forward to any feedback you can provide. You can directly reply to this email, or <a href="https://www.dotnetstacks.com">talk to me on Twitter</a> as well. I’ll talk to you next week!</p>
+:ET

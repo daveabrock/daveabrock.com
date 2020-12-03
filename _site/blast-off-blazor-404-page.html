@@ -1,0 +1,192 @@
+<p>I hope you enjoyed the <a href="https://daveabrock.com/2020/10/26/blast-off-blazor-intro">introduction to our <em>Blast Off with Blazor</em> project</a>. It’s time to get to work!</p>
+
+<p>We’re going to write our first reusable component, and use Egil Hansen’s wonderful <a href="https://github.com/egil/bUnit">bUnit Blazor component testing library</a> to confirm it renders appropriately. I strongly believe testing should never be an afterthought, and we should start testing from Day 1.</p>
+
+<p>To do all this, we’ll write a custom 404 error page. This first one will be simple but will allow us to understand how basic components work.</p>
+
+<p>This post contains the following content:</p>
+
+<ul>
+  <li><a href="#understand-the-apprazor-file">Understand the App.razor file</a></li>
+  <li><a href="#our-first-shared-component">Our first shared component</a></li>
+  <li><a href="#test-our-component-with-the-bunit-library">Test our component with the bUnit library</a>
+    <ul>
+      <li><a href="#set-up-your-testing-project">Set up your testing project</a></li>
+      <li><a href="#write-the-test">Write the test</a></li>
+    </ul>
+  </li>
+  <li><a href="#wrap-up">Wrap up</a></li>
+</ul>
+
+<h1 id="understand-the-apprazor-file">Understand the App.razor file</h1>
+
+<p>Obviously, we know that if the user navigates to a page that doesn’t exist, like <code class="language-plaintext highlighter-rouge">/somepage</code>, that we’ll want to customize the error page. But where does Blazor figure out what pages are valid?</p>
+
+<p>The answer lies in the <code class="language-plaintext highlighter-rouge">App.razor</code> file, which sits at the root of our Blazor Web Assembly project.</p>
+
+<p>You’ll notice the default <code class="language-plaintext highlighter-rouge">App.razor</code> file looks something like this:</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;Router</span> <span class="na">AppAssembly=</span><span class="s">"@typeof(Startup).Assembly"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;Found</span> <span class="na">Context=</span><span class="s">"routeData"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;RouteView</span> <span class="na">RouteData=</span><span class="s">"@routeData"</span> <span class="na">DefaultLayout=</span><span class="s">"@typeof(MainLayout)"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/Found&gt;</span>
+    <span class="nt">&lt;NotFound&gt;</span>
+        <span class="nt">&lt;p&gt;</span>Sorry, there's nothing at this address.<span class="nt">&lt;/p&gt;</span>
+    <span class="nt">&lt;/NotFound&gt;</span>
+<span class="nt">&lt;/Router&gt;</span>
+</code></pre></div></div>
+
+<p>Here, you’ll see Blazor’s component model in action—even Blazor’s routing mechanism uses components! We see a <code class="language-plaintext highlighter-rouge">Router</code> component, a <code class="language-plaintext highlighter-rouge">Found</code> component, and a <code class="language-plaintext highlighter-rouge">NotFound</code> component. The <code class="language-plaintext highlighter-rouge">Router</code> and <code class="language-plaintext highlighter-rouge">Found</code> components also take parameters. We’ll dig into component parameters in a future post.</p>
+
+<p>Last time, we learned that you pass an <code class="language-plaintext highlighter-rouge">@page</code> directive at the top of your component. For example, our <code class="language-plaintext highlighter-rouge">Index.razor</code> component will look like this:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@page "/"
+</code></pre></div></div>
+
+<p>This is a <em>route template</em>. When you compile this component, the generated class provides a <code class="language-plaintext highlighter-rouge">RouteAttribute</code> with this route template. Then, at runtime, the <code class="language-plaintext highlighter-rouge">RouteView</code> component receives this <code class="language-plaintext highlighter-rouge">routeData</code> from the <code class="language-plaintext highlighter-rouge">Router</code> component, then renders the component with its layout. If you don’t want to specify a layout for each component—pro tip: you probably don’t—you’ll pass a default one. By default, it’ll pass <code class="language-plaintext highlighter-rouge">Shared/MainLayout.razor</code>.</p>
+
+<p>For our purposes, we see that the <code class="language-plaintext highlighter-rouge">NotFound</code> component decides what to render when a component can’t be found. It passes our default layout—which we want to keep, to preserve our header—and a message that says <code class="language-plaintext highlighter-rouge">Sorry, there's nothing at this address</code>. How boring. Let’s make things a little more exciting.</p>
+
+<p class="notice--info">For more information on how routing works in Blazor, <a href="https://docs.microsoft.com/aspnet/core/blazor/fundamentals/routing?view=aspnetcore-3.1">read the Microsoft Docs article</a>.</p>
+
+<h1 id="our-first-shared-component">Our first shared component</h1>
+
+<p>Let’s create our first shared component, called <code class="language-plaintext highlighter-rouge">NotFoundPage.razor</code>. Create that file in the <code class="language-plaintext highlighter-rouge">Shared</code> directory of our project. The <code class="language-plaintext highlighter-rouge">Shared</code> directory is a good place for components we’ll use throughout our app. (In Visual Studio 2019, you can right-click the <code class="language-plaintext highlighter-rouge">Shared</code> directory and select <strong>Add</strong> &gt; <strong>Razor Component</strong>.)</p>
+
+<p>As we’ve said, a component can be really anything—a page, a part of a page, a button, form, whatever—this will be some static HTML, with a button a user can click to go to our home page.</p>
+
+<p>The following markup displays a “Houston, we have a problem” message with a funny picture and a message. If you don’t understand the CSS classes, that’s OK—<a href="https://daveabrock.com/2020/10/26/blast-off-blazor-intro#what-about-css">that’s me tweaking Tailwind CSS</a>.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"flex justify-center"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"max-w-md rounded overflow-hidden shadow-lg m-12"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;h1</span> <span class="na">class=</span><span class="s">"text-4xl m-6"</span><span class="nt">&gt;</span>Houston, we have a problem<span class="nt">&lt;/h1&gt;</span>
+        <span class="nt">&lt;img</span> <span class="na">class=</span><span class="s">"w-full"</span> <span class="na">src=</span><span class="s">"images/we-have-problem.jpg"</span> <span class="nt">/&gt;</span>
+
+        <span class="nt">&lt;p</span> <span class="na">class=</span><span class="s">"m-4"</span><span class="nt">&gt;</span>
+            We couldn't find what you're looking for. Maybe it was a typo,
+            or maybe we did something wrong. Whatever the case, you should probably go somewhere else.
+        <span class="nt">&lt;/p&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</code></pre></div></div>
+
+<p>Now, we can add the button that takes a user back to our home page. We first need to add the logic to do so.</p>
+
+<p>To work with URIs in Blazor, you’ll <a href="https://docs.microsoft.com/dotnet/api/microsoft.aspnetcore.components.navigationmanager?view=aspnetcore-3.1">utilize the <code class="language-plaintext highlighter-rouge">NavigationManager</code> class</a>. We can use the <code class="language-plaintext highlighter-rouge">NavigateTo</code> method.</p>
+
+<p>In the bottom of the file, under all the markup, add a <code class="language-plaintext highlighter-rouge">@code</code> block with the following one-liner:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">@code</span> <span class="p">{</span>
+    <span class="k">void</span> <span class="nf">BackHome</span><span class="p">()</span> <span class="p">=&gt;</span> <span class="n">Navigator</span><span class="p">.</span><span class="nf">NavigateTo</span><span class="p">(</span><span class="s">"/"</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Let’s wire up the button to call this function—our first event! In the <code class="language-plaintext highlighter-rouge">button</code> markup add <code class="language-plaintext highlighter-rouge">@onclick="BackHome"</code>, like so:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;button</span> <span class="na">class=</span><span class="s">"text-center m-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"</span> <span class="err">@</span><span class="na">onclick=</span><span class="s">"BackHome"</span><span class="nt">&gt;</span>
+    🚀 Back to Mission Control
+<span class="nt">&lt;/button&gt;</span>
+</code></pre></div></div>
+
+<p>There are <a href="https://docs.microsoft.com/aspnet/core/blazor/components/event-handling?view=aspnetcore-3.1">so many events to work with</a>—in our case, we’re just calling a function when the button is clicked. Make sure to include the <code class="language-plaintext highlighter-rouge">@</code> as this is an ASP.NET Core directive, and not a JavaScript one. You’ll also notice you’ll just need to pass the method name.</p>
+
+<p>With that done, head back to <code class="language-plaintext highlighter-rouge">App.razor</code> and add our new component to the <code class="language-plaintext highlighter-rouge">NotFound</code> section.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;NotFound&gt;</span>
+    <span class="nt">&lt;LayoutView</span> <span class="na">Layout=</span><span class="s">"@typeof(MainLayout)"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;NotFoundPage</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/LayoutView&gt;</span>
+<span class="nt">&lt;/NotFound&gt;</span>
+</code></pre></div></div>
+
+<p>Now, fire up your app and enter a silly path like <code class="language-plaintext highlighter-rouge">http://localhost:5000/kittykittylicklick</code> and change the <code class="language-plaintext highlighter-rouge">NotFound</code> section to the following.</p>
+
+<p><img src="http://localhost:4001/images/bowb-404.png" alt="Our 404 page" /></p>
+
+<p>With our first component under our belt, let’s discuss testing our component.</p>
+
+<h1 id="test-our-component-with-the-bunit-library">Test our component with the bUnit library</h1>
+
+<p>Thanks to Egil Hansen, we can <a href="https://github.com/egil/bUnit">use the bUnit library</a> to test our Blazor components. You can use bUnit to test everything about your components, no matter the complexity: you can test renders, event handlers, component state, async changes, mocking dependencies, and more.</p>
+
+<p class="notice--info">Check out the <a href="https://bunit.egilhansen.com/docs/getting-started/index.html">bUnit documentation</a> to learn more.</p>
+
+<h2 id="set-up-your-testing-project">Set up your testing project</h2>
+
+<p>First, we’ll need to set up our test project. The quickest way is through the <code class="language-plaintext highlighter-rouge">dotnet</code> CLI, so fire up your terminal and navigate to your project root (where your solution file is).</p>
+
+<p>Perform a one-time task to install the bUnit template. Right now, this is built upon the xUnit testing framework.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dotnet new <span class="nt">--install</span> bunit.template::1.0.0-beta-11
+</code></pre></div></div>
+
+<p>With that installed, create your test project. We’ll call it <code class="language-plaintext highlighter-rouge">Test</code>.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dotnet new bunit <span class="nt">-o</span> Test
+</code></pre></div></div>
+
+<p>Then, add the project to your solution:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dotnet sln ImageOfDay.sln add Test/Test.csproj
+</code></pre></div></div>
+
+<p>Finally, add a reference between the core project and your test project:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dotnet add Test/Test.csproj reference Client/Client.csproj
+</code></pre></div></div>
+
+<p>Head back to Visual Studio. If you refresh the app in Solution Explorer, you should see your <code class="language-plaintext highlighter-rouge">Test</code> project.</p>
+
+<h2 id="write-the-test">Write the test</h2>
+
+<p>We’re now ready to write our first test. Create a new class in our <code class="language-plaintext highlighter-rouge">Test</code> project, called <code class="language-plaintext highlighter-rouge">NotFoundTest.cs</code>.</p>
+
+<p>In our test method, we’ll set up our tests to initialize a <code class="language-plaintext highlighter-rouge">TestContext</code> and render our component in question:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="n">Fact</span><span class="p">]</span>
+<span class="k">public</span> <span class="k">void</span> <span class="nf">NotFoundComponentRendersCorrectly</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">using</span> <span class="nn">var</span> <span class="n">ctx</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">TestContext</span><span class="p">();</span>
+    <span class="kt">var</span> <span class="n">cut</span> <span class="p">=</span> <span class="n">ctx</span><span class="p">.</span><span class="n">RenderComponent</span><span class="p">&lt;</span><span class="n">NotFoundPage</span><span class="p">&gt;();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>I’m not going to test for every HTML character in our component. Let’s make sure the heading and button text is rendered.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// setup code</span>
+<span class="kt">var</span> <span class="n">h1Element</span> <span class="p">=</span> <span class="n">cut</span><span class="p">.</span><span class="nf">Find</span><span class="p">(</span><span class="s">"h1"</span><span class="p">).</span><span class="n">TextContent</span><span class="p">;</span>
+<span class="kt">var</span> <span class="n">buttonElement</span> <span class="p">=</span> <span class="n">cut</span><span class="p">.</span><span class="nf">Find</span><span class="p">(</span><span class="s">"button"</span><span class="p">).</span><span class="n">TextContent</span><span class="p">;</span>
+
+<span class="n">h1Element</span><span class="p">.</span><span class="nf">MarkupMatches</span><span class="p">(</span><span class="s">"Houston, we have a problem"</span><span class="p">);</span>
+<span class="n">buttonElement</span><span class="p">.</span><span class="nf">MarkupMatches</span><span class="p">(</span><span class="s">"🚀 Back to Mission Control"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>We first find the text content of our <code class="language-plaintext highlighter-rouge">h1</code> and <code class="language-plaintext highlighter-rouge">button</code> tags. By <em>text content</em>, I mean the text inside the tags. This allows us to only check for the text and not have to hard code the opening and closing tag and all the CSS classes.</p>
+
+<p>Here’s how our complete test method looks:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="n">Fact</span><span class="p">]</span>
+<span class="k">public</span> <span class="k">void</span> <span class="nf">NotFoundComponentRendersCorrectly</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">using</span> <span class="nn">var</span> <span class="n">ctx</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">TestContext</span><span class="p">();</span>
+    <span class="kt">var</span> <span class="n">cut</span> <span class="p">=</span> <span class="n">ctx</span><span class="p">.</span><span class="n">RenderComponent</span><span class="p">&lt;</span><span class="n">NotFoundPage</span><span class="p">&gt;();</span>
+    <span class="kt">var</span> <span class="n">h1Element</span> <span class="p">=</span> <span class="n">cut</span><span class="p">.</span><span class="nf">Find</span><span class="p">(</span><span class="s">"h1"</span><span class="p">).</span><span class="n">TextContent</span><span class="p">;</span>
+    <span class="kt">var</span> <span class="n">buttonElement</span> <span class="p">=</span> <span class="n">cut</span><span class="p">.</span><span class="nf">Find</span><span class="p">(</span><span class="s">"button"</span><span class="p">).</span><span class="n">TextContent</span><span class="p">;</span>
+
+    <span class="n">h1Element</span><span class="p">.</span><span class="nf">MarkupMatches</span><span class="p">(</span><span class="s">"Houston, we have a problem"</span><span class="p">);</span>
+    <span class="n">buttonElement</span><span class="p">.</span><span class="nf">MarkupMatches</span><span class="p">(</span><span class="s">"🚀 Back to Mission Control"</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The bUnit library works great with existing tooling. Using your favorite method, run your test (like <strong>Test</strong> &gt; <strong>Run All Tests in Visual Studio</strong>), and you’ll see the results in Test Explorer.</p>
+
+<p><img src="http://localhost:4001/images/bowb-test-explorer.png" alt="Our 404 page" /></p>
+
+<p class="notice--warning"><strong>Wondering about testing the button click?</strong> We can test the button click with bUnit, but involves injecting the <code class="language-plaintext highlighter-rouge">NavigationManager</code> from our test class. It’s not documented yet, <a href="https://github.com/egil/bunit/issues/73#issuecomment-597828532">but there is a solution available</a>. Injecting and mocking services is not a light topic, so I’ll reserve that for a future post.</p>
+
+<h1 id="wrap-up">Wrap up</h1>
+
+<p>In this post, we got our feet wet with our first component—a 404 page. We understood how routing works by understanding the <code class="language-plaintext highlighter-rouge">App.razor</code> file, created a <code class="language-plaintext highlighter-rouge">NotFoundPage</code> component, and introduced event handling with a button click. We then tested our new component with the bUnit Blazor component testing library.</p>
+
+<p>I pushed all code for this post <a href="https://github.com/daveabrock/NASAImageOfDay">to the GitHub repository</a>. See you next time!</p>
+

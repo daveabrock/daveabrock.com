@@ -1,0 +1,413 @@
+<p>You don’t have to be <a href="https://eng.uber.com/microservice-architecture/">operating at Uber scale</a> to understand the complexities of microservices and distributed systems. In many ways, even trying to develop a web app and an API or two can give you headaches when trying to build out a decent local development experience.</p>
+
+<p>In the .NET world, you’re defining ports for multiple projects, hardcoding URLs, and generally walking on egg shells in getting your different services to communicate with one another. If even the slightest configuration detail changes, you feel the pain once again. Of course, you could Docker-ize your environment, but that comes with a steep learning curve. This doesn’t even factor for the complexities of deploying a distributed system to something like Kubernetes.</p>
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">If you run Kubernetes in production, you must be incredibly intelligent. <br /><br />That’s not a compliment; it’s a requirement.</p>&mdash; HydroxyCoreyQuinn (@QuinnyPig) <a href="https://twitter.com/QuinnyPig/status/1121462122741940226?ref_src=twsrc%5Etfw">April 25, 2019</a></blockquote>
+<script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>Project Tye, a new-ish (since May) experimental developer tool, <a href="https://devblogs.microsoft.com/aspnet/introducing-project-tye/">wants to lend a hand</a>. Tye wants to both make development of microservices easier and also help to automate the deployment of .NET applications. It’s big on meeting you where you are—offering a convention-based approach to service discovery and dependencies, and make containerizing of .NET applications automatic, all by using a single configuration file.</p>
+
+<p>We’ll be walking through Project Tye in two separate posts. This post will focus on how Tye can help your local development experience. In the next post, we’ll work on deploying to Kubernetes.</p>
+
+<p class="notice--info">Before we get started, make sure you have the <a href="https://dotnet.microsoft.com/download/dotnet-core/3.1">.NET Core 3.1 SDK installed</a>. You won’t get very far if you don’t.</p>
+
+<p>This post covers the following topics.</p>
+
+<ul>
+  <li><a href="#install-tye">Install Tye</a></li>
+  <li><a href="#set-up-our-projects">Set up our projects</a></li>
+  <li><a href="#build-out-a-simple-api">Build out a simple API</a></li>
+  <li><a href="#build-out-web-project">Build out web project</a></li>
+  <li><a href="#adding-a-dependency">Adding a dependency</a>
+    <ul>
+      <li><a href="#using-a-configuration-file">Using a configuration file</a></li>
+      <li><a href="#working-with-redis">Working with Redis</a></li>
+    </ul>
+  </li>
+  <li><a href="#learn-more">Learn more</a></li>
+  <li><a href="#wrapping-up">Wrapping up</a></li>
+</ul>
+
+<p>Now, fire up your terminal and let’s get started!</p>
+
+<h1 id="install-tye">Install Tye</h1>
+
+<p>First, we must install Tye. Tye is a <a href="https://docs.microsoft.com/dotnet/core/tools/global-tools">global .NET tool</a>.</p>
+
+<p>Execute this from your terminal:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dotnet tool <span class="nb">install</span> <span class="nt">-g</span> Microsoft.Tye <span class="nt">--version</span> <span class="s2">"0.4.0-alpha.20371.1"</span>
+</code></pre></div></div>
+
+<p class="notice--warning">Because Tye isn’t stable yet, you need to append <code class="language-plaintext highlighter-rouge">--version</code> to it with your desired version. Depending when you read this, the version above might not be the latest. If you leave off <code class="language-plaintext highlighter-rouge">--version</code> you’ll get a listing of the available current versions.</p>
+
+<h1 id="set-up-our-projects">Set up our projects</h1>
+
+<p>Now, we’ll create two projects under a single solution: a web project and an API project. Create a folder for this (or just do a <code class="language-plaintext highlighter-rouge">mkdir my-project</code> from the terminal).</p>
+
+<p>We’re going to do a quick app that loads some Marvel characters for us. Execute the following from your newly created folder to create our web app, a Razor pages solution:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dotnet new razor <span class="nt">-n</span> marvel-web
+</code></pre></div></div>
+
+<p>And now, without moving folders, create our API project:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dotnet new webapi <span class="nt">-n</span> marvel-api
+</code></pre></div></div>
+
+<p>Let’s add both projects to our solution:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dotnet new sln
+dotnet sln add marvel-web marvel-api
+</code></pre></div></div>
+
+<p>And now, you can run Tye in the same folder as your new solution file:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tye run
+</code></pre></div></div>
+
+<p>There’s a lot going on here. Tye is building your projects, launching your services, and creating a dashboard for you at <code class="language-plaintext highlighter-rouge">http://127.0.0.1:8000</code>. What’s important here: if you do nothing, ASP.NET Core will assign your app’s listening ports randomly, freeing you from the pain of port conflicts.</p>
+
+<p><img src="http://localhost:4001/images/tye-run.png" alt="tye run" /></p>
+
+<p>The main page of the dashboard shows you all your services, your bindings (discoverable URLs), and more.</p>
+
+<p><img src="http://localhost:4001/images/dashboard-high-level.png" alt="tye run" /></p>
+
+<p>If you click the name of a service (like <code class="language-plaintext highlighter-rouge">marvel-web</code>), you can access real-time metrics as it’s running:</p>
+
+<p><img src="http://localhost:4001/images/marvel-web-metrics.png" alt="tye run" /></p>
+
+<p>And, of course, what would a dashboard be without logs?</p>
+
+<p><img src="http://localhost:4001/images/marvel-web-logs.png" alt="tye run" /></p>
+
+<p>Of course, this is cool but not very exciting. Let’s add some code to our apps.</p>
+
+<h1 id="build-out-a-simple-api">Build out a simple API</h1>
+
+<p>Now, open up the <code class="language-plaintext highlighter-rouge">marvel-api</code> project with your favorite editor (like Visual Studio or Visual Studio Code). At the root, rename the <code class="language-plaintext highlighter-rouge">WeatherForecast.cs</code> file to <code class="language-plaintext highlighter-rouge">Character.cs</code> and replace the contents of the file with this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">namespace</span> <span class="nn">marvel_api</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">Character</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">Status</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Then, rename the controller to <code class="language-plaintext highlighter-rouge">CharactersController.cs</code>. In it, we’ll set up 10 Marvel characters. When we go a get, we’ll retrieve five random ones. (In a little bit, we’ll be able to use this to show off our Redis caching integration.)</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Collections.Generic</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Linq</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">Microsoft.AspNetCore.Mvc</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">Microsoft.Extensions.Logging</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">marvel_api.Controllers</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="n">ApiController</span><span class="p">]</span>
+    <span class="p">[</span><span class="nf">Route</span><span class="p">(</span><span class="s">"[controller]"</span><span class="p">)]</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">CharactersController</span> <span class="p">:</span> <span class="n">ControllerBase</span>
+    <span class="p">{</span>
+        <span class="k">private</span> <span class="k">static</span> <span class="k">readonly</span> <span class="n">Character</span><span class="p">[]</span> <span class="n">Characters</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+        <span class="p">{</span>
+            <span class="k">new</span> <span class="nf">Character</span><span class="p">()</span> <span class="p">{</span> 
+                <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Anthony"</span><span class="p">,</span>
+                <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Stark"</span><span class="p">,</span>
+                <span class="n">Status</span> <span class="p">=</span> <span class="s">"Deceased"</span>
+            <span class="p">},</span>
+            <span class="k">new</span> <span class="nf">Character</span><span class="p">()</span>
+            <span class="p">{</span>
+                <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Steven"</span><span class="p">,</span>
+                <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Rogers"</span><span class="p">,</span>
+                <span class="n">Status</span> <span class="p">=</span> <span class="s">"Alive"</span>
+            <span class="p">},</span>
+            <span class="k">new</span> <span class="nf">Character</span><span class="p">()</span>
+            <span class="p">{</span>
+                <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Peter"</span><span class="p">,</span>
+                <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Quill"</span><span class="p">,</span>
+                <span class="n">Status</span> <span class="p">=</span> <span class="s">"Alive"</span>
+            <span class="p">},</span>
+            <span class="k">new</span> <span class="nf">Character</span><span class="p">()</span>
+            <span class="p">{</span>
+                <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Thor"</span><span class="p">,</span>
+                <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Odinson"</span><span class="p">,</span>
+                <span class="n">Status</span> <span class="p">=</span> <span class="s">"Alive"</span>
+            <span class="p">},</span>
+            <span class="k">new</span> <span class="nf">Character</span><span class="p">()</span>
+            <span class="p">{</span>
+                <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Natalia"</span><span class="p">,</span>
+                <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Romanoff"</span><span class="p">,</span>
+                <span class="n">Status</span> <span class="p">=</span> <span class="s">"Deceased"</span>
+            <span class="p">},</span>
+            <span class="k">new</span> <span class="nf">Character</span><span class="p">()</span>
+            <span class="p">{</span>
+                <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"T'Challa"</span><span class="p">,</span>
+                <span class="n">LastName</span> <span class="p">=</span> <span class="k">null</span><span class="p">,</span>
+                <span class="n">Status</span> <span class="p">=</span> <span class="s">"Alive"</span>
+            <span class="p">},</span>
+            <span class="k">new</span> <span class="nf">Character</span><span class="p">()</span>
+            <span class="p">{</span>
+                <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Bruce"</span><span class="p">,</span>
+                <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Banner"</span><span class="p">,</span>
+                <span class="n">Status</span> <span class="p">=</span> <span class="s">"Alive"</span>
+            <span class="p">},</span>
+            <span class="k">new</span> <span class="nf">Character</span><span class="p">()</span>
+            <span class="p">{</span>
+                <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Scott"</span><span class="p">,</span>
+                <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Lang"</span><span class="p">,</span>
+                <span class="n">Status</span> <span class="p">=</span> <span class="s">"Alive"</span>
+            <span class="p">},</span>
+            <span class="k">new</span> <span class="nf">Character</span><span class="p">()</span>
+            <span class="p">{</span>
+                <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Phillip"</span><span class="p">,</span>
+                <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Coulson"</span><span class="p">,</span>
+                <span class="n">Status</span> <span class="p">=</span> <span class="s">"Deceased"</span>
+            <span class="p">},</span>
+            <span class="k">new</span> <span class="nf">Character</span><span class="p">()</span>
+            <span class="p">{</span>
+                <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"Nick"</span><span class="p">,</span>
+                <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Fury"</span><span class="p">,</span>
+                <span class="n">Status</span> <span class="p">=</span> <span class="s">"Alive"</span>
+            <span class="p">}</span>
+        <span class="p">};</span>
+
+        <span class="k">private</span> <span class="k">readonly</span> <span class="n">ILogger</span><span class="p">&lt;</span><span class="n">CharactersController</span><span class="p">&gt;</span> <span class="n">_logger</span><span class="p">;</span>
+
+        <span class="k">public</span> <span class="nf">CharactersController</span><span class="p">(</span><span class="n">ILogger</span><span class="p">&lt;</span><span class="n">CharactersController</span><span class="p">&gt;</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">_logger</span> <span class="p">=</span> <span class="n">logger</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="p">[</span><span class="n">HttpGet</span><span class="p">]</span>
+        <span class="k">public</span> <span class="n">IEnumerable</span><span class="p">&lt;</span><span class="n">Character</span><span class="p">&gt;</span> <span class="nf">Get</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="kt">var</span> <span class="n">rand</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Random</span><span class="p">();</span>
+            <span class="k">return</span> <span class="n">Characters</span><span class="p">.</span><span class="nf">OrderBy</span><span class="p">(</span><span class="n">x</span> <span class="p">=&gt;</span> <span class="n">rand</span><span class="p">.</span><span class="nf">Next</span><span class="p">()).</span><span class="nf">Take</span><span class="p">(</span><span class="m">5</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>That should be all we need for the API for the time being. Now, let’s open the <code class="language-plaintext highlighter-rouge">marvel-web</code> project.</p>
+
+<h1 id="build-out-web-project">Build out web project</h1>
+
+<p>In this project, also add a <code class="language-plaintext highlighter-rouge">Character</code> class (or you could always create a shared project, as it’s identical between the API and web projects):</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">namespace</span> <span class="nn">marvel_web</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">Character</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">Status</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Then, create a <code class="language-plaintext highlighter-rouge">CharacterClient.cs</code> class that calls our API.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System.Collections.Generic</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Net.Http</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Text.Json</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Threading.Tasks</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">marvel_web</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">CharacterClient</span>
+    <span class="p">{</span>
+        <span class="k">private</span> <span class="k">readonly</span> <span class="n">HttpClient</span> <span class="n">_client</span><span class="p">;</span>
+
+        <span class="k">public</span> <span class="nf">CharacterClient</span><span class="p">(</span><span class="n">HttpClient</span> <span class="n">client</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">_client</span> <span class="p">=</span> <span class="n">client</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">public</span> <span class="k">async</span> <span class="n">Task</span><span class="p">&lt;</span><span class="n">List</span><span class="p">&lt;</span><span class="n">Character</span><span class="p">&gt;&gt;</span> <span class="nf">GetCharactersAsync</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="kt">var</span> <span class="n">response</span> <span class="p">=</span> <span class="k">await</span> <span class="n">_client</span><span class="p">.</span><span class="nf">GetAsync</span><span class="p">(</span><span class="s">"/characters"</span><span class="p">);</span>
+            <span class="kt">var</span> <span class="n">stream</span> <span class="p">=</span> <span class="k">await</span> <span class="n">response</span><span class="p">.</span><span class="n">Content</span><span class="p">.</span><span class="nf">ReadAsStreamAsync</span><span class="p">();</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="n">JsonSerializer</span><span class="p">.</span><span class="n">DeserializeAsync</span><span class="p">&lt;</span><span class="n">List</span><span class="p">&lt;</span><span class="n">Character</span><span class="p">&gt;&gt;(</span><span class="n">stream</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>In the Index page model, at <code class="language-plaintext highlighter-rouge">Index.cshtml.cs</code>, add a <code class="language-plaintext highlighter-rouge">Characters</code> property and change <code class="language-plaintext highlighter-rouge">OnGet</code> to call the client we created:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System.Collections.Generic</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Threading.Tasks</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">Microsoft.AspNetCore.Mvc</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">Microsoft.AspNetCore.Mvc.RazorPages</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">Microsoft.Extensions.Logging</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">marvel_web.Pages</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">IndexModel</span> <span class="p">:</span> <span class="n">PageModel</span>
+    <span class="p">{</span>
+        <span class="k">private</span> <span class="k">readonly</span> <span class="n">ILogger</span><span class="p">&lt;</span><span class="n">IndexModel</span><span class="p">&gt;</span> <span class="n">_logger</span><span class="p">;</span>
+
+        <span class="k">public</span> <span class="nf">IndexModel</span><span class="p">(</span><span class="n">ILogger</span><span class="p">&lt;</span><span class="n">IndexModel</span><span class="p">&gt;</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">_logger</span> <span class="p">=</span> <span class="n">logger</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">public</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">Character</span><span class="p">&gt;</span> <span class="n">Characters</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+
+        <span class="k">public</span> <span class="k">async</span> <span class="n">Task</span> <span class="nf">OnGet</span><span class="p">([</span><span class="n">FromServices</span><span class="p">]</span> <span class="n">CharacterClient</span> <span class="n">client</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">Characters</span> <span class="p">=</span> <span class="k">await</span> <span class="n">client</span><span class="p">.</span><span class="nf">GetCharactersAsync</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Next, open <code class="language-plaintext highlighter-rouge">Index.cshtml</code> to lay out our table:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@page
+@model IndexModel
+
+<span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"text-center"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;h1</span> <span class="na">class=</span><span class="s">"display-4"</span><span class="nt">&gt;</span>Random Marvel Characters<span class="nt">&lt;/h1&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+
+<span class="nt">&lt;table</span> <span class="na">class=</span><span class="s">"table"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;thead&gt;</span>
+        <span class="nt">&lt;tr&gt;</span>
+            <span class="nt">&lt;th&gt;</span>First Name<span class="nt">&lt;/th&gt;</span>
+            <span class="nt">&lt;th&gt;</span>Last Name<span class="nt">&lt;/th&gt;</span>
+            <span class="nt">&lt;th&gt;</span>Status<span class="nt">&lt;/th&gt;</span>
+        <span class="nt">&lt;/tr&gt;</span>
+    <span class="nt">&lt;/thead&gt;</span>
+    <span class="nt">&lt;tbody&gt;</span>
+        @foreach (var character in @Model.Characters)
+        {
+            <span class="nt">&lt;tr&gt;</span>
+                <span class="nt">&lt;td&gt;</span>@character.FirstName<span class="nt">&lt;/td&gt;</span>
+                <span class="nt">&lt;td&gt;</span>@character.LastName<span class="nt">&lt;/td&gt;</span>
+                <span class="nt">&lt;td&gt;</span>@character.Status<span class="nt">&lt;/td&gt;</span>
+            <span class="nt">&lt;/tr&gt;</span>
+        }
+    <span class="nt">&lt;/tbody&gt;</span>
+<span class="nt">&lt;/table&gt;</span>
+</code></pre></div></div>
+
+<p>You might be thinking: <em>OK, how does my web app communicate with my API</em>?</p>
+
+<p>That magic will be done through the <code class="language-plaintext highlighter-rouge">Microsoft.Tye.Extensions.Configuration</code> NuGet package, that you can install from either the <code class="language-plaintext highlighter-rouge">dotnet</code> CLI or the NuGet Package Manager in Visual Studio itself. You may already be familiar with the <code class="language-plaintext highlighter-rouge">Microsoft.Extensions.Configuration</code> system that ships with any ASP.NET Core project. The Tye package provides Tye-specific extension methods on top of <code class="language-plaintext highlighter-rouge">Microsoft.Extensions.Configuration</code>.</p>
+
+<p>Open up <code class="language-plaintext highlighter-rouge">Startup.cs</code> and change <code class="language-plaintext highlighter-rouge">ConfigureServices</code> to this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">void</span> <span class="nf">ConfigureServices</span><span class="p">(</span><span class="n">IServiceCollection</span> <span class="n">services</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">services</span><span class="p">.</span><span class="nf">AddRazorPages</span><span class="p">();</span>
+
+    <span class="n">services</span><span class="p">.</span><span class="n">AddHttpClient</span><span class="p">&lt;</span><span class="n">CharacterClient</span><span class="p">&gt;(</span><span class="n">client</span> <span class="p">=&gt;</span>
+    <span class="p">{</span>
+        <span class="n">client</span><span class="p">.</span><span class="n">BaseAddress</span> <span class="p">=</span> <span class="n">Configuration</span><span class="p">.</span><span class="nf">GetServiceUri</span><span class="p">(</span><span class="s">"marvel-api"</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This is where the service discovery takes place. (Feel free to <a href="https://github.com/dotnet/tye/blob/master/docs/reference/service_discovery.md">geek out on how Tye does service discovery</a>.) What a world—no port numbers, no brittle configuration. It just works. Execute <code class="language-plaintext highlighter-rouge">tye run</code> now—and go to the web project. (Also, if you click over to the logs, it’s a lot more insightful now.)</p>
+
+<p><img src="http://localhost:4001/images/randos.png" alt="random characters" /></p>
+
+<h1 id="adding-a-dependency">Adding a dependency</h1>
+
+<p>At this point, things are great—we’ve been able to take a better look at code we manage and write. In the real world, that is rarely the case. You use libraries and dependencies you don’t manage—as a matter of fact, the whole point is to have the complexity managed for you, but how can Tye discover these dependencies?</p>
+
+<h2 id="using-a-configuration-file">Using a configuration file</h2>
+
+<p>Now that things are getting a little more involved, it’d be a good time to ask you to run <code class="language-plaintext highlighter-rouge">tye init</code>. When you do this, Tye drops an optional configuration file (<code class="language-plaintext highlighter-rouge">tye.yaml</code>) that allows you to customize your settings. When I did this, Tye populated the file with information about my current setup. (Tye provides <a href="https://github.com/dotnet/tye/blob/master/docs/reference/schema.md">documentation on the schema</a>, as well.)</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># tye application configuration file</span>
+<span class="c1"># read all about it at https://github.com/dotnet/tye</span>
+<span class="c1">#</span>
+<span class="c1"># when you've given us a try, we'd love to know what you think:</span>
+<span class="c1">#    https://aka.ms/AA7q20u</span>
+<span class="c1">#</span>
+<span class="na">name</span><span class="pi">:</span> <span class="s">marvel-tye</span>
+<span class="na">services</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">marvel-web</span>
+  <span class="na">project</span><span class="pi">:</span> <span class="s">marvel-web/marvel-web.csproj</span>
+<span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">marvel-api</span>
+  <span class="na">project</span><span class="pi">:</span> <span class="s">marvel-api/marvel-api.csproj</span>
+</code></pre></div></div>
+
+<h2 id="working-with-redis">Working with Redis</h2>
+
+<p>To see how Tye works with external dependencies, we’ll add a Redis cache (thanks <a href="https://devblogs.microsoft.com/aspnet/introducing-project-tye/">to the announcement</a> for the inspiration). First, we’ll refactor our API’s <code class="language-plaintext highlighter-rouge">Get</code> method to use our <code class="language-plaintext highlighter-rouge">IDistributedCache</code> interface.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//using Microsoft.Extensions.Caching.Distributed;</span>
+<span class="c1">//using System.Text.Json;</span>
+
+<span class="p">[</span><span class="n">HttpGet</span><span class="p">]</span>
+<span class="k">public</span> <span class="k">async</span> <span class="n">Task</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;</span> <span class="nf">Get</span><span class="p">([</span><span class="n">FromServices</span><span class="p">]</span><span class="n">IDistributedCache</span> <span class="n">cache</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">var</span> <span class="n">characters</span> <span class="p">=</span> <span class="k">await</span> <span class="n">cache</span><span class="p">.</span><span class="nf">GetStringAsync</span><span class="p">(</span><span class="s">"characters"</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">characters</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">rand</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Random</span><span class="p">();</span>
+        <span class="kt">var</span> <span class="n">randomCharacters</span> <span class="p">=</span> <span class="n">Characters</span><span class="p">.</span><span class="nf">OrderBy</span><span class="p">(</span><span class="n">x</span> <span class="p">=&gt;</span> <span class="n">rand</span><span class="p">.</span><span class="nf">Next</span><span class="p">()).</span><span class="nf">Take</span><span class="p">(</span><span class="m">5</span><span class="p">);</span>
+
+        <span class="n">characters</span> <span class="p">=</span> <span class="n">JsonSerializer</span><span class="p">.</span><span class="nf">Serialize</span><span class="p">(</span><span class="n">randomCharacters</span><span class="p">);</span>
+
+        <span class="k">await</span> <span class="n">cache</span><span class="p">.</span><span class="nf">SetStringAsync</span><span class="p">(</span><span class="s">"characters"</span><span class="p">,</span> <span class="n">characters</span><span class="p">,</span> <span class="k">new</span> <span class="n">DistributedCacheEntryOptions</span>
+        <span class="p">{</span>
+            <span class="n">AbsoluteExpirationRelativeToNow</span> <span class="p">=</span> <span class="n">TimeSpan</span><span class="p">.</span><span class="nf">FromSeconds</span><span class="p">(</span><span class="m">3</span><span class="p">)</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">characters</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>For our API to use the <code class="language-plaintext highlighter-rouge">IDistributedCache</code>, we need to inject it in our <code class="language-plaintext highlighter-rouge">Startup</code> class in our API. After you fetch the <code class="language-plaintext highlighter-rouge">Microsoft.Extensions.Caching.StackExchangeRedis</code> NuGet package, do this in <code class="language-plaintext highlighter-rouge">Startup.cs</code>:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">void</span> <span class="nf">ConfigureServices</span><span class="p">(</span><span class="n">IServiceCollection</span> <span class="n">services</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">services</span><span class="p">.</span><span class="nf">AddControllers</span><span class="p">();</span>
+
+    <span class="n">services</span><span class="p">.</span><span class="nf">AddStackExchangeRedisCache</span><span class="p">(</span><span class="n">options</span> <span class="p">=&gt;</span>
+    <span class="p">{</span>
+      <span class="n">options</span><span class="p">.</span><span class="n">Configuration</span> <span class="p">=</span> <span class="n">Configuration</span><span class="p">.</span><span class="nf">GetConnectionString</span><span class="p">(</span><span class="s">"redis"</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Again, admire the beauty of no port hardcoding. Instead, the Tye host binds <code class="language-plaintext highlighter-rouge">redis</code> to the configuration string for our <code class="language-plaintext highlighter-rouge">redis</code> service. Next, let’s update our new configuration file to use redis. As in the announcement, we can add a <code class="language-plaintext highlighter-rouge">redis-cli</code> service to monitor redis traffic.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">name</span><span class="pi">:</span> <span class="s">marvel-tye</span>
+<span class="na">services</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">marvel-web</span>
+  <span class="na">project</span><span class="pi">:</span> <span class="s">marvel-web/marvel-web.csproj</span>
+<span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">marvel-api</span>
+  <span class="na">project</span><span class="pi">:</span> <span class="s">marvel-api/marvel-api.csproj</span>
+<span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">redis</span>
+  <span class="na">image</span><span class="pi">:</span> <span class="s">redis</span>
+  <span class="na">bindings</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">6379</span>
+    <span class="na">connectionString</span><span class="pi">:</span> <span class="s2">"</span><span class="s">${host}:${port}"</span>
+<span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">redis-cli</span>
+  <span class="na">image</span><span class="pi">:</span> <span class="s">redis</span>
+  <span class="na">args</span><span class="pi">:</span> <span class="s2">"</span><span class="s">redis-cli</span><span class="nv"> </span><span class="s">-h</span><span class="nv"> </span><span class="s">redis</span><span class="nv"> </span><span class="s">MONITOR"</span>
+</code></pre></div></div>
+
+<p>Now, if you do a <code class="language-plaintext highlighter-rouge">tye run</code>, pull up the dashboard and note the addition of our redis components. If you go to the web project, we should see new randomized characters every three seconds.</p>
+
+<h1 id="learn-more">Learn more</h1>
+
+<p>There are so many possibilities with Tye—<a href="https://github.com/dotnet/tye">head on over to the GitHub repository</a> to learn more. There’s tons of samples there to get you started, including apps with Angular, MongoDB, nginx, Azure Functions, and much more. And if it’s missing something, let me team know using a GitHub issue or the feedback button in the Tye dashboard.</p>
+
+<h1 id="wrapping-up">Wrapping up</h1>
+
+<p>In this post, we introduced Project Tye and talked about how it can improve your experience when building .NET distributed applications. We installed Tye, toured the dashboard, and built out a simple web and API project. We showed how easy service discovery is with Tye, and also added a dependency.</p>
+
+<p>In the next post, we’ll talk about how Tye can assist you with deploying our app to Kubernetes. Stay tuned!</p>

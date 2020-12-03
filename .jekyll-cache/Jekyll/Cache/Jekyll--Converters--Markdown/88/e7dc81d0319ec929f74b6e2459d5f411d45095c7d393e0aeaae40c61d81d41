@@ -1,0 +1,177 @@
+I"NI<p class="notice--success"><strong>Note</strong>: Originally published five months before the official release of C# 9, I’ve updated this post after the release to capture the latest updates.</p>
+
+<p>This is a humbling yet completely accurate fact: you spend much more time reading code than writing it. Any experienced programmer will tell you the reading-to-writing ratio is easily 5-to-1 or even 10-to-1. You’re understanding how things work. You’re hunting for bugs. You’re scrolling past code with thoughts like, “<em>Nope, doesn’t apply … doesn’t matter, doesn’t matter …</em>” until you have to pause and think, and spend a silly amount of time trying to understand how something works.</p>
+
+<p>It could be a developer trying to be clever, or an unfortunate function with an <a href="http://wiki.c2.com/?ArrowAntiPattern">arrow-shaped pattern</a> … you know, a variety of things. Whatever the case, it interrupts your flow. When you think how much time you spend reviewing code, it adds up and can turn into a big annoyance.</p>
+
+<p>For example, let’s say you’re trying to figure out a bug and you come across this C# 8 code.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="p">(!(</span><span class="n">dave</span> <span class="k">is</span> <span class="n">Developer</span><span class="p">))</span>  
+</code></pre></div></div>
+
+<p>This is getting a little ridiculous. Nobody has time for this negation logic and double parentheses. Best case, it interrupts your flow and mental model. Worst case, you scan it and misunderstand it. I might sound crazy, I get it - this may have only taken an extra few seconds. But for a large application, hundreds of times a day? You see what I mean? Why couldn’t I do something like this?</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="p">(</span><span class="n">dave</span> <span class="k">is</span> <span class="n">not</span> <span class="n">Developer</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>See? I completely understand this: I can keep scrolling or stop and know I’ve found my bug. <em>If only I could do this</em>, you think.</p>
+
+<p>If you aren’t aware, <em>you can</em>. This syntax, and other improvements, are available in the <a href="https://devblogs.microsoft.com/dotnet/c-9-0-on-the-record/">C# 9 release</a>, released with .NET 5 in November 2020. C# 9 has a lot, but this post is going to focus on improvements that help restore valuable mental energy that is required in a mentally exhausting profession. And before you ask: no, C# 9 isn’t full of FDA-approved health benefits, but I’ve found some great stuff that helps make code cleaner, more maintainable, and easier to understand, and prevents a lot of “wait, what?” moments.</p>
+
+<p>Let’s take a look at what’s coming. This is just scratching the surface, and I’ll write about more features in-depth as I come across them. I think you’ll find the more you dive into C# 9, the more you appreciate its adoption of the <a href="https://en.wikipedia.org/wiki/Functional_programming">functional programming</a>, “no side effects” model.</p>
+
+<p>This post covers the following topics.</p>
+
+<ul>
+  <li><a href="#records">Records</a>
+    <ul>
+      <li><a href="#data-member-simplification">Data member simplification</a></li>
+      <li><a href="#with-expressions">With-expressions</a></li>
+    </ul>
+  </li>
+  <li><a href="#top-level-programs">Top-level programs</a></li>
+  <li><a href="#logical-patterns">Logical patterns</a></li>
+  <li><a href="#new-expressions-for-target-types">New expressions for target types</a></li>
+  <li><a href="#playing-with-the-c-9-preview-bits">Playing with the C# 9 preview bits</a></li>
+</ul>
+
+<h1 id="records">Records</h1>
+
+<p>One of the biggest features coming out of C# 9 is the concept of records. Records allow an entire object to be immutable, meaning you can do value-like things on them. Think data, not objects.</p>
+
+<p>Let’s take a <code class="language-plaintext highlighter-rouge">Developer</code> record:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="n">record</span> <span class="n">Developer</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">PreferredLanguage</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="n">init</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Wait, what is <code class="language-plaintext highlighter-rouge">init</code> doing there? That is an init-only property, also new to C# 9. Before this, your properties needed to be mutable for them to be initialized. With <code class="language-plaintext highlighter-rouge">init</code> accessors, it’s like <code class="language-plaintext highlighter-rouge">set</code> except it can only be called during object initialization.</p>
+
+<p>Anyway, our record now gives us access to some other cool stuff that makes for some clean code.</p>
+
+<h2 id="data-member-simplification">Data member simplification</h2>
+
+<p>If we initialize our objects using constructors like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">dev</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Developer</span><span class="p">(</span><span class="s">"Dave"</span><span class="p">,</span> <span class="s">"Brock"</span><span class="p">,</span> <span class="s">"C#"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>…we can declare a record this way instead:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="n">record</span> <span class="nf">Developer</span><span class="p">(</span><span class="kt">string</span> <span class="n">FirstName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">LastName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">PreferredLanguage</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h2 id="with-expressions">With-expressions</h2>
+
+<p>Much of your data is immutable, so if you wanted to create a new object with much, but not all, of the same data, you <del>would do something like this (your use cases would be much more complicated, hopefully)</del> are probably used to doing something like this in regular C# 8 with classes.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+
+<span class="kt">var</span> <span class="n">developer1</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Developer</span>
+<span class="p">{</span>
+    <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"David"</span><span class="p">,</span>
+    <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Brock"</span><span class="p">,</span>
+    <span class="n">PreferredLanguage</span> <span class="p">=</span> <span class="s">"C#"</span>
+<span class="p">};</span>
+
+<span class="c1">// ...</span>
+<span class="kt">var</span> <span class="n">developer2</span> <span class="p">=</span> <span class="n">developer1</span><span class="p">;</span>
+<span class="n">developer2</span><span class="p">.</span><span class="n">LastName</span> <span class="p">=</span> <span class="s">"Pine"</span><span class="p">;</span>
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">developer2</span><span class="p">.</span><span class="n">FirstName</span><span class="p">);</span> <span class="c1">// David</span>
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">developer2</span><span class="p">.</span><span class="n">LastName</span><span class="p">);</span> <span class="c1">// Pine</span>
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">developer2</span><span class="p">.</span><span class="n">PreferredLanguage</span><span class="p">);</span> <span class="c1">// C#</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">Developer</span><span class="p">(</span><span class="kt">string</span> <span class="n">FirstName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">LastName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">PreferredLanguage</span><span class="p">);</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">PreferredLanguage</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>In C# 9, try a <code class="language-plaintext highlighter-rouge">with</code> expression instead, with your records:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+
+<span class="kt">var</span> <span class="n">developer1</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Developer</span>
+<span class="p">{</span>
+    <span class="n">FirstName</span> <span class="p">=</span> <span class="s">"David"</span><span class="p">,</span>
+    <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Brock"</span><span class="p">,</span>
+    <span class="n">PreferredLanguage</span> <span class="p">=</span> <span class="s">"C#"</span>
+<span class="p">};</span>
+  
+<span class="kt">var</span> <span class="n">developer2</span> <span class="p">=</span> <span class="n">developer1</span> <span class="n">with</span> <span class="p">{</span> <span class="n">LastName</span> <span class="p">=</span> <span class="s">"Pine"</span> <span class="p">};</span>
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">developer2</span><span class="p">.</span><span class="n">FirstName</span><span class="p">);</span> <span class="c1">// David</span>
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">developer2</span><span class="p">.</span><span class="n">LastName</span><span class="p">);</span> <span class="c1">// Pine</span>
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="n">developer2</span><span class="p">.</span><span class="n">PreferredLanguage</span><span class="p">);</span> <span class="c1">// C#</span>
+
+<span class="k">public</span> <span class="n">record</span> <span class="n">Developer</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">FirstName</span><span class="p">;</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">LastName</span><span class="p">;</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">PreferredLanguage</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>You can even specify multiple properties to just include what you need changed.</p>
+
+<p>This C# 9 example above is actually an example of a top-level program! Speaking of which…</p>
+
+<h1 id="top-level-programs">Top-level programs</h1>
+
+<p>This is my favorite, even if I don’t write a lot of console applications. Inside your <code class="language-plaintext highlighter-rouge">Main</code> method you would typically see:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">MyProgram</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">Main</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"Hello, Wisconsin!"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>No more of this silly boilerplate code! After your <code class="language-plaintext highlighter-rouge">using</code> statements, do this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+
+<span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"Hello, Wisconsin!"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>This will need to follow the <a href="https://highlander.fandom.com/wiki/There_can_be_only_one#:~:text=There%20can%20be%20only%20one,one%22%20shall%20receive%20The%20Prize.">Highlander rule</a> - there can only be one - but the same argument applies to the <code class="language-plaintext highlighter-rouge">Main()</code> entry method in your console applications today.</p>
+
+<h1 id="logical-patterns">Logical patterns</h1>
+
+<p>OK, moving on from records (for now). With the <code class="language-plaintext highlighter-rouge">is not</code> pattern we used to kick off this post, we showcased some logical pattern improvements. You can officially combine any operators with <code class="language-plaintext highlighter-rouge">and</code>, <code class="language-plaintext highlighter-rouge">or</code>, and <code class="language-plaintext highlighter-rouge">not</code>.</p>
+
+<p>A great use case would be for every developer’s battle: null checking. For example, you can easier code against <code class="language-plaintext highlighter-rouge">null</code>, or in this case, <code class="language-plaintext highlighter-rouge">not null</code>:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">not</span> <span class="k">null</span> <span class="p">=&gt;</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentException</span><span class="p">(</span><span class="s">$"Not sure what this is: </span><span class="p">{</span><span class="n">yourArgument</span><span class="p">}</span><span class="s">"</span><span class="p">,</span> <span class="k">nameof</span><span class="p">(</span><span class="n">yourArgument</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h1 id="new-expressions-for-target-types">New expressions for target types</h1>
+
+<p>Let’s say I had a <code class="language-plaintext highlighter-rouge">Developer</code> type that takes in a first and last name from a constructor. To create the object, I’d do something like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Developer</span> <span class="n">dave</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Developer</span><span class="p">(</span><span class="s">"Dave"</span><span class="p">,</span> <span class="s">"Brock"</span><span class="p">,</span> <span class="s">"C#"</span><span class="p">);</span>
+<span class="kt">var</span> <span class="n">dave</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Developer</span><span class="p">(</span><span class="s">"Dave"</span><span class="p">,</span> <span class="s">"Brock"</span><span class="p">,</span> <span class="s">"C#"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>With C# 9, you can leave out the type.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Developer</span> <span class="n">dave</span> <span class="p">=</span> <span class="k">new</span> <span class="p">(</span><span class="s">"Dave"</span><span class="p">,</span> <span class="s">"Brock"</span><span class="p">,</span> <span class="s">"C#"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h1 id="playing-with-the-c-9-preview-bits">Playing with the C# 9 preview bits</h1>
+
+<p>Are you reading this before the C# 9 release in November 2020? If you want to play with the C# 9 bits, some good news: you can use <a href="https://www.linqpad.net/">the LinqPad tool</a> to do so with a click of a checkbox - no install required!</p>
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Play with the latest experimental C# 9 features in LINQPad, including records and init-only properties. Just click a checkbox; no install required! <a href="https://t.co/VbXTMdhfgl">https://t.co/VbXTMdhfgl</a> <a href="https://t.co/Jw3UEgwXyB">pic.twitter.com/Jw3UEgwXyB</a></p>&mdash; LINQPad·Joe Albahari (@linqpad) <a href="https://twitter.com/linqpad/status/1273191238087225345?ref_src=twsrc%5Etfw">June 17, 2020</a></blockquote>
+<script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+:ET

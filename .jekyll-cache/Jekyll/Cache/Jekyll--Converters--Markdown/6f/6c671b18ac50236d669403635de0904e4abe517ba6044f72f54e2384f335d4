@@ -1,0 +1,283 @@
+I"�f<p>So far in this series, we introduced <code class="language-plaintext highlighter-rouge">Microsoft.FeatureManagement</code> as a way to <a href="https://daveabrock.com/2020/05/24/introducing-feature-management-copy">manage feature flag functionality in your .NET applications</a> and used the <code class="language-plaintext highlighter-rouge">Microsoft.FeatureManagement.AspNetCore</code> library to <a href="https://daveabrock.com/2020/05/30/introducing-feature-management-aspnetcore.html">conditionally filter HTML components and apply filters across controller action methods and classes</a>.</p>
+
+<p>These examples are great to show off how to get started with native feature flags, but you might be wondering if you can do something more powerful than simply checking booleans. And, you can! Using feature filters you can use three feature filters provided out of the box, and can also write your own.</p>
+
+<p>In this post, I’ll show you how to:</p>
+
+<ul>
+  <li>Use the <code class="language-plaintext highlighter-rouge">TimeWindowFilter</code> to conditionally show a feature based on a time range</li>
+  <li>Write a custom filter to detect a user’s browser to partially roll out a feature</li>
+</ul>
+
+<p>This is part 3 in a four-part series on .NET native feature flags:</p>
+
+<ul>
+  <li>Part 1: <a href="https://daveabrock.com/2020/05/24/introducing-feature-management-copy">Introducing the <code class="language-plaintext highlighter-rouge">Microsoft.FeatureManagement</code> library</a></li>
+  <li>Part 2: <a href="https://daveabrock.com/2020/05/30/introducing-feature-management-aspnetcore">Use Microsoft.FeatureManagement.AspNetCore to filter actions and HTML</a></li>
+  <li>Part 3, this post: Implement custom filters in your ASP.NET Core feature flags</li>
+  <li>Part 4: <a href="https://daveabrock.com/2020/06/17/use-feature-flags-azure-app-config">Manage feature flags with Azure App Configuration</a></li>
+</ul>
+
+<p>This post contains the following content.</p>
+
+<ul>
+  <li><a href="#implement-ifeaturefilter-using-provided-filters">Implement IFeatureFilter using provided filters</a>
+    <ul>
+      <li><a href="#implement-timewindowfilter">Implement TimeWindowFilter</a>
+        <ul>
+          <li><a href="#update-startup-class">Update Startup class</a></li>
+          <li><a href="#update-featureflagscs">Update FeatureFlags.cs</a></li>
+          <li><a href="#add-timewindow-configuration-to-appsettingsjson">Add TimeWindow configuration to appsettings.json</a></li>
+          <li><a href="#update-the-m-the-c-and-the-v">Update the M, the C, and the V</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#write-a-custom-filter">Write a custom filter</a>
+    <ul>
+      <li><a href="#parameters-a-second-look">Parameters, a second look</a></li>
+      <li><a href="#creating-your-filter">Creating your filter</a></li>
+      <li><a href="#add-a-flag-check-in-your-view">Add a flag check in your view</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="implement-ifeaturefilter-using-provided-filters">Implement IFeatureFilter using provided filters</h1>
+
+<p>The <code class="language-plaintext highlighter-rouge">Microsoft.FeatureManagement</code> library includes support for the <code class="language-plaintext highlighter-rouge">IFeatureFilter</code> interface, which allows you to define whether criteria is met to enable (or disable) a feature. Included with this interface are three filters you can plug in without custom code:</p>
+
+<ul>
+  <li>PercentageFilter - activate a feature <a href="https://docs.microsoft.com/dotnet/api/microsoft.featuremanagement.featurefilters.percentagefilter?view=azure-dotnet-preview">based on a random percentage</a></li>
+  <li>TargetingFilter - allows you to <a href="https://docs.microsoft.com/dotnet/api/microsoft.featuremanagement.featurefilters.targetingfilter?view=azure-dotnet-preview">activate features for targeted audiences</a></li>
+  <li>TimeWindowFilter - activate a feature <a href="https://docs.microsoft.com/dotnet/api/microsoft.featuremanagement.featurefilters.timewindowfilter?view=azure-dotnet-preview">based on a time window</a></li>
+</ul>
+
+<p>In this example, we’ll be showing off the <code class="language-plaintext highlighter-rouge">TimeWindowFilter</code>. Before getting started, make sure that you have set up our sample app as we did in the <a href="https://daveabrock.com/2020/05/24/introducing-feature-management-copy">first post in this series</a>.</p>
+
+<h2 id="implement-timewindowfilter">Implement TimeWindowFilter</h2>
+
+<p>The <code class="language-plaintext highlighter-rouge">TimeWindowFilter</code> does exactly as its name suggests. You provide a start and end time in your configuration, as <code class="language-plaintext highlighter-rouge">DateTime</code> objects, and if the current date is in the window the feature flag will be activated.</p>
+
+<p>Especially in these times, you might see a scenario where you’d like to have a temporary banner on your page that says something like, <em>Because of unexpected delays, your deliveries might take longer. Thank you for your patience</em>. Let’s set that up.</p>
+
+<h3 id="update-startup-class">Update Startup class</h3>
+
+<p>Previously in the series, you added the following to the <code class="language-plaintext highlighter-rouge">ConfigureServices</code> method in <code class="language-plaintext highlighter-rouge">Startup.cs</code>:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">void</span> <span class="nf">ConfigureServices</span><span class="p">(</span><span class="n">IServiceCollection</span> <span class="n">services</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="c1">//</span>
+  <span class="n">services</span><span class="p">.</span><span class="nf">AddFeatureManagement</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>You’ll need to modify this slightly to implement feature filters. Update the call with <code class="language-plaintext highlighter-rouge">AddFeatureFilter</code> to update the service to use an <code class="language-plaintext highlighter-rouge">IFeatureManagementBuilder</code> instance.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">Microsoft.FeatureManagement</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">Microsoft.FeatureManagement.FeatureFilters</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">void</span> <span class="nf">ConfigureServices</span><span class="p">(</span><span class="n">IServiceCollection</span> <span class="n">services</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="c1">//</span>
+  <span class="n">services</span><span class="p">.</span><span class="nf">AddFeatureManagement</span><span class="p">().</span><span class="n">AddFeatureFilter</span><span class="p">&lt;</span><span class="n">TimeWindowFilter</span><span class="p">&gt;();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="update-featureflagscs">Update FeatureFlags.cs</h3>
+
+<p>As we’ve done throughout this series, you’ll want to update our list of feature flags in our <code class="language-plaintext highlighter-rouge">FeatureFlags.cs</code> to avoid hard-coding strings in our controller:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">FeatureFlags</span>
+<span class="p">{</span>
+  <span class="k">public</span> <span class="k">const</span> <span class="kt">string</span> <span class="n">EmergencyBanner</span> <span class="p">=</span> <span class="s">"EmergencyBanner"</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="add-timewindow-configuration-to-appsettingsjson">Add TimeWindow configuration to appsettings.json</h3>
+
+<p>Under the <code class="language-plaintext highlighter-rouge">FeatureManagement</code> section in your <code class="language-plaintext highlighter-rouge">appsettings.json</code>, you’ll add a section for our <code class="language-plaintext highlighter-rouge">EmergencyBanner</code>.</p>
+
+<p>Underneath the <code class="language-plaintext highlighter-rouge">EmergencyBanner</code> property, define an <code class="language-plaintext highlighter-rouge">EnabledFor</code> array. This array takes elements where, if any are enabled, the flag will be set to true. For each item, you’ll need to specify a <code class="language-plaintext highlighter-rouge">Name</code> value and any <code class="language-plaintext highlighter-rouge">Parameters.</code> The <code class="language-plaintext highlighter-rouge">Parameters</code> object is optional and allows you to pass in any parameter values required by the feature in question.</p>
+
+<p>Here’s what the <code class="language-plaintext highlighter-rouge">FeatureManagement</code> section looks like:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"FeatureManagement"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"EmergencyBanner"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"EnabledFor"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"Name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Microsoft.TimeWindow"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"Parameters"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"Start"</span><span class="p">:</span><span class="w"> </span><span class="s2">"01 Jan 2020 12:00:00 +00:00"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"End"</span><span class="p">:</span><span class="w"> </span><span class="s2">"01 Jul 2020 12:00:00 +00:00"</span><span class="w">
+          </span><span class="p">}</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>If users are viewing this page between January 1 and July 1 of 2020, the feature flag will be activated and the users will see the warning.</p>
+
+<h3 id="update-the-m-the-c-and-the-v">Update the M, the C, and the V</h3>
+
+<p>Don’t worry, the hard part is over. Let’s update our <code class="language-plaintext highlighter-rouge">IndexViewModel.cs</code> to take a boolean:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">namespace</span> <span class="nn">FeatureFlags.Models</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">IndexViewModel</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="kt">bool</span> <span class="n">ShowEmergencyBanner</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now, we can update our controller to update the model value if the feature flag is enabled. In <code class="language-plaintext highlighter-rouge">HomeController.cs</code>, call <code class="language-plaintext highlighter-rouge">IsEnabledAsync</code>. When called, the <code class="language-plaintext highlighter-rouge">IFeatureManager</code> will check our configuration to see if the feature is valid.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">async</span> <span class="n">Task</span><span class="p">&lt;</span><span class="n">IActionResult</span><span class="p">&gt;</span> <span class="nf">Index</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="kt">var</span> <span class="n">indexViewModel</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">IndexViewModel</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="n">ShowEmergencyBanner</span> <span class="p">=</span> <span class="k">await</span> <span class="n">_featureManager</span><span class="p">.</span><span class="nf">IsEnabledAsync</span><span class="p">(</span><span class="n">FeatureFlags</span><span class="p">.</span><span class="n">EmergencyBanner</span><span class="p">)</span>
+  <span class="p">};</span>
+
+  <span class="k">return</span> <span class="nf">View</span><span class="p">(</span><span class="n">indexViewModel</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now, let’s update our <code class="language-plaintext highlighter-rouge">Home/Index.cshtml</code> view to conditionally render the warning.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@model IndexViewModel
+
+<span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"text-center"</span><span class="nt">&gt;</span>
+  @if (Model.ShowEmergencyBanner)
+  {
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"alert alert-warning"</span> <span class="na">role=</span><span class="s">"alert"</span><span class="nt">&gt;</span>
+      Because of unexpected delays, your deliveries might take longer. Thank you for your patience.
+    <span class="nt">&lt;/div&gt;</span>
+   }
+<span class="nt">&lt;/div&gt;</span>
+</code></pre></div></div>
+
+<p>Fire up the app and see your hard work. Good job, you.</p>
+
+<p><img src="http://localhost:4001/images/timewindow.png" alt="After turning on flag" /></p>
+
+<h1 id="write-a-custom-filter">Write a custom filter</h1>
+
+<p>With a handle on how we use the shipped filters, we’re now ready to write our own. Let’s imagine a scenario where you only want a subset of users to access your feature. You could do the <code class="language-plaintext highlighter-rouge">PercentageFilter</code>, but we can also detect a user’s browser and, say, only ship a feature to Chrome users. Let’s give it a shot.</p>
+
+<h2 id="parameters-a-second-look">Parameters, a second look</h2>
+
+<p>When we write our own, we’ll get to see the structure of what you need to specify in <code class="language-plaintext highlighter-rouge">appsettings.json</code>.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">"MyFilter"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"EnabledFor"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"Name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MyFilterName"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"Parameters"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"ParametersArray"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="p">]</span><span class="w">
+          </span><span class="p">}</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>For our specific case, we want to only activate the flag for Chrome users. We’ll specify this as an array underneath <code class="language-plaintext highlighter-rouge">Parameters</code> in <code class="language-plaintext highlighter-rouge">appsettings.json</code>. As such, this is what our new section should look like.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">"BrowserFilter"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+  </span><span class="nl">"EnabledFor"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+  </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"Name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BrowserFilter"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Parameters"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"AllowedBrowsers"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="s2">"Chrome"</span><span class="w"> </span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>You’ll notice that <code class="language-plaintext highlighter-rouge">EnabledFor</code> and the <code class="language-plaintext highlighter-rouge">AllowedBrowsers</code> are both arrays. This means you can specify a set of conditions under <code class="language-plaintext highlighter-rouge">EnabledFor</code> and multiple browsers - we are doing one apiece to keep it simple.</p>
+
+<p>Now, after we update <code class="language-plaintext highlighter-rouge">appsettings.json</code> we will create <code class="language-plaintext highlighter-rouge">BrowserFilterSettings</code> that we’ll use to store the <code class="language-plaintext highlighter-rouge">AllowedBrowsers</code>.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">namespace</span> <span class="nn">FeatureFlags</span>
+<span class="p">{</span>
+  <span class="k">public</span> <span class="k">class</span> <span class="nc">BrowserFilterSettings</span>
+  <span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span><span class="p">[]</span> <span class="n">AllowedBrowsers</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>As we’ve done throughout the series, let’s add a constant to <code class="language-plaintext highlighter-rouge">FeatureFlags.cs</code>:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">const</span> <span class="kt">string</span> <span class="n">BrowserFilter</span> <span class="p">=</span> <span class="s">"BrowserFilter"</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h2 id="creating-your-filter">Creating your filter</h2>
+
+<p>Now we’re ready to write our actual filter - let’s create <code class="language-plaintext highlighter-rouge">BrowserFilter.cs</code>. You’ll need to implement the <code class="language-plaintext highlighter-rouge">IFeatureFilter</code> interface, which requires a single <code class="language-plaintext highlighter-rouge">EvaluateAsync</code> call.</p>
+
+<p>Here’s what our new class looks like. Take a look at the code before I explain what it does.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">Microsoft.AspNetCore.Http</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">Microsoft.Extensions.Configuration</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">Microsoft.FeatureManagement</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Collections.Generic</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Linq</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Threading.Tasks</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">FeatureFlags</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="nf">FilterAlias</span><span class="p">(</span><span class="n">FeatureFlags</span><span class="p">.</span><span class="n">BrowserFilter</span><span class="p">)]</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">BrowserFilter</span> <span class="p">:</span> <span class="n">IFeatureFilter</span>
+    <span class="p">{</span>
+        <span class="k">private</span> <span class="k">readonly</span> <span class="n">IHttpContextAccessor</span> <span class="n">_httpContextAccessor</span><span class="p">;</span>
+        <span class="k">public</span> <span class="nf">BrowserFilter</span><span class="p">(</span><span class="n">IHttpContextAccessor</span> <span class="n">httpContextAccessor</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">_httpContextAccessor</span> <span class="p">=</span> <span class="n">httpContextAccessor</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">public</span> <span class="n">Task</span><span class="p">&lt;</span><span class="kt">bool</span><span class="p">&gt;</span> <span class="nf">EvaluateAsync</span><span class="p">(</span><span class="n">FeatureFilterEvaluationContext</span> <span class="n">context</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="kt">var</span> <span class="n">userAgent</span> <span class="p">=</span> <span class="n">_httpContextAccessor</span><span class="p">.</span><span class="n">HttpContext</span><span class="p">.</span><span class="n">Request</span><span class="p">.</span><span class="n">Headers</span><span class="p">[</span><span class="s">"User-Agent"</span><span class="p">].</span><span class="nf">ToString</span><span class="p">();</span>
+            <span class="kt">var</span> <span class="n">settings</span> <span class="p">=</span> <span class="n">context</span><span class="p">.</span><span class="n">Parameters</span><span class="p">.</span><span class="n">Get</span><span class="p">&lt;</span><span class="n">BrowserFilterSettings</span><span class="p">&gt;();</span>
+            <span class="k">return</span> <span class="n">Task</span><span class="p">.</span><span class="nf">FromResult</span><span class="p">(</span><span class="n">settings</span><span class="p">.</span><span class="n">AllowedBrowsers</span><span class="p">.</span><span class="nf">Any</span><span class="p">(</span><span class="n">userAgent</span><span class="p">.</span><span class="n">Contains</span><span class="p">));</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Looking at the <code class="language-plaintext highlighter-rouge">EvaluateAsync</code> method, you’ll notice:</p>
+
+<ul>
+  <li>We inspect the headers of the HTTP request to get the <code class="language-plaintext highlighter-rouge">User-Agent</code> value, which notes the client browser</li>
+  <li>Then, we get the settings file, <code class="language-plaintext highlighter-rouge">BrowserFilterSettings.cs</code>, to see the allowed browsers, which were pulled by the configuration</li>
+  <li>Returns <code class="language-plaintext highlighter-rouge">true</code> if the <code class="language-plaintext highlighter-rouge">userAgent</code> contains a value in the <code class="language-plaintext highlighter-rouge">AllowedBrowser</code> array</li>
+</ul>
+
+<p>As some housekeeping, we inject an instance of <code class="language-plaintext highlighter-rouge">IHttpContextAccessor</code>, which will need to be added here.</p>
+
+<p>Now, you’ll need to add that and a reference to your new feature filter in <code class="language-plaintext highlighter-rouge">Startup.cs</code>:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">void</span> <span class="nf">ConfigureServices</span><span class="p">(</span><span class="n">IServiceCollection</span> <span class="n">services</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">services</span><span class="p">.</span><span class="nf">AddHttpContextAccessor</span><span class="p">();</span>
+  <span class="n">services</span><span class="p">.</span><span class="nf">AddFeatureManagement</span><span class="p">().</span><span class="n">AddFeatureFilter</span><span class="p">&lt;</span><span class="n">BrowserFilter</span><span class="p">&gt;();</span>
+
+  <span class="n">services</span><span class="p">.</span><span class="nf">AddControllersWithViews</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="add-a-flag-check-in-your-view">Add a flag check in your view</h2>
+
+<p>Now, if you add a check similar to the following, you will see your filter in action!</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;feature</span> <span class="na">name=</span><span class="s">"@FeatureFlags.BrowserFilter"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;div&gt;</span>We are using Chrome.<span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/feature&gt;</span>
+</code></pre></div></div>
+
+<p>Nice work. Check in with us next week, as we’ll help to make this production ready with Azure App Configuration.</p>
+:ET

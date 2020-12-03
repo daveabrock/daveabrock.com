@@ -1,0 +1,13 @@
+I"ÿ<p>If you want to clone a GitHub repository, the most common (and <a href="https://help.github.com/articles/cloning-a-repository/">documented</a>) way is to browse to it and click that green <strong>Clone or download</strong> button. In this case, I am cloning the <a href="https://github.com/dotnet/machinelearning">.NET machine learning project</a>:</p>
+
+<p><img src="http://localhost:4001/images/CloneOrDownload.png" alt="CloneOrDownload" /></p>
+
+<p>Typically, I would copy the Git repository path and clone it in a command line window, like so:</p>
+
+<p><code class="language-plaintext highlighter-rouge">git clone https://github.com/dotnet/machinelearning.git</code></p>
+
+<p>As it turns out, this is a waste of clicks. All you have to do is grab the URL from the address bar of your favorite browser and ignore the <code class="language-plaintext highlighter-rouge">.git</code> extension altogether.</p>
+
+<p>Try this:
+<img src="http://localhost:4001/images/CloneWithoutExtension.png" alt="CloneWithoutExtension" /></p>
+:ET
